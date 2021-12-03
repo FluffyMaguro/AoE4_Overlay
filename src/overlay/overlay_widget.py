@@ -8,14 +8,9 @@ from overlay.helper_func import file_path
 from overlay.settings import settings
 
 
-class PlayerWidget(QtWidgets.QWidget):
+class PlayerWidget:
     """ Player widget shown on the overlay"""
-    def __init__(self):
-        super().__init__()
-        self.hide()
-        playout = QtWidgets.QHBoxLayout()
-        self.setLayout(playout)
-
+    def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
         self.flag = QtWidgets.QLabel()
         self.flag.setFixedSize(QtCore.QSize(60, 30))
         self.name = QtWidgets.QLabel()
@@ -30,9 +25,19 @@ class PlayerWidget(QtWidgets.QWidget):
         self.losses = QtWidgets.QLabel()
         self.losses.setStyleSheet("color: red")
 
-        for item in (self.flag, self.name, self.civ, self.rating, self.rank,
-                     self.winrate, self.wins, self.losses):
-            playout.addWidget(item)
+        for column, widget in enumerate(
+            (self.flag, self.name, self.civ, self.rating, self.rank,
+             self.winrate, self.wins, self.losses)):
+            toplayout.addWidget(widget, row, column)
+
+    def show(self, show: bool = True):
+        """ Shows or hides all widgets in this class """
+        for widget in (self.flag, self.name, self.civ, self.rating, self.rank,
+                       self.winrate, self.wins, self.losses):
+            if show:
+                widget.show()
+            else:
+                widget.hide()
 
     def update_player(self, player_data: Dict[str, Any]):
         self.show()
@@ -87,7 +92,7 @@ class AoEOverlay(QtWidgets.QWidget):
                             | QtCore.Qt.WindowDoesNotAcceptFocus)
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
-        self.playerlayout = QtWidgets.QVBoxLayout()
+        self.playerlayout = QtWidgets.QGridLayout()
         self.playerlayout.setAlignment(QtCore.Qt.AlignRight
                                        | QtCore.Qt.AlignTop)
         self.setLayout(self.playerlayout)
@@ -98,9 +103,8 @@ class AoEOverlay(QtWidgets.QWidget):
         self.playerlayout.addWidget(self.map)
 
         self.players = []
-        for _ in range(8):
-            self.players.append(PlayerWidget())
-            self.playerlayout.addWidget(self.players[-1])
+        for i in range(8):
+            self.players.append(PlayerWidget(i + 1, self.playerlayout))
 
         self.show()
 
@@ -110,7 +114,7 @@ class AoEOverlay(QtWidgets.QWidget):
     def update_data(self, game_data: Dict[str, Any]):
         self.map.setText(map_data.get(game_data['map_type'], "Unknown map"))
 
-        [p.hide() for p in self.players]
+        [p.show(False) for p in self.players]
         for i, player in enumerate(game_data['players']):
             self.players[i].update_player(player)
 
