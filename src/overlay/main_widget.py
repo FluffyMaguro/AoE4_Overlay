@@ -1,11 +1,11 @@
 import webbrowser
 from functools import partial
-import keyboard
 from typing import Any, Dict, Optional
 
+import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.game_checking import API_checker, validate_steam_id
+from overlay.game_checking import API_checker, find_player, validate_steam_id
 from overlay.helper_func import version_check
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
@@ -41,25 +41,28 @@ class MainWidget(QtWidgets.QWidget):
         self.threadpool = QtCore.QThreadPool()
         self.api_checker = API_checker()
         self.force_stop = False
-
         self.overlay_widget = AoEOverlay()
+        self.init_UI()
+        self.start()
 
+    def init_UI(self):
         # Layout
         self.main_layout = QtWidgets.QGridLayout()
         self.main_layout.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(self.main_layout)
 
         # Current steam_id
-        self.current_steam_id = QtWidgets.QLabel("Current steam ID: None")
-        self.current_steam_id.setStyleSheet("font-weight: bold")
-        self.main_layout.addWidget(self.current_steam_id)
+        self.profile_info = QtWidgets.QLabel("Current steam ID: None")
+        self.profile_info.setStyleSheet("font-weight: bold")
+        self.main_layout.addWidget(self.profile_info)
 
         # Edit steam_id
         self.steam_id_edit = QtWidgets.QLineEdit()
         self.steam_id_edit.setPlaceholderText("Your steam ID")
         self.steam_id_edit.setStatusTip(
             'Steam ID can be found in "Account Details" at the top left')
-        self.steam_id_edit.setMaximumWidth(200)
+        self.steam_id_edit.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.steam_id_edit.setMaximumWidth(220)
         self.main_layout.addWidget(self.steam_id_edit, 1, 0)
 
         # Set steam_id
@@ -82,12 +85,66 @@ class MainWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.key_showhide, 3, 1)
         self.key_showhide.key_changed.connect(self.hotkey_changed)
 
+        # Position change button
+        self.btn_change_position = QtWidgets.QPushButton(
+            "Change/fix overlay position")
+        self.btn_change_position.clicked.connect(
+            self.overlay_widget.change_state)
+        self.main_layout.addWidget(self.btn_change_position, 4, 0)
+
+        # Overlay font
+        font_label = QtWidgets.QLabel("Change overlay font")
+        self.main_layout.addWidget(font_label)
+
+        self.font_size_combo = QtWidgets.QComboBox()
+        self.font_size_combo.setStatusTip("Overlay font size")
+        for i in range(1, 50):
+            self.font_size_combo.addItem(f"{i} pt")
+        self.font_size_combo.setCurrentIndex(settings.font_size - 1)
+        self.font_size_combo.currentIndexChanged.connect(
+            self.font_size_changed)
+        self.main_layout.addWidget(self.font_size_combo, 4, 1)
+
+        # Create update button
+        self.update_button = QtWidgets.QPushButton("New update!")
+        self.update_button.setStatusTip(
+            "Click here to download new app version")
+        self.update_button.setStyleSheet(
+            'background-color: #3bb825; color: black')
+        self.update_button.hide()
+        self.main_layout.addWidget(self.update_button, 5, 0)
+
+        # Multi search
+        self.multi_search = QtWidgets.QLineEdit()
+        self.multi_search.setPlaceholderText("Steam ID / profile ID / Name")
+        self.multi_search.setStatusTip(
+            'Search for your account with one option')
+        self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.multi_search.setMaximumWidth(220)
+        self.main_layout.addWidget(self.multi_search, 6, 0)
+
+        # Multi search button
+        self.multi_search_btn = QtWidgets.QPushButton("Search")
+        self.multi_search_btn.clicked.connect(self.find_profile)
+        self.main_layout.addWidget(self.multi_search_btn, 6, 1)
+
+    def find_profile(self):
+        text = self.multi_search.text()
+        find_player(text)
+        print("finding with", text)
+
+    def font_size_changed(self):
+        font_size = self.font_size_combo.currentIndex() + 1
+        settings.font_size = font_size
+        self.overlay_widget.update_font_size(font_size)
+
+    def start(self):
         # Load config and initialize
         if validate_steam_id(settings.steam_id):
             logger.info("steam_id loaded and is valid")
             self.api_checker.steam_id = settings.steam_id
             self.steam_id_edit.setText(str(settings.steam_id))
-            self.update_labels(valid=True, steam_id=settings.steam_id)
+            self.update_profile_info(valid=True, steam_id=settings.steam_id)
 
         # Hotkey
         if settings.overlay_hotkey:
@@ -228,7 +285,7 @@ class MainWidget(QtWidgets.QWidget):
             self.key_showhide.setKeySequence(
                 QtGui.QKeySequence.fromString(None))
             return
-        elif new_hotkey == "" or new_hotkey == settings.overlay_hotkey:
+        elif not new_hotkey or new_hotkey == settings.overlay_hotkey:
             return
 
         logger.info(f"Setting new hotkey to: {new_hotkey}")
@@ -238,7 +295,7 @@ class MainWidget(QtWidgets.QWidget):
         keyboard.add_hotkey(settings.overlay_hotkey,
                             self.overlay_widget.show_hide)
 
-    def stop_check(self):
+    def stop_checking_api(self):
         """ The app is closing, we need to start shuttings things down"""
         self.force_stop = True
         self.api_checker.force_stop = True
@@ -260,14 +317,14 @@ class MainWidget(QtWidgets.QWidget):
         thread_check.signals.result.connect(self.got_new_game)
         self.threadpool.start(thread_check)
 
-    def update_labels(self, valid: bool, steam_id="None"):
+    def update_profile_info(self, valid: bool, steam_id="None"):
         """ Update labels for steam id label"""
-        self.current_steam_id.setText(f"Valid steam ID: {steam_id}")
+        self.profile_info.setText(f"Valid steam ID: {steam_id}")
         if valid:
-            self.current_steam_id.setStyleSheet(
+            self.profile_info.setStyleSheet(
                 "color: #359c20; font-weight: bold")
         else:
-            self.current_steam_id.setStyleSheet("")
+            self.profile_info.setStyleSheet("")
             self.steam_id_edit.setPlaceholderText("Invalid steam ID!")
             self.steam_id_edit.setText("")
 
@@ -277,20 +334,20 @@ class MainWidget(QtWidgets.QWidget):
             steam_id = int(self.steam_id_edit.text())
         except ValueError:
             logger.warning(f"Invalid steam_id: {self.steam_id_edit.text()}")
-            self.update_labels(valid=False)
+            self.update_profile_info(valid=False)
             return
 
         # Validate steam_id
         if not validate_steam_id(steam_id):
             logger.warning(f"Invalid steam ID: {self.steam_id_edit.text()}")
-            self.update_labels(valid=False)
+            self.update_profile_info(valid=False)
             return
 
         # Save to config
         settings.steam_id = steam_id
 
         # Update label
-        self.update_labels(valid=True, steam_id=steam_id)
+        self.update_profile_info(valid=True, steam_id=steam_id)
 
         # Update/run search
         self.api_checker.steam_id = steam_id
@@ -301,11 +358,5 @@ class MainWidget(QtWidgets.QWidget):
         if not link:
             return
         logger.info("New version available!")
-
-        # Create update button
-        update_button = QtWidgets.QPushButton("New update!")
-        update_button.setStatusTip("Click here to download new app version")
-        update_button.setMaximumWidth(100)
-        update_button.clicked.connect(partial(webbrowser.open, link))
-        update_button.setStyleSheet('background-color: #3bb825; color: black')
-        self.main_layout.addWidget(update_button, 2, 0)
+        self.update_button.clicked.connect(partial(webbrowser.open, link))
+        self.update_button.show()

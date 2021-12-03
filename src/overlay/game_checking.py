@@ -6,10 +6,12 @@ https://aoeiv.net/#api
 
 import json
 import time
+from pprint import pprint
 from typing import Any, Dict, Optional
 
 import requests
-from pprint import pprint
+from requests import sessions
+
 from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
@@ -21,6 +23,21 @@ def validate_steam_id(steam_id: Optional[int]) -> bool:
         return False
     url = f"https://aoeiv.net/api/player/matches?game=aoe4&steam_id={steam_id}&count=1"
     return session.get(url).text != "[]"
+
+
+def find_player(text: str):
+    """ Tries to find a player based on a text containing either name, steam_id or profile_id"""
+
+    id = None
+    try:
+        id = int(text)
+        print("probably id")
+
+    except Exception:
+        print("probably name")
+
+    if id is not None:
+        result = validate_steam_id(id)
 
 
 class API_checker:

@@ -17,7 +17,7 @@ class MainApp(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
         self.setWindowIcon(QtGui.QIcon(file_path('src/img/icon.ico')))
-        self.setGeometry(0, 0, 530, 150)
+        self.setGeometry(0, 0, 450, 150)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
                   QtCore.QPoint(int(self.width() / 2), self.height()))
 
@@ -88,9 +88,10 @@ class MainApp(QtWidgets.QMainWindow):
         self.show()
         self.centralWidget().check_for_new_version(VERSION)
 
-    def stop_all(self):
+    def finish(self):
         """ Give it some time to stop everything correctly"""
-        self.centralWidget().stop_check()
+        settings.save()
+        self.centralWidget().stop_checking_api()
         pyqt_wait(1000)
 
 
@@ -98,6 +99,5 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     Main = MainApp()
     exit_event = app.exec_()
-    settings.save()
-    Main.stop_all()
+    Main.finish()
     sys.exit(exit_event)

@@ -1,6 +1,10 @@
 import json
 import os
-from typing import Optional
+from typing import List, Optional
+
+from overlay.logging_func import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_config_folder() -> str:
@@ -10,7 +14,10 @@ def get_config_folder() -> str:
 class _Settings:
     def __init__(self):
         self.steam_id: Optional[int] = None
+        self.profile_id: Optional[int] = None
         self.overlay_hotkey: str = ""
+        self.overlay_geometry: Optional[List[int]] = None
+        self.font_size: int = 12
         self.load()
 
     def load(self):
@@ -20,11 +27,16 @@ class _Settings:
         if not os.path.isfile(config_file):
             return
 
-        with open(config_file, 'r') as f:
-            data = json.loads(f.read())
+        try:
+            with open(config_file, 'r') as f:
+                data = json.loads(f.read())
+        except Exception:
+            logger.warning("Failed to parse config file")
+            return
 
-        self.steam_id = data.get('steam_id', None)
-        self.overlay_hotkey = data.get('overlay_hotkey', "")
+        for key in self.__dict__:
+            if key in data:
+                setattr(self, key, data[key])
 
     def save(self):
         """ Saves configuration to app data"""
@@ -34,11 +46,7 @@ class _Settings:
         config_file = os.path.join(config_folder, "config.json")
 
         with open(config_file, 'w') as f:
-            f.write(
-                json.dumps({
-                    "steam_id": self.steam_id,
-                    "overlay_hotkey": self.overlay_hotkey
-                }))
+            f.write(json.dumps(self.__dict__))
 
 
 settings = _Settings()

@@ -1,10 +1,11 @@
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.aoe4_data import civ_data, map_data
 from overlay.helper_func import file_path
+from overlay.settings import settings
 
 
 class PlayerWidget(QtWidgets.QWidget):
@@ -21,10 +22,13 @@ class PlayerWidget(QtWidgets.QWidget):
         self.name.setStyleSheet("font-weight: bold")
         self.civ = QtWidgets.QLabel()
         self.rating = QtWidgets.QLabel()
+        self.rating.setStyleSheet("color: blue")
         self.rank = QtWidgets.QLabel()
         self.winrate = QtWidgets.QLabel()
         self.wins = QtWidgets.QLabel()
+        self.wins.setStyleSheet("color: green")
         self.losses = QtWidgets.QLabel()
+        self.losses.setStyleSheet("color: red")
 
         for item in (self.flag, self.name, self.civ, self.rating, self.rank,
                      self.winrate, self.wins, self.losses):
@@ -34,7 +38,7 @@ class PlayerWidget(QtWidgets.QWidget):
         self.show()
         civ_name = civ_data.get(player_data['civ'], "Unknown civ")
         self.name.setText(player_data['name'])
-        self.civ.setText(civ_name)
+        self.civ.setText(f"({civ_name})")
 
         # Flag
         image_file = file_path(f'src/img/flags/{civ_name}.webp')
@@ -65,11 +69,16 @@ class AoEOverlay(QtWidgets.QWidget):
     """Overlay widget showing AOE4 information """
     def __init__(self):
         super().__init__()
+        self.fixed = True
 
-        self.setGeometry(0, 0, 600, 600)
-        sg = QtWidgets.QDesktopWidget().screenGeometry(0)
-        self.move(sg.width() - self.width() - 10, sg.top() + 10)
+        if settings.overlay_geometry is None:
+            self.setGeometry(0, 0, 600, 600)
+            sg = QtWidgets.QDesktopWidget().screenGeometry(0)
+            self.move(sg.width() - self.width() - 10, sg.top() + 10)
+        else:
+            self.setGeometry(*settings.overlay_geometry)
 
+        self.setWindowTitle('AoE IV: Overlay')
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint
                             | QtCore.Qt.WindowTransparentForInput
                             | QtCore.Qt.WindowStaysOnTopHint
@@ -82,8 +91,7 @@ class AoEOverlay(QtWidgets.QWidget):
         self.playerlayout.setAlignment(QtCore.Qt.AlignRight
                                        | QtCore.Qt.AlignTop)
         self.setLayout(self.playerlayout)
-
-        self.setStyleSheet("font-size: 12pt")
+        self.update_font_size(settings.font_size)
 
         # Add UI elements
         self.map = QtWidgets.QLabel("MAP_NAME")
@@ -95,6 +103,9 @@ class AoEOverlay(QtWidgets.QWidget):
             self.playerlayout.addWidget(self.players[-1])
 
         self.show()
+
+    def update_font_size(self, font_size):
+        self.setStyleSheet(f"QLabel {{font-size: {font_size}pt }}")
 
     def update_data(self, game_data: Dict[str, Any]):
         self.map.setText(map_data.get(game_data['map_type'], "Unknown map"))
@@ -111,3 +122,35 @@ class AoEOverlay(QtWidgets.QWidget):
             self.hide()
         else:
             self.show()
+
+    def save_geometry(self):
+        """ Saves overlay geometry into settings"""
+        pos = self.pos()
+        settings.overlay_geometry = [
+            pos.x(), pos.y(), self.width(),
+            self.height()
+        ]
+
+    def change_state(self):
+        """ Changes the widget to be movable or not"""
+        pos = self.pos()
+
+        if self.fixed:
+            self.fixed = False
+            self.setWindowFlags(QtCore.Qt.Window
+                                | QtCore.Qt.CustomizeWindowHint
+                                | QtCore.Qt.WindowTitleHint)
+            self.setAttribute(QtCore.Qt.WA_TranslucentBackground, False)
+            self.move(pos.x() - 8, pos.y() - 31)
+        else:
+            self.fixed = True
+            self.setWindowFlags(QtCore.Qt.FramelessWindowHint
+                                | QtCore.Qt.WindowTransparentForInput
+                                | QtCore.Qt.WindowStaysOnTopHint
+                                | QtCore.Qt.CoverWindow
+                                | QtCore.Qt.NoDropShadowWindowHint
+                                | QtCore.Qt.WindowDoesNotAcceptFocus)
+            self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+            self.move(pos.x() + 8, pos.y() + 31)
+            self.save_geometry()
+        self.show()
