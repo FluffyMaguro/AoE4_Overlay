@@ -108,7 +108,7 @@ class AoEOverlay(QtWidgets.QWidget):
 
         self.show()
 
-    def update_font_size(self, font_size):
+    def update_font_size(self, font_size: int):
         self.setStyleSheet(f"QLabel {{font-size: {font_size}pt }}")
 
     def update_data(self, game_data: Dict[str, Any]):
