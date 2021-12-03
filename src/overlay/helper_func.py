@@ -1,7 +1,12 @@
 import json
 import os
 import pathlib
-from typing import Any, Dict
+
+import requests
+
+from overlay.logging_func import get_logger
+
+logger = get_logger(__name__)
 
 # def isCompiled() -> bool:
 #     """ Checks whether the app is compiled by Nuitka"""
@@ -19,27 +24,20 @@ def file_path(file: str) -> str:
     return os.path.normpath(os.path.join(ROOT, file))
 
 
-def get_config_folder() -> str:
-    return os.path.join(os.getenv('APPDATA'), "AoE4_Overlay")
+def version_to_int(version: str):
+    """Convets `1.0.1` to an integer """
+    return sum([
+        int(i) * (1000**idx) for idx, i in enumerate(version.split('.')[::-1])
+    ])
 
 
-def load_config() -> Dict[str, Any]:
-    """ Loads configuration from app data"""
-    config_file = os.path.join(get_config_folder(), "config.json")
-
-    if not os.path.isfile(config_file):
-        return {}
-
-    with open(config_file, 'r') as f:
-        return json.loads(f.read())
-
-
-def save_config(object: Dict[str, Any]):
-    """ Saves configuration to app data"""
-    config_folder = get_config_folder()
-    if not os.path.isdir(config_folder):
-        os.mkdir(config_folder)
-    config_file = os.path.join(config_folder, "config.json")
-
-    with open(config_file, 'w') as f:
-        f.write(json.dumps(object))
+def version_check(version: str) -> str:
+    """ Checks version. Returns either link for the new version or an empty string. """
+    try:
+        url = "https://raw.githubusercontent.com/FluffyMaguro/AoE4_Overlay/main/version.json"
+        data = json.loads(requests.get(url).text)
+        if version_to_int(version) < version_to_int(data['version']):
+            return data['link']
+    except Exception:
+        logger.warning("Failed to check for a new version")
+    return ""

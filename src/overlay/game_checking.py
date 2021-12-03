@@ -1,6 +1,5 @@
 """"
 Using 
-https://aoeiv.net/#nightbot
 https://aoeiv.net/#api
 
 """
@@ -10,14 +9,16 @@ import time
 from typing import Any, Dict, Optional
 
 import requests
-
+from pprint import pprint
 from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
 session = requests.session()
 
 
-def validate_steam_id(steam_id: int):
+def validate_steam_id(steam_id: Optional[int]) -> bool:
+    if steam_id is None:
+        return False
     url = f"https://aoeiv.net/api/player/matches?game=aoe4&steam_id={steam_id}&count=1"
     return session.get(url).text != "[]"
 
@@ -87,5 +88,25 @@ class API_checker:
             logger.exception(f"Failed to parse rating: {resp}")
             return
 
+        # Gets additional player data from leaderboards stats (in-place)
+        for player in match['players']:
+            self.get_player_data(leaderboard_id, player)
+
+        return match  # Delete later
         if match['started'] > rating['timestamp']:
             return match
+
+    def get_player_data(self, leaderboard_id: int, player_dict: Dict[str,
+                                                                     Any]):
+        """ Updates player data inplace"""
+
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&start=1&count=1"
+        data = json.loads(session.get(url).text)
+        if not data['leaderboard']:
+            return  # not yet ranked player
+        data = data["leaderboard"][0]
+        player_dict['rating'] = data["rating"]
+        player_dict['wins'] = data["wins"]
+        player_dict['losses'] = data["losses"]
+        player_dict['rank'] = data["rank"]
+        player_dict['streak'] = data["streak"]

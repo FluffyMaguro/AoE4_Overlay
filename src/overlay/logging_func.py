@@ -12,7 +12,7 @@ def get_logger(name: str):
     logger.addHandler(f_handler)
 
     format = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        '%(asctime)s %(levelname)s - %(name)s (%(funcName)s): %(message)s',
         datefmt='%Y-%M-%d %H:%M:%S')
     c_handler.setFormatter(format)
     f_handler.setFormatter(format)

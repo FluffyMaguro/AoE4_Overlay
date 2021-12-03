@@ -5,8 +5,9 @@ from functools import partial
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.helper_func import file_path, get_config_folder
-from overlay.main_widget import MainWidget
+from overlay.helper_func import file_path
+from overlay.main_widget import MainWidget, pyqt_wait
+from overlay.settings import get_config_folder, settings
 
 VERSION = "1.0.0"
 
@@ -56,11 +57,18 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Github
         icon = QtGui.QIcon(file_path("src/img/github.png"))
-        githubAction = QtWidgets.QAction(icon, 'Github page', self)
+        githubAction = QtWidgets.QAction(icon, 'Overlay on Github', self)
         githubAction.triggered.connect(
             partial(webbrowser.open,
                     "https://github.com/FluffyMaguro/AoE4_Overlay"))
         link_menu.addAction(githubAction)
+
+        # Discord
+        icon = QtGui.QIcon(file_path("src/img/discord.png"))
+        mdiscordAction = QtWidgets.QAction(icon, 'My discord', self)
+        mdiscordAction.triggered.connect(
+            partial(webbrowser.open, "https://discord.gg/FtGdhqD"))
+        link_menu.addAction(mdiscordAction)
 
         # Maguro
         icon = QtGui.QIcon(file_path("src/img/maguro.jpg"))
@@ -69,24 +77,27 @@ class MainApp(QtWidgets.QMainWindow):
             partial(webbrowser.open, "https://www.maguro.one/"))
         link_menu.addAction(maguroAction)
 
+        # AoEIV.net
+        icon = QtGui.QIcon(file_path("src/img/aoeivnet.png"))
+        maguroAction = QtWidgets.QAction(icon, 'AoEIV.net', self)
+        maguroAction.triggered.connect(
+            partial(webbrowser.open, "https://aoeiv.net/"))
+        link_menu.addAction(maguroAction)
+
         self.statusBar()
         self.show()
-
-    def wait_ms(self, time):
-        """ Pause executing for `time` in miliseconds"""
-        loop = QtCore.QEventLoop()
-        QtCore.QTimer.singleShot(time, loop.quit)
-        loop.exec_()
+        self.centralWidget().check_for_new_version(VERSION)
 
     def stop_all(self):
         """ Give it some time to stop everything correctly"""
         self.centralWidget().stop_check()
-        self.wait_ms(1000)
+        pyqt_wait(1000)
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     Main = MainApp()
     exit_event = app.exec_()
+    settings.save()
     Main.stop_all()
     sys.exit(exit_event)
