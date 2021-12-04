@@ -177,8 +177,6 @@ def get_full_match_history(amount: int = 100) -> List[Any]:
 
 class API_checker:
     def __init__(self):
-        self.steam_id: Optional[int] = None
-        self.profile_id: Optional[int] = None
         self.force_stop = False
 
     def sleep(self, seconds: int) -> bool:

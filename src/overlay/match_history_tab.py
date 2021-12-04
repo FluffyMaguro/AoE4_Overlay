@@ -40,6 +40,12 @@ class MatchEntry(QtWidgets.QWidget):
                           time.localtime(match_data['started'])))
         date.setToolTip("year/month/day HH:MM:SS")
 
+        # Mode
+        mode = QtWidgets.QLabel()
+        if len(teams) == 2:
+            player_number = [len(teams[i]) for i in teams]
+            mode.setText(f"{player_number[0]}v{player_number[1]}")
+
         # Result
         result = QtWidgets.QLabel(match_data["result"])
 
@@ -49,9 +55,10 @@ class MatchEntry(QtWidgets.QWidget):
         rating_string = f"{'+' if plus else ''}{match_data['my_rating_diff']} → {match_data['my_rating']}"
         elo_change = QtWidgets.QLabel(rating_string)
 
-        for item in (*team_widgets, map_name, ranked, date, result,
+        for item in (*team_widgets, map_name, ranked, date, mode, result,
                      elo_change):
             self.layout().addWidget(item)
+            item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.show()
 

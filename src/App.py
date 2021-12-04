@@ -17,12 +17,12 @@ class MainApp(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
         self.setWindowIcon(QtGui.QIcon(file_path('src/img/icon.ico')))
-        self.setGeometry(0, 0, 800, 500)
+        self.setGeometry(0, 0, settings.app_width, settings.app_height)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
-                  QtCore.QPoint(int(self.width() / 2), self.height()))
+                  QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
 
         # Create central widget
-        self.setCentralWidget(TabWidget())
+        self.setCentralWidget(TabWidget(self))
 
         ### Create menu bar items
         menubar = self.menuBar()
@@ -90,12 +90,15 @@ class MainApp(QtWidgets.QMainWindow):
 
     def finish(self):
         """ Give it some time to stop everything correctly"""
+        settings.app_width = self.width()
+        settings.app_height = self.height()
         settings.save()
         self.centralWidget().main_tab.stop_checking_api()
         pyqt_wait(1000)
 
 
 if __name__ == '__main__':
+    settings.load()
     app = QtWidgets.QApplication(sys.argv)
     Main = MainApp()
     exit_event = app.exec_()

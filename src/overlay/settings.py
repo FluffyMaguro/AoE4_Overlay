@@ -12,13 +12,14 @@ CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
 
 class _Settings:
     def __init__(self):
+        self.app_width: int = 900
+        self.app_height: int = 600
         self.steam_id: Optional[int] = None
         self.profile_id: Optional[int] = None
         self.player_name: Optional[str] = None
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
-        self.load()
 
     def load(self):
         """ Loads configuration from app data"""
