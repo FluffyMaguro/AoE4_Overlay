@@ -5,9 +5,9 @@ from functools import partial
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.helper_func import file_path
-from overlay.main_widget import MainWidget, pyqt_wait
-from overlay.settings import get_config_folder, settings
+from overlay.helper_func import file_path, pyqt_wait
+from overlay.settings import CONFIG_FOLDER, settings
+from overlay.tab_widget import TabWidget
 
 VERSION = "1.0.0"
 
@@ -17,12 +17,12 @@ class MainApp(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
         self.setWindowIcon(QtGui.QIcon(file_path('src/img/icon.ico')))
-        self.setGeometry(0, 0, 450, 150)
+        self.setGeometry(0, 0, 800, 500)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
                   QtCore.QPoint(int(self.width() / 2), self.height()))
 
         # Create central widget
-        self.setCentralWidget(MainWidget())
+        self.setCentralWidget(TabWidget())
 
         ### Create menu bar items
         menubar = self.menuBar()
@@ -43,8 +43,8 @@ class MainApp(QtWidgets.QMainWindow):
             getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
         htmlAction = QtWidgets.QAction(icon, 'Config file', self)
         htmlAction.setStatusTip('Open the folder with config files')
-        htmlAction.triggered.connect(lambda: subprocess.run(
-            ['explorer', get_config_folder()]))
+        htmlAction.triggered.connect(
+            lambda: subprocess.run(['explorer', CONFIG_FOLDER]))
         file_menu.addAction(htmlAction)
 
         # Exit
@@ -91,7 +91,7 @@ class MainApp(QtWidgets.QMainWindow):
     def finish(self):
         """ Give it some time to stop everything correctly"""
         settings.save()
-        self.centralWidget().stop_checking_api()
+        self.centralWidget().main_tab.stop_checking_api()
         pyqt_wait(1000)
 
 

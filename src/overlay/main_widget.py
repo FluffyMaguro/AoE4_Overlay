@@ -1,25 +1,15 @@
-import webbrowser
-from functools import partial
 from typing import Any, Dict, Optional
 
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.game_checking import API_checker, find_player
-from overlay.helper_func import version_check
+from overlay.api_checking import API_checker, find_player
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
 from overlay.settings import settings
 from overlay.worker import Worker
 
 logger = get_logger(__name__)
-
-
-def pyqt_wait(miliseconds: int):
-    """ Pause executing for `time` in miliseconds"""
-    loop = QtCore.QEventLoop()
-    QtCore.QTimer.singleShot(miliseconds, loop.quit)
-    loop.exec_()
 
 
 class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
@@ -35,9 +25,9 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
         self.key_changed.emit(value.toString())
 
 
-class MainWidget(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
+class MainTab(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
         self.threadpool = QtCore.QThreadPool()
         self.api_checker = API_checker()
         self.force_stop = False
@@ -54,7 +44,8 @@ class MainWidget(QtWidgets.QWidget):
         # profile info
         self.profile_info = QtWidgets.QLabel("No player identified")
         self.profile_info.setStyleSheet("font-weight: bold")
-        self.profile_info.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.profile_info.setTextInteractionFlags(
+            QtCore.Qt.TextSelectableByMouse)
         self.main_layout.addWidget(self.profile_info)
 
         # Notification
@@ -64,7 +55,7 @@ class MainWidget(QtWidgets.QWidget):
 
         # Multi search
         self.multi_search = QtWidgets.QLineEdit()
-        self.multi_search.setPlaceholderText("Steam ID / profile ID / Name")
+        self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
         self.multi_search.setStatusTip(
             'Search for your account with one option')
         self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -121,10 +112,12 @@ class MainWidget(QtWidgets.QWidget):
     def update_profile_info(self):
         """ Updates profile information based on found steam_id and profile_id"""
         s = []
+        if settings.player_name:
+            s.append(settings.player_name)
         if settings.steam_id:
-            s.append(f"Player steam_id: {settings.steam_id}")
+            s.append(f"Steam_id: {settings.steam_id}")
         if settings.profile_id:
-            s.append(f"Player profile_id: {settings.profile_id}")
+            s.append(f"Profile_id: {settings.profile_id}")
 
         if s:
             self.profile_info.setText('\n'.join(s))
@@ -138,7 +131,7 @@ class MainWidget(QtWidgets.QWidget):
         self.notification_label.setStyleSheet(f"color: {color}")
 
     def find_profile(self):
-        """ Attempts to find player ids based on provided text (name, either id)""" 
+        """ Attempts to find player ids based on provided text (name, either id)"""
         self.notification_label.hide()
         text = self.multi_search.text()
         logger.info(f"Finding a player with key: {text}")
@@ -147,6 +140,7 @@ class MainWidget(QtWidgets.QWidget):
             self.api_checker.profile_id = settings.profile_id
             self.update_profile_info()
             self.notification("Found player!", "#359c20")
+            self.parent().match_history_tab.update_match_history()
         else:
             self.notification("Failed to find such player!", "red")
 
@@ -168,8 +162,13 @@ class MainWidget(QtWidgets.QWidget):
             keyboard.add_hotkey(settings.overlay_hotkey,
                                 self.overlay_widget.show_hide)
 
+        if settings.steam_id or settings.profile_id:
+            self.parent().match_history_tab.update_match_history()
+
         # self.run_check()
         # DEBUG FOR VISUAL CHANGES
+        self.overlay_widget.hide()
+        return
         self.overlay_widget.update_data({
             'lobby_id':
             '109775240919138141',
@@ -331,12 +330,3 @@ class MainWidget(QtWidgets.QWidget):
                               delayed_seconds)
         thread_check.signals.result.connect(self.got_new_game)
         self.threadpool.start(thread_check)
-
-    def check_for_new_version(self, version: str):
-        """ Checks for a new version, creates a button if there is one """
-        link = version_check(version)
-        if not link:
-            return
-        logger.info("New version available!")
-        self.update_button.clicked.connect(partial(webbrowser.open, link))
-        self.update_button.show()

@@ -8,3 +8,4 @@ _venv.bat
 _vsc.bat
 *.pyc
 file.log
+test.py

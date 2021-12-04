@@ -3,6 +3,7 @@ import os
 import pathlib
 
 import requests
+from PyQt5 import QtCore
 
 from overlay.logging_func import get_logger
 
@@ -17,6 +18,13 @@ logger = get_logger(__name__)
 #     return pathlib.Path(sys.argv[0]).parent.absolute()
 
 ROOT = pathlib.Path(__file__).parent.parent.parent.absolute()
+
+
+def pyqt_wait(miliseconds: int):
+    """ Pause executing for `time` in miliseconds"""
+    loop = QtCore.QEventLoop()
+    QtCore.QTimer.singleShot(miliseconds, loop.quit)
+    loop.exec_()
 
 
 def file_path(file: str) -> str:

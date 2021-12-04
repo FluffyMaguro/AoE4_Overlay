@@ -6,15 +6,15 @@ from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
 
-
-def get_config_folder() -> str:
-    return os.path.join(os.getenv('APPDATA'), "AoE4_Overlay")
+CONFIG_FOLDER = os.path.join(os.getenv('APPDATA'), "AoE4_Overlay")
+CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
 
 
 class _Settings:
     def __init__(self):
         self.steam_id: Optional[int] = None
         self.profile_id: Optional[int] = None
+        self.player_name: Optional[str] = None
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
@@ -22,13 +22,10 @@ class _Settings:
 
     def load(self):
         """ Loads configuration from app data"""
-        config_file = os.path.join(get_config_folder(), "config.json")
-
-        if not os.path.isfile(config_file):
+        if not os.path.isfile(CONFIG_FILE):
             return
-
         try:
-            with open(config_file, 'r') as f:
+            with open(CONFIG_FILE, 'r') as f:
                 data = json.loads(f.read())
         except Exception:
             logger.warning("Failed to parse config file")
@@ -40,12 +37,10 @@ class _Settings:
 
     def save(self):
         """ Saves configuration to app data"""
-        config_folder = get_config_folder()
-        if not os.path.isdir(config_folder):
-            os.mkdir(config_folder)
-        config_file = os.path.join(config_folder, "config.json")
+        if not os.path.isdir(CONFIG_FOLDER):
+            os.mkdir(CONFIG_FOLDER)
 
-        with open(config_file, 'w') as f:
+        with open(CONFIG_FILE, 'w') as f:
             f.write(json.dumps(self.__dict__))
 
 
