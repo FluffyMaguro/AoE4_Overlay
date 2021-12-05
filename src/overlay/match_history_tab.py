@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
 from overlay.api_checking import get_full_match_history
-from overlay.worker import Worker
+from overlay.worker import scheldule
 
 
 class MatchEntry(QtWidgets.QWidget):
@@ -38,7 +38,7 @@ class MatchEntry(QtWidgets.QWidget):
         date = QtWidgets.QLabel(
             time.strftime("%Y/%m/%d %H:%M:%S",
                           time.localtime(match_data['started'])))
-        date.setToolTip("year/month/day HH:MM:SS")
+        date.setStatusTip("year/month/day HH:MM:SS")
 
         # Mode
         mode = QtWidgets.QLabel()
@@ -67,7 +67,6 @@ class MatchHistoryTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.matches = dict()
-        self.threadpool = QtCore.QThreadPool()
 
         # Scroll content
         scroll_content = QtWidgets.QWidget()
@@ -91,10 +90,9 @@ class MatchHistoryTab(QtWidgets.QWidget):
 
     def update_match_history(self, amount: int = 10):
         """ Gets data and updates match history"""
-        thread_history = Worker(get_full_match_history, amount)
-        thread_history.signals.result.connect(
-            self.update_match_history_widgets)
-        self.threadpool.start(thread_history)
+        return  # ** REMOVE LATER
+        scheldule(self.update_match_history_widgets, get_full_match_history,
+                  amount)
 
     def update_match_history_widgets(self, match_history: List[Any]):
         for match in match_history:

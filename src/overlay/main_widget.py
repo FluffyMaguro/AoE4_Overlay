@@ -7,7 +7,7 @@ from overlay.api_checking import API_checker, find_player
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
 from overlay.settings import settings
-from overlay.worker import Worker
+from overlay.worker import scheldule
 
 logger = get_logger(__name__)
 
@@ -29,7 +29,6 @@ class MainTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.threadpool = QtCore.QThreadPool()
         self.api_checker = API_checker()
         self.force_stop = False
         self.overlay_widget = AoEOverlay()
@@ -58,7 +57,8 @@ class MainTab(QtWidgets.QWidget):
         self.multi_search = QtWidgets.QLineEdit()
         self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
         self.multi_search.setStatusTip(
-            'Search for your account with one option')
+            'Search for your account with one of these (Steam ID / Profile ID / Name)'
+        )
         self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.multi_search.setMaximumWidth(220)
         self.main_layout.addWidget(self.multi_search, 2, 0)
@@ -66,6 +66,9 @@ class MainTab(QtWidgets.QWidget):
         # Multi search button
         self.multi_search_btn = QtWidgets.QPushButton("Search")
         self.multi_search_btn.clicked.connect(self.find_profile)
+        self.multi_search_btn.setStatusTip(
+            'Search for your account with one of these (Steam ID / Profile ID / Name)'
+        )
         self.main_layout.addWidget(self.multi_search_btn, 2, 1)
 
         spacer = QtWidgets.QLabel()
@@ -78,12 +81,16 @@ class MainTab(QtWidgets.QWidget):
 
         self.key_showhide = CustomKeySequenceEdit(self)
         self.key_showhide.setMaximumWidth(100)
+        self.key_showhide.setStatusTip("Hotkey hiding and showing the overlay")
         self.main_layout.addWidget(self.key_showhide, 4, 1)
         self.key_showhide.key_changed.connect(self.hotkey_changed)
 
         # Position change button
         self.btn_change_position = QtWidgets.QPushButton(
             "Change/fix overlay position")
+        self.btn_change_position.setStatusTip(
+            "Click to change overlay position. Click again to fix its position."
+        )
         self.btn_change_position.clicked.connect(
             self.overlay_widget.change_state)
         self.main_layout.addWidget(self.btn_change_position, 5, 0)
@@ -137,9 +144,7 @@ class MainTab(QtWidgets.QWidget):
         text = self.multi_search.text()
         logger.info(f"Finding a player with key: {text}")
 
-        thread_find_player = Worker(find_player, text)
-        thread_find_player.signals.result.connect(self.find_profile_finish)
-        self.threadpool.start(thread_find_player)
+        scheldule(self.find_profile_finish, find_player, text)
 
     def find_profile_finish(self, result: bool):
         if result:
@@ -330,7 +335,5 @@ class MainTab(QtWidgets.QWidget):
 
     def run_check(self, delayed_seconds: int = 0):
         """ Creates a new thread for a new api check"""
-        thread_check = Worker(self.api_checker.check_for_new_game,
-                              delayed_seconds)
-        thread_check.signals.result.connect(self.got_new_game)
-        self.threadpool.start(thread_check)
+        scheldule(self.got_new_game, self.api_checker.check_for_new_game,
+                  delayed_seconds)

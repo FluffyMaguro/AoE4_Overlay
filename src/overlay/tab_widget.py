@@ -20,10 +20,11 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab = GraphTab(self)
         # Need this one defined the last
         self.main_tab = MainTab(self)
-
-        self.addTab(self.main_tab, "Setting")
-        self.addTab(self.match_history_tab, "Games")
+        
         self.addTab(self.graph_tab, "Graphs")
+        self.addTab(self.main_tab, "Settings")
+        self.addTab(self.match_history_tab, "Games")
+        
 
     def check_for_new_version(self, version: str):
         """ Checks for a new version, creates a button if there is one """

@@ -1,11 +1,14 @@
 import sys
 import traceback
+from typing import Callable
 
 from PyQt5 import QtCore
 
 from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
+
+THREADPOOL = QtCore.QThreadPool()
 
 
 class WorkerSignals(QtCore.QObject):
@@ -67,3 +70,10 @@ class Worker(QtCore.QRunnable):
             logger.exception('Error with pyqt thread. The app likely closed.')
         except Exception:
             logger.exception("")
+
+
+def scheldule(callback_function: Callable, worker_function: Callable, *args):
+    """ Scheldules work on the worker function and passes the result to the callback function"""
+    thread = Worker(worker_function, *args)
+    thread.signals.result.connect(callback_function)
+    THREADPOOL.start(thread)

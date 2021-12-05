@@ -1,11 +1,12 @@
-from typing import Any, Dict, Optional
+import time
+from typing import Any, Dict, List, Optional
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.logging_func import get_logger
 from overlay.plotting import Figure
 from overlay.settings import settings
-from overlay.worker import Worker
+from overlay.worker import scheldule
 
 logger = get_logger(__name__)
 
@@ -18,31 +19,40 @@ class GraphTab(QtWidgets.QWidget):
 
         # Refresh button
         refresh = QtWidgets.QPushButton("Rescale", self)
+        refresh.setStatusTip("Rescales the graph based on new size")
         refresh.clicked.connect(self.plot_data)
         refresh.move(QtCore.QPoint(10, 10))
 
         # ** get data somewhere
-        # cache data for rescaling
-        self.data = self.get_rating_debug_3v3()
 
-        # Demo plotting
+        # ** PLOT Ratings, Ranks
+
+        # Get data
+        scheldule(self.get_data_finished, self.get_rating_debug_3v3)
+
+    def get_data_finished(self, data: List[Any]):
+        self.data = data
         self.plot_data()
 
     def plot_data(self):
         # Update size
         new_width = self.parent().parent().width()
-        new_height = self.parent().parent().height()
+        new_height = self.parent().parent().height() - 20
         self.graph.setGeometry(0, 0, new_width, new_height)
 
         # Demo of plotting
         y = [i['rating'] for i in self.data]
         x = list(range(len(y)))
 
-        fig = Figure("Basic chart", new_width, new_height)
+        fig = Figure("3v3 Rating history", new_width, new_height)
+        fig.x_label = "Games"
+        fig.y_label = "Rating"
         fig.plot(x, y, label="3v3 rating")
+        fig.text("Some text", 2, 1100)
         self.graph.setPixmap(fig.get_pixmap())
 
     def get_rating_debug_3v3(self):
+        time.sleep(0.1)
         return [{
             'drops': 1,
             'num_losses': 8,
