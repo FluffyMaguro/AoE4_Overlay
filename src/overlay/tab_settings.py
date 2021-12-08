@@ -58,8 +58,8 @@ class SettingsTab(QtWidgets.QWidget):
         self.multi_search = QtWidgets.QLineEdit()
         self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
         self.multi_search.setStatusTip(
-            'Search for your account with one of these (Steam ID / Profile ID / Name)'
-        )
+            'Search for your account with one of these (Steam ID / Profile ID / Name).'
+            ' Searching by name might not find the correct player.')
         self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.multi_search.setMaximumWidth(220)
         self.main_layout.addWidget(self.multi_search, 2, 0)
@@ -68,8 +68,8 @@ class SettingsTab(QtWidgets.QWidget):
         self.multi_search_btn = QtWidgets.QPushButton("Search")
         self.multi_search_btn.clicked.connect(self.find_profile)
         self.multi_search_btn.setStatusTip(
-            'Search for your account with one of these (Steam ID / Profile ID / Name)'
-        )
+            'Search for your account with one of these (Steam ID / Profile ID / Name).'
+            ' Searching by name might not find the correct player.')
         self.main_layout.addWidget(self.multi_search_btn, 2, 1)
 
         spacer = QtWidgets.QLabel()

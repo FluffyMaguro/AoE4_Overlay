@@ -13,7 +13,7 @@ class StatsTab(QtWidgets.QWidget):
 
     # Num games found
 
-    # wins/losses/highest rating & streak/ per league
+    # winrate/wins/losses/highest rating & streak/ per league
 
     # Map stats per_civ/all
 
