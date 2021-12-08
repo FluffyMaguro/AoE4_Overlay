@@ -86,6 +86,12 @@ class MatchHistoryTab(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
+    def clear_games(self):
+        """ Removes all games from the game tab"""
+        for widget in self.matches.values():
+            self.scroll_layout.removeWidget(widget)
+        self.matches = dict()
+
     def update_match_history_widgets(self, match_history: List[Any]):
         for match in match_history:
             # Game already created or game doesn't have rating yet

@@ -151,6 +151,7 @@ class SettingsTab(QtWidgets.QWidget):
         if result:
             self.update_profile_info()
             self.notification("Player found!", "#359c20")
+            self.parent.match_history_tab.clear_games()
             self.update_data()
             self.parent.graph_tab.get_new_data()
         else:

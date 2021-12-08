@@ -11,7 +11,11 @@ class StatsTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__()
 
-    # Map stats
+    # Num games found
+
+    # wins/losses/highest rating & streak/ per league
+
+    # Map stats per_civ/all
 
     # Civ stats
 
