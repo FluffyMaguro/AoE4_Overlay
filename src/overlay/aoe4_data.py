@@ -28,7 +28,7 @@ map_data = {
     9: 'Confluence',
     10: 'French Pass',
     11: 'Hill and Dale',
-    12: 'King of Hill',
+    12: 'King of The Hill',
     13: 'Warring Islands',
     14: 'Archipelago',
     15: 'Nagari',

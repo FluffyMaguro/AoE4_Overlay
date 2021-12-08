@@ -1,9 +1,10 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.api_checking import API_checker, find_player
+from overlay.api_checking import (API_checker, find_player,
+                                  get_full_match_history)
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
 from overlay.settings import settings
@@ -25,7 +26,7 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
         self.key_changed.emit(value.toString())
 
 
-class MainTab(QtWidgets.QWidget):
+class SettingsTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -150,9 +151,21 @@ class MainTab(QtWidgets.QWidget):
         if result:
             self.update_profile_info()
             self.notification("Player found!", "#359c20")
-            self.parent.match_history_tab.update_match_history()
+            self.update_data()
+            self.parent.graph_tab.get_new_data()
         else:
             self.notification("Failed to find such player!", "red")
+
+    def update_data(self, amount_games: int = 1000000):
+        """ Gets new data for games, updates match history and stats"""
+        scheldule(self.update_data_got_data, get_full_match_history,
+                  amount_games)
+
+    def update_data_got_data(self, match_history: List[Any]):
+        """ Passes match history data to correct widgets"""
+        self.parent.match_history_tab.update_match_history_widgets(
+            match_history)
+        self.parent.stats_tab.update_data(match_history)
 
     def font_size_changed(self):
         font_size = self.font_size_combo.currentIndex() + 1
@@ -171,7 +184,7 @@ class MainTab(QtWidgets.QWidget):
                                 self.overlay_widget.show_hide)
 
         if settings.steam_id or settings.profile_id:
-            self.parent.match_history_tab.update_match_history()
+            self.update_data()
 
         # self.run_check()
         # DEBUG FOR VISUAL CHANGES
@@ -329,7 +342,7 @@ class MainTab(QtWidgets.QWidget):
 
         if game_data is not None:
             self.overlay_widget.update_data(game_data)
-            self.parent.match_history_tab.update_match_history(amount=3)
+            self.update_data(amount_games=3)
 
         self.run_check(delayed_seconds=30)
 

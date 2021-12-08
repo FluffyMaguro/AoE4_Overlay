@@ -20,6 +20,7 @@ class _Settings:
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
+        self.show_graph = {"1": True, "2": True, "3": True, "4": True}
 
     def load(self):
         """ Loads configuration from app data"""

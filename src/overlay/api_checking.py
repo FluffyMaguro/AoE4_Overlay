@@ -230,7 +230,7 @@ class API_checker:
         for player in match['players']:
             self.get_player_data(leaderboard_id, player)
 
-        return match  # Delete later
+        return match  # ***Delete later
         if match['started'] > rating['timestamp']:
             return match
 

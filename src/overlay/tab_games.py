@@ -4,8 +4,6 @@ from typing import Any, Dict, List
 from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
-from overlay.api_checking import get_full_match_history
-from overlay.worker import scheldule
 
 
 class MatchEntry(QtWidgets.QWidget):
@@ -87,12 +85,6 @@ class MatchHistoryTab(QtWidgets.QWidget):
         layout.addWidget(scroll)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-
-    def update_match_history(self, amount: int = 10):
-        """ Gets data and updates match history"""
-        return  # ** REMOVE LATER
-        scheldule(self.update_match_history_widgets, get_full_match_history,
-                  amount)
 
     def update_match_history_widgets(self, match_history: List[Any]):
         for match in match_history:

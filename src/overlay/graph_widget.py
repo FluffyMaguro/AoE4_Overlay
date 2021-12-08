@@ -1,6 +1,7 @@
 import bisect
 import math
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+import time
+from typing import Iterable, List, Optional, Tuple, Union
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -34,11 +35,11 @@ def get_ticks(vmin: float, vmax: float, tick_number: int = 10) -> List[float]:
     # Calculate the rest of the ticks
     ticks = []
     tick = new_min
-    while tick <= vmax + diff:
-        ticks.append(tick)
+    while tick <= vmax:
+        if tick >= vmin:
+            ticks.append(tick)
         tick += diff
 
-    ticks = [t for t in ticks if vmin <= t <= vmax]
     return ticks
 
 
@@ -116,6 +117,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.x_label: str = ""
         self.y_label: str = ""
         self._data = []
+        self.x_is_timestamp: bool = False
 
     def paintEvent(self, event):
         """ Override for draw event"""
@@ -125,14 +127,18 @@ class GraphWidget(QtWidgets.QWidget):
              x: Iterable[float],
              y: Iterable[float],
              label: str = "",
-             linewidth: float = 3):
+             linewidth: float = 3,
+             show: bool = True,
+             index: int = -1):
         """ Simple line chart"""
         self._data.append({
             "type": "lineplot",
             "x": x,
             "y": y,
             "label": label,
-            "linewidth": linewidth
+            "linewidth": linewidth,
+            "index": index,
+            "show": show
         })
 
     def text(self, text: str, x: float, y: float, color: str = "black"):
@@ -142,8 +148,24 @@ class GraphWidget(QtWidgets.QWidget):
             "text": text,
             "x": (x, ),
             "y": (y, ),
-            "color": color
+            "color": color,
+            "show": True
         })
+
+    def clear_data(self):
+        """ Clears all current data"""
+        self._data = []
+
+    def set_plot_visibility(self, index: int, visible: bool):
+        """ Changes the visibility of the plot 
+        Args:
+            `index` : index of the plot (given manually)
+            `visible` : whether to show or hide
+        """
+        for item in self._data:
+            if index == item.get("index", -1):
+                item["show"] = visible
+                return
 
     def calculate_limits(self) -> Tuple[float, float, float, float]:
         """ Calculates figure limits
@@ -156,10 +178,10 @@ class GraphWidget(QtWidgets.QWidget):
         def mmax(i: Iterable):
             return max(i) if i else 1
 
-        x_min = mmin([min(i['x']) for i in self._data])
-        x_max = mmax([max(i['x']) for i in self._data])
-        y_min = mmin([min(i['y']) for i in self._data])
-        y_max = mmax([max(i['y']) for i in self._data])
+        x_min = mmin([min(i['x']) for i in self._data if i["show"]])
+        x_max = mmax([max(i['x']) for i in self._data if i["show"]])
+        y_min = mmin([min(i['y']) for i in self._data if i["show"]])
+        y_max = mmax([max(i['y']) for i in self._data if i["show"]])
         return x_min, x_max, y_min, y_max
 
     @staticmethod
@@ -182,8 +204,12 @@ class GraphWidget(QtWidgets.QWidget):
         qp.setFont(font)
 
     @staticmethod
-    def _format_ticks(value, percent: bool = False) -> str:
-        if percent:
+    def _format_ticks(value,
+                      percent: bool = False,
+                      timestamp: bool = False) -> str:
+        if timestamp:
+            return time.strftime("%Y/%m/%d", time.localtime(value))
+        elif percent:
             return f"{value:.1%}"
         elif -1 < value < 1 and value != 0:
             return f"{value:.2f}"
@@ -209,12 +235,6 @@ class GraphWidget(QtWidgets.QWidget):
         qp = QtGui.QPainter()
         qp.begin(self)
         qp.setPen(QtGui.QColor(0, 0, 0))
-
-        # Title
-        self._set_font(qp, 14)
-        rect = QtCore.QRect(int(self.width() / 2) - 500, 0, 1000, 30)
-        qp.drawText(rect, QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter,
-                    self.title)
 
         # Bounding box
         x_offset_left = 80
@@ -242,20 +262,19 @@ class GraphWidget(QtWidgets.QWidget):
 
         # X-ticks
         x_ticks = get_ticks(x_min, x_max, 5)
-        nx_min, ny_min = trans(x_min, y_min)
-        nx_max, ny_max = trans(x_max, y_max)
-
-        self._set_font(qp, 12)
+        self._set_font(qp, 10)
         for x in x_ticks:
             xn, _ = trans(x, y_min)
             xn1 = (xn, box.y_end + box.padding + 1)
             xn2 = (xn, int(xn1[1] + self.height() / 100))
             self._draw_line(qp, [xn1, xn2], linewidth=1)
             rect = QtCore.QRect(xn - 100, box.y + box.height, 200, 30)
-            qp.drawText(rect, QtCore.Qt.AlignCenter, self._format_ticks(x))
+            qp.drawText(rect, QtCore.Qt.AlignCenter,
+                        self._format_ticks(x, timestamp=self.x_is_timestamp))
 
             # Grid
-            self._draw_line(qp, [(xn, ny_min), (xn, ny_max)],
+            self._draw_line(qp, [(xn, box.y + 1),
+                                 (xn, box.y + box.height - 1)],
                             linewidth=1,
                             color=QtGui.QColor("#c9c9c9"))
 
@@ -271,7 +290,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self._format_ticks(y))
 
             # Grid
-            self._draw_line(qp, [(nx_min, yn), (nx_max, yn)],
+            self._draw_line(qp, [(box.x + 1, yn), (box.x + box.width - 1, yn)],
                             linewidth=1,
                             color=QtGui.QColor("#c9c9c9"))
 
@@ -279,7 +298,9 @@ class GraphWidget(QtWidgets.QWidget):
         used_colors = []
         self._set_font(qp, 10)
         for idx, data in enumerate(self._data):
-            if data["type"] == "lineplot":
+            if not data["show"]:
+                continue
+            elif data["type"] == "lineplot":
                 points = [trans(x, y) for x, y in zip(data['x'], data['y'])]
                 used_colors.append(QtGui.QColor(*COLORS[idx % len(COLORS)]))
                 self._draw_line(qp,
@@ -294,16 +315,24 @@ class GraphWidget(QtWidgets.QWidget):
                 qp.drawText(rect, QtCore.Qt.AlignCenter, data['text'])
 
         # Legend
-        item_num = len([i for i in self._data if i['type'] != "text"])
+        labels = [
+            len(i['label']) for i in self._data
+            if i['type'] != "text" and i["show"]
+        ]
+        item_num = len(labels)
+        text_len = max(labels) if labels else 0
         qp.setBrush(QtGui.QColor("#fff"))
+        qp.setPen(QtGui.QColor("black"))
         textbox = QtCore.QRect(box.x_start + box.width // 200,
-                               box.y_start + box.width // 200, 130,
-                               25 * item_num)
+                               box.y_start + box.width // 200,
+                               35 + text_len * 7, 27 * item_num)
         qp.drawRect(textbox)
         textbox.setLeft(textbox.left() + 30)
         textbox.setTop(textbox.top() + 5)
-        for i, item in enumerate(self._data):
-            if item["type"] == "text":
+
+        i = 0
+        for item in self._data:
+            if not item["show"] or item["type"] == "text":
                 continue
             points = [(textbox.x() - 20, textbox.y() + 10),
                       (textbox.x() + -5, textbox.y() + 10)]
@@ -312,9 +341,10 @@ class GraphWidget(QtWidgets.QWidget):
             qp.drawText(textbox, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
                         item["label"])
             textbox.setTop(textbox.top() + 25)
+            i += 1
 
         # Change font for axis labels
-        self._set_font(qp, 14)
+        self._set_font(qp, 12)
 
         # X-label
         qp.setPen(QtGui.QColor("black"))
@@ -327,5 +357,11 @@ class GraphWidget(QtWidgets.QWidget):
         rect = QtCore.QRect(-box.y - box.height // 2 - 100, 5, 200, 25)
         qp.drawText(rect, QtCore.Qt.AlignCenter, self.y_label)
         qp.rotate(90)
+
+        # Title
+        self._set_font(qp, 14)
+        rect = QtCore.QRect(box.x + box.width // 2 - 500, -2, 1000, 30)
+        qp.drawText(rect, QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter,
+                    self.title)
 
         qp.end()
