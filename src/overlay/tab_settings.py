@@ -1,10 +1,7 @@
-from typing import Any, Dict, List, Optional
-
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.api_checking import (API_checker, find_player,
-                                  get_full_match_history)
+from overlay.api_checking import find_player
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
 from overlay.settings import settings
@@ -27,14 +24,12 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
 
 
 class SettingsTab(QtWidgets.QWidget):
+    new_profile = QtCore.pyqtSignal()
+
     def __init__(self, parent):
-        super().__init__()
-        self.parent = parent
-        self.api_checker = API_checker()
-        self.force_stop = False
+        super().__init__(parent)
         self.overlay_widget = AoEOverlay()
         self.init_UI()
-        self.start()
 
     def init_UI(self):
         # Layout
@@ -42,7 +37,7 @@ class SettingsTab(QtWidgets.QWidget):
         self.main_layout.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(self.main_layout)
 
-        # profile info
+        # Profile info
         self.profile_info = QtWidgets.QLabel("No player identified")
         self.profile_info.setStyleSheet("font-weight: bold")
         self.profile_info.setTextInteractionFlags(
@@ -67,13 +62,13 @@ class SettingsTab(QtWidgets.QWidget):
         # Multi search button
         self.multi_search_btn = QtWidgets.QPushButton("Search")
         self.multi_search_btn.clicked.connect(self.find_profile)
+        self.multi_search_btn.setShortcut("Return")
         self.multi_search_btn.setStatusTip(
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
         self.main_layout.addWidget(self.multi_search_btn, 2, 1)
 
-        spacer = QtWidgets.QLabel()
-        self.main_layout.addWidget(spacer, 3, 0)
+        self.main_layout.addItem(QtWidgets.QSpacerItem(0, 20), 3, 0)
 
         # Hotkey for overlay
         key_label = QtWidgets.QLabel(
@@ -118,6 +113,20 @@ class SettingsTab(QtWidgets.QWidget):
         self.update_button.hide()
         self.main_layout.addWidget(self.update_button, 6, 0)
 
+    def start(self):
+        # Initialize
+        self.update_profile_info()
+
+        # Hotkey
+        if settings.overlay_hotkey:
+            self.key_showhide.setKeySequence(
+                QtGui.QKeySequence.fromString(settings.overlay_hotkey))
+            keyboard.add_hotkey(settings.overlay_hotkey,
+                                self.overlay_widget.show_hide)
+
+        if settings.steam_id or settings.profile_id:
+            self.new_profile.emit()
+
     def update_profile_info(self):
         """ Updates profile information based on found steam_id and profile_id"""
         s = []
@@ -142,177 +151,25 @@ class SettingsTab(QtWidgets.QWidget):
     def find_profile(self):
         """ Attempts to find player ids based on provided text (name, either id)"""
         self.notification_label.hide()
-        text = self.multi_search.text()
+        text = self.multi_search.text().strip()
+        if not text:
+            return
         logger.info(f"Finding a player with key: {text}")
 
         scheldule(self.find_profile_finish, find_player, text)
 
     def find_profile_finish(self, result: bool):
         if result:
+            self.new_profile.emit()
             self.update_profile_info()
             self.notification("Player found!", "#359c20")
-            self.parent.match_history_tab.clear_games()
-            self.update_data()
-            self.parent.graph_tab.get_new_data()
         else:
             self.notification("Failed to find such player!", "red")
-
-    def update_data(self, amount_games: int = 1000000):
-        """ Gets new data for games, updates match history and stats"""
-        scheldule(self.update_data_got_data, get_full_match_history,
-                  amount_games)
-
-    def update_data_got_data(self, match_history: List[Any]):
-        """ Passes match history data to correct widgets"""
-        self.parent.match_history_tab.update_match_history_widgets(
-            match_history)
-        self.parent.stats_tab.update_data(match_history)
 
     def font_size_changed(self):
         font_size = self.font_size_combo.currentIndex() + 1
         settings.font_size = font_size
         self.overlay_widget.update_font_size(font_size)
-
-    def start(self):
-        # Initialize
-        self.update_profile_info()
-
-        # Hotkey
-        if settings.overlay_hotkey:
-            self.key_showhide.setKeySequence(
-                QtGui.QKeySequence.fromString(settings.overlay_hotkey))
-            keyboard.add_hotkey(settings.overlay_hotkey,
-                                self.overlay_widget.show_hide)
-
-        if settings.steam_id or settings.profile_id:
-            self.update_data()
-
-        # self.run_check()
-        # DEBUG FOR VISUAL CHANGES
-        self.overlay_widget.hide()
-        return
-        self.overlay_widget.update_data({
-            'lobby_id':
-            '109775240919138141',
-            'map_size':
-            3,
-            'map_type':
-            9,
-            'match_id':
-            '12595190',
-            'name':
-            'AUTOMATCH',
-            'num_players':
-            6,
-            'num_slots':
-            6,
-            'players': [{
-                'civ': 4,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'losses': 5,
-                'name': 'Mini-Negan',
-                'profile_id': 5636932,
-                'rank': 12570,
-                'rating': 1105,
-                'rating_change': None,
-                'slot': 1,
-                'slot_type': 1,
-                'streak': -1,
-                'team': 1,
-                'wins': 8,
-                'won': None
-            }, {
-                'civ': 5,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'name': 'Iotawolf101',
-                'profile_id': 181552,
-                'rating': None,
-                'rating_change': None,
-                'slot': 3,
-                'slot_type': 1,
-                'team': 1,
-                'won': None
-            }, {
-                'civ': 1,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'losses': 8,
-                'name': 'Maguro',
-                'profile_id': 5233600,
-                'rank': 17708,
-                'rating': 1063,
-                'rating_change': None,
-                'slot': 2,
-                'slot_type': 1,
-                'streak': 1,
-                'team': 1,
-                'wins': 9,
-                'won': None
-            }, {
-                'civ': 3,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'losses': 5,
-                'name': 'Kanax',
-                'profile_id': 6703549,
-                'rank': 27902,
-                'rating': 990,
-                'rating_change': None,
-                'slot': 4,
-                'slot_type': 1,
-                'streak': -2,
-                'team': 2,
-                'wins': 5,
-                'won': None
-            }, {
-                'civ': 5,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'losses': 62,
-                'name': 'lebowskiiiiiiiii',
-                'profile_id': 684531,
-                'rank': 29512,
-                'rating': 979,
-                'rating_change': None,
-                'slot': 5,
-                'slot_type': 1,
-                'streak': -1,
-                'team': 2,
-                'wins': 54,
-                'won': None
-            }, {
-                'civ': 6,
-                'clan': None,
-                'color': None,
-                'country': None,
-                'name': 'gcdomi7872',
-                'profile_id': 5971541,
-                'rating': None,
-                'rating_change': None,
-                'slot': 6,
-                'slot_type': 1,
-                'team': 2,
-                'won': None
-            }],
-            'ranked':
-            False,
-            'rating_type_id':
-            17,
-            'server':
-            'ukwest',
-            'started':
-            1638493446,
-            'version':
-            '8324'
-        })
-        # DEBUG END
 
     def hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
@@ -330,24 +187,3 @@ class SettingsTab(QtWidgets.QWidget):
         settings.overlay_hotkey = new_hotkey
         keyboard.add_hotkey(settings.overlay_hotkey,
                             self.overlay_widget.show_hide)
-
-    def stop_checking_api(self):
-        """ The app is closing, we need to start shuttings things down"""
-        self.force_stop = True
-        self.api_checker.force_stop = True
-
-    def got_new_game(self, game_data: Optional[Dict[str, Any]]):
-        """Received new data from api check, passes data along and reruns the check"""
-        if self.force_stop:
-            return
-
-        if game_data is not None:
-            self.overlay_widget.update_data(game_data)
-            self.update_data(amount_games=3)
-
-        self.run_check(delayed_seconds=30)
-
-    def run_check(self, delayed_seconds: int = 0):
-        """ Creates a new thread for a new api check"""
-        scheldule(self.got_new_game, self.api_checker.check_for_new_game,
-                  delayed_seconds)

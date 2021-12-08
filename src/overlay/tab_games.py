@@ -4,13 +4,24 @@ from typing import Any, Dict, List
 from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
+from overlay.api_checking import get_full_match_history
+from overlay.worker import scheldule
 
 
-class MatchEntry(QtWidgets.QWidget):
-    def __init__(self, parent, match_data: Dict[str, Any]):
+class Line(QtWidgets.QFrame):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.setLayout(QtWidgets.QHBoxLayout())
-        self.layout().setAlignment(QtCore.Qt.AlignTop)
+        self.setStyleSheet("background-color: #bbb")
+        self.setMinimumHeight(1)
+        self.setMaximumHeight(1)
+
+
+class MatchEntry:
+    def __init__(self, layout: QtWidgets.QGridLayout, match_data: Dict[str,
+                                                                       Any]):
+        self.main_layout: QtWidgets.QGridLayout = layout
+        self.in_layout: bool = False
+        self.match_id = match_data['match_id']
 
         teams = dict()
         for player in match_data["players"]:
@@ -21,20 +32,19 @@ class MatchEntry(QtWidgets.QWidget):
 
         # Teams
         team_widgets = []
-        for team in teams:
+        for i, team in enumerate(teams):
+            if i > 1:  # Keep it to two teams
+                break
             team_string = "\n".join(teams[team])
             team_widgets.append(QtWidgets.QLabel(team_string))
 
         # Map
         map_name = QtWidgets.QLabel(
             map_data.get(match_data["map_type"], "Unknown map"))
-        # Ranked
-        ranked = QtWidgets.QLabel(
-            "ranked" if match_data["ranked"] else "unranked")
 
         # Date
         date = QtWidgets.QLabel(
-            time.strftime("%Y/%m/%d %H:%M:%S",
+            time.strftime("%b %d, %H:%M:%S",
                           time.localtime(match_data['started'])))
         date.setStatusTip("year/month/day HH:MM:SS")
 
@@ -53,23 +63,36 @@ class MatchEntry(QtWidgets.QWidget):
         rating_string = f"{'+' if plus else ''}{match_data['my_rating_diff']} → {match_data['my_rating']}"
         elo_change = QtWidgets.QLabel(rating_string)
 
-        for item in (*team_widgets, map_name, ranked, date, mode, result,
-                     elo_change):
-            self.layout().addWidget(item)
-            item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.widgets = (*team_widgets, map_name, date, mode, result,
+                        elo_change)
 
-        self.show()
+        for item in self.widgets:
+            item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+            item.setAlignment(QtCore.Qt.AlignCenter)
+
+    def add_to_layout(self, row: int):
+        """ Adds widgets back to the layout"""
+        self.in_layout = True
+        for column, widget in enumerate(self.widgets):
+            self.main_layout.addWidget(widget, row, column)
+
+    def remove_from_layout(self):
+        """ Removes its widgets from the layout"""
+        self.in_layout = False
+        for widget in self.widgets:
+            self.main_layout.removeWidget(widget)
 
 
 class MatchHistoryTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.matches = dict()
+        # List of added matches. New ones at the end.
+        self.matches: List[MatchEntry] = []
 
         # Scroll content
         scroll_content = QtWidgets.QWidget()
-        self.scroll_layout = QtWidgets.QVBoxLayout(self)
-        self.scroll_layout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_layout = QtWidgets.QGridLayout(self)
+        self.scroll_layout.setContentsMargins(10, 10, 10, 10)
         self.scroll_layout.setAlignment(QtCore.Qt.AlignTop)
         scroll_content.setLayout(self.scroll_layout)
 
@@ -86,17 +109,51 @@ class MatchHistoryTab(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
+        # Header
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Team 1"), 0, 0)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Team 2"), 0, 1)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Map"), 0, 2)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Date"), 0, 3)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Mode"), 0, 4)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Rating change"), 0, 6)
+
+        for i in range(self.scroll_layout.count()):
+            self.scroll_layout.itemAt(i).widget().setAlignment(
+                QtCore.Qt.AlignHCenter)
+            self.scroll_layout.itemAt(i).widget().setStyleSheet(
+                "font-weight: bold")
+
+        self.scroll_layout.addWidget(Line(), 1, 0, 1, 7)
+
     def clear_games(self):
         """ Removes all games from the game tab"""
-        for widget in self.matches.values():
-            self.scroll_layout.removeWidget(widget)
-        self.matches = dict()
+        for item in self.matches:
+            item.remove_from_layout()
+        self.matches = []
 
-    def update_match_history_widgets(self, match_history: List[Any]):
-        for match in match_history:
-            # Game already created or game doesn't have rating yet
-            if match["match_id"] in self.matches or match['my_rating'] == -1:
+    def run_update(self, amount: int):
+        scheldule(self.update_widgets, get_full_match_history, amount)
+
+    def update_widgets(self, match_history: List[Any]):
+        # Remove widgets from the layout
+        for item in self.matches:
+            item.remove_from_layout()
+
+        # Add new matches to our list
+        present_match_ids = {i.match_id for i in self.matches}
+        for match in reversed(match_history):
+            if match['my_rating'] == -1:
                 continue
-            widget = MatchEntry(self, match)
-            self.matches[match["match_id"]] = widget
-            self.scroll_layout.addWidget(widget)
+            if match['match_id'] in present_match_ids:
+                continue
+            self.matches.append(MatchEntry(self.scroll_layout, match))
+
+        # Re-add widgets to the layout
+        added_rows = 2  # With header and line
+        for match_entry in reversed(self.matches):
+            if match_entry.in_layout:
+                continue
+            match_entry.add_to_layout(added_rows)
+            self.scroll_layout.addWidget(Line(), added_rows + 1, 0, 1, 7)
+            added_rows += 2

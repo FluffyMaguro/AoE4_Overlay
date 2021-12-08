@@ -102,6 +102,10 @@ class MainApp(QtWidgets.QMainWindow):
         self.statusBar()
         self.show()
         self.centralWidget().check_for_new_version(VERSION)
+        self.centralWidget().start()
+
+    def update_title(self, name: str):
+        self.setWindowTitle(f"AoE IV: Overlay ({VERSION}) – {name}")
 
     def finish(self):
         """ Give it some time to stop everything correctly"""
@@ -110,7 +114,7 @@ class MainApp(QtWidgets.QMainWindow):
         for i, action in enumerate(self.show_graph_actions):
             settings.show_graph[str(i + 1)] = action.isChecked()
         settings.save()
-        self.centralWidget().main_tab.stop_checking_api()
+        self.centralWidget().stop_checking_api()
         pyqt_wait(1000)
 
 

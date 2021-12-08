@@ -26,9 +26,9 @@ class GraphTab(QtWidgets.QWidget):
         self.graph.x_is_timestamp = True
         layout.addWidget(self.graph)
 
-        self.get_new_data()
+        self.run_update()
 
-    def get_new_data(self):
+    def run_update(self):
         """ Gets new data and updates graphs"""
         scheldule(self.plot_data, self.get_all_rating_history)
 

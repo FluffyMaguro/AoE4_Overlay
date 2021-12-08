@@ -2,7 +2,7 @@
 Using 
 https://aoeiv.net/#api
 
-# Match type            leaderboard_id
+# Mode type            leaderboard_id
 # Quick Match (1v1)	    17
 # Quick Match (2v2)	    18
 # Quick Match (3v3)	    19
@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
+from overlay.aoe4_data import mode_data
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -50,8 +51,8 @@ def validate_id(id: Optional[int],
 def find_player_by_name(name: str) -> bool:
     """ Looks for a player by name. If found return `True`.
     Updates settings automatically"""
-    for id in range(17, 21):
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&search={name}&start=1&count=1"
+    for id in mode_data:
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&search={name}&count=1"
         data = json.loads(session.get(url).text)
         if data['leaderboard'] and name == data['leaderboard'][0]['name']:
             settings.profile_id = data['leaderboard'][0]['profile_id']
@@ -66,8 +67,8 @@ def attempt_to_find_profile_id():
     Only works if the player is ranked any team mode."""
     if not settings.steam_id:
         return
-    for id in range(17, 21):
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&steam_id={settings.steam_id}&start=1&count=1"
+    for id in mode_data:
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&steam_id={settings.steam_id}&count=1"
         data = json.loads(session.get(url).text)
         if data['leaderboard']:
             settings.profile_id = data['leaderboard'][0]['profile_id']
@@ -134,6 +135,25 @@ def get_rating_history(leaderboard_id: int, amount: int = 1) -> List[Any]:
         return []
 
 
+def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
+    """ Gets leaderboard data for the main player"""
+    if settings.steam_id:
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&steam_id={settings.steam_id}&count=1"
+    elif settings.profile_id:
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={settings.profile_id}&count=1"
+    elif settings.player_name:
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&search={settings.player_name}&count=1"
+    else:
+        return {}
+
+    resp = session.get(url).text
+    try:
+        return json.loads(session.get(url).text)
+    except:
+        logger.exception(f"Failed to parse leaderboard data: {resp}")
+        return {}
+
+
 def get_full_match_history(amount: int = 100) -> List[Any]:
     """ Gets match history and adds some data its missing"""
 
@@ -164,6 +184,7 @@ def get_full_match_history(amount: int = 100) -> List[Any]:
     for match in data:
         rating_diff, rating = find_rating_change(match["rating_type_id"] + 2,
                                                  match['started'])
+
         match["my_rating"] = rating
         if rating_diff is None:
             match['result'] = "?"
@@ -238,7 +259,7 @@ class API_checker:
                                                                      Any]):
         """ Updates player data inplace"""
 
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&start=1&count=1"
+        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
         data = json.loads(session.get(url).text)
         if not data['leaderboard']:
             return  # not yet ranked player

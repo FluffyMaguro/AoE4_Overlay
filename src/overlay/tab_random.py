@@ -21,9 +21,7 @@ class RandomTab(QtWidgets.QWidget):
         civ_layout.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         layout.addLayout(civ_layout)
 
-        spacer = QtWidgets.QLabel()
-        spacer.setMinimumHeight(50)
-        civ_layout.addWidget(spacer)
+        civ_layout.addItem(QtWidgets.QSpacerItem(0, 50))
 
         # Civ image
         self.civ_image = QtWidgets.QLabel()
@@ -36,9 +34,7 @@ class RandomTab(QtWidgets.QWidget):
         self.civ_label.setStyleSheet("font-weight: bold; font-size: 20px")
         civ_layout.addWidget(self.civ_label)
 
-        spacer = QtWidgets.QLabel()
-        spacer.setMinimumHeight(84)
-        civ_layout.addWidget(spacer)
+        civ_layout.addItem(QtWidgets.QSpacerItem(0, 70))
 
         # Randomize civ
         rnd_civ = QtWidgets.QPushButton("Randomize civ")
@@ -62,9 +58,7 @@ class RandomTab(QtWidgets.QWidget):
         self.map_label.setStyleSheet("font-weight: bold; font-size: 20px")
         map_layout.addWidget(self.map_label)
 
-        spacer = QtWidgets.QLabel()
-        spacer.setMinimumHeight(20)
-        map_layout.addWidget(spacer)
+        civ_layout.addItem(QtWidgets.QSpacerItem(0, 20))
 
         # Randomize map
         rnd_map = QtWidgets.QPushButton("Randomize map")

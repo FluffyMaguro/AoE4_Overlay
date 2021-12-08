@@ -2,7 +2,21 @@
 Ids used by 
 https://aoeiv.net/#api
 
+
+# Mode type            leaderboard_id
+# Quick Match (1v1)	    17
+# Quick Match (2v2)	    18
+# Quick Match (3v3)	    19
+# Quick Match (4v4)	    20
+
 """
+
+mode_data = {
+    17: "1v1",
+    18: "2v2",
+    19: "3v3",
+    20: "4v4",
+}
 
 civ_data = {
     0: 'Abbasid Dynasty',

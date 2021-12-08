@@ -208,7 +208,7 @@ class GraphWidget(QtWidgets.QWidget):
                       percent: bool = False,
                       timestamp: bool = False) -> str:
         if timestamp:
-            return time.strftime("%Y/%m/%d", time.localtime(value))
+            return time.strftime("%b %d, %y", time.localtime(value))
         elif percent:
             return f"{value:.1%}"
         elif -1 < value < 1 and value != 0:
