@@ -154,7 +154,7 @@ def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
         return {}
 
 
-def get_full_match_history(amount: int = 100) -> List[Any]:
+def get_full_match_history(amount: int) -> List[Any]:
     """ Gets match history and adds some data its missing"""
 
     # Get player match history

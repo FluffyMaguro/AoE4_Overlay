@@ -1,11 +1,11 @@
 import platform
 import webbrowser
 from functools import partial
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from PyQt5 import QtWidgets
 
-from overlay.api_checking import Api_checker
+from overlay.api_checking import Api_checker, get_full_match_history
 from overlay.helper_func import is_compiled, version_check
 from overlay.logging_func import get_logger
 from overlay.settings import settings
@@ -49,10 +49,18 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def new_profile_found(self):
         self.graph_tab.run_update()
-        self.stats_tab.run_update()
+        self.stats_tab.run_mode_update()
         self.games_tab.clear_games()
-        self.games_tab.run_update(100)
+        self.update_with_match_history_data(10000)
         self.parent().update_title(settings.player_name)
+
+    def update_with_match_history_data(self, amount: int):
+        """ Gets match history and updates games tab and passes data to stats tab"""
+        scheldule(self.got_match_history, get_full_match_history, amount)
+
+    def got_match_history(self, match_history: List[Any]):
+        self.stats_tab.update_other_stats(match_history)
+        self.games_tab.update_widgets(match_history)
 
     def run_new_game_check(self, delayed_seconds: int = 0):
         """ Creates a new thread for a new api check"""
@@ -66,8 +74,8 @@ class TabWidget(QtWidgets.QTabWidget):
         if game_data is not None and "new_rating" in game_data:
             logger.info("New game finished...")
             self.graph_tab.run_update()
-            self.stats_tab.run_update()
-            self.games_tab.run_update(3)
+            self.stats_tab.run_mode_update()
+            self.update_with_match_history_data(3)
             self.new_game_finished()
         elif game_data is not None:
             logger.info("New live game...")

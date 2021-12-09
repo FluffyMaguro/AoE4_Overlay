@@ -25,93 +25,112 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
 
 class SettingsTab(QtWidgets.QWidget):
     new_profile = QtCore.pyqtSignal()
+    show_hide_overlay = QtCore.pyqtSignal()
 
     def __init__(self, parent):
         super().__init__(parent)
         self.overlay_widget = AoEOverlay()
         self.init_UI()
+        self.show_hide_overlay.connect(self.overlay_widget.show_hide)
 
     def init_UI(self):
         # Layout
-        self.main_layout = QtWidgets.QGridLayout()
+        self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setSpacing(25)
         self.setLayout(self.main_layout)
+
+        ### Profile box
+        profile_box = QtWidgets.QGroupBox("Profile")
+        profile_box.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
+                                  QtWidgets.QSizePolicy.Fixed))
+        profile_box.setMinimumSize(400, 100)
+        profile_box_layout = QtWidgets.QGridLayout()
+        profile_box.setLayout(profile_box_layout)
+        self.main_layout.addWidget(profile_box)
 
         # Profile info
         self.profile_info = QtWidgets.QLabel("No player identified")
         self.profile_info.setStyleSheet("font-weight: bold")
         self.profile_info.setTextInteractionFlags(
             QtCore.Qt.TextSelectableByMouse)
-        self.main_layout.addWidget(self.profile_info)
+        profile_box_layout.addWidget(self.profile_info)
 
         # Notification
         self.notification_label = QtWidgets.QLabel()
         self.notification_label.hide()
-        self.main_layout.addWidget(self.notification_label, 1, 0)
+        profile_box_layout.addWidget(self.notification_label, 0, 0)
 
         # Multi search
         self.multi_search = QtWidgets.QLineEdit()
         self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
-        self.multi_search.setStatusTip(
+        self.multi_search.setToolTip(
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
         self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.multi_search.setMaximumWidth(220)
-        self.main_layout.addWidget(self.multi_search, 2, 0)
+        profile_box_layout.addWidget(self.multi_search, 1, 0)
 
         # Multi search button
         self.multi_search_btn = QtWidgets.QPushButton("Search")
         self.multi_search_btn.clicked.connect(self.find_profile)
         self.multi_search_btn.setShortcut("Return")
-        self.multi_search_btn.setStatusTip(
+        self.multi_search_btn.setToolTip(
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
-        self.main_layout.addWidget(self.multi_search_btn, 2, 1)
+        profile_box_layout.addWidget(self.multi_search_btn, 1, 1)
 
-        self.main_layout.addItem(QtWidgets.QSpacerItem(0, 20), 3, 0)
+        ### Overlay box
+        overlay_box = QtWidgets.QGroupBox("Overlay")
+        overlay_box.setMinimumSize(400, 100)
+        overlay_box.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
+                                  QtWidgets.QSizePolicy.Fixed))
+        overlay_layout = QtWidgets.QGridLayout()
+        overlay_box.setLayout(overlay_layout)
+        self.main_layout.addWidget(overlay_box)
 
         # Hotkey for overlay
-        key_label = QtWidgets.QLabel(
-            "Add a hotkey for showing or hiding overlay:")
-        self.main_layout.addWidget(key_label, 4, 0)
+        key_label = QtWidgets.QLabel("Hotkey for showing and hiding overlay:")
+        overlay_layout.addWidget(key_label, 0, 0)
 
         self.key_showhide = CustomKeySequenceEdit(self)
         self.key_showhide.setMaximumWidth(100)
-        self.key_showhide.setStatusTip("Hotkey hiding and showing the overlay")
-        self.main_layout.addWidget(self.key_showhide, 4, 1)
+        self.key_showhide.setToolTip("Hotkey for showing and hiding overlay")
+        overlay_layout.addWidget(self.key_showhide, 0, 1)
         self.key_showhide.key_changed.connect(self.hotkey_changed)
 
-        # Position change button
-        self.btn_change_position = QtWidgets.QPushButton(
-            "Change/fix overlay position")
-        self.btn_change_position.setStatusTip(
-            "Click to change overlay position. Click again to fix its position."
-        )
-        self.btn_change_position.clicked.connect(
-            self.overlay_widget.change_state)
-        self.main_layout.addWidget(self.btn_change_position, 5, 0)
-
         # Overlay font
-        font_label = QtWidgets.QLabel("Change overlay font")
-        self.main_layout.addWidget(font_label)
+        font_label = QtWidgets.QLabel("Overlay font size:")
+        overlay_layout.addWidget(font_label, 1, 0)
 
         self.font_size_combo = QtWidgets.QComboBox()
-        self.font_size_combo.setStatusTip("Overlay font size")
         for i in range(1, 50):
             self.font_size_combo.addItem(f"{i} pt")
         self.font_size_combo.setCurrentIndex(settings.font_size - 1)
         self.font_size_combo.currentIndexChanged.connect(
             self.font_size_changed)
-        self.main_layout.addWidget(self.font_size_combo, 5, 1)
+        overlay_layout.addWidget(self.font_size_combo, 1, 1)
+
+        # Position change button
+        self.btn_change_position = QtWidgets.QPushButton(
+            "Change/fix overlay position")
+        self.btn_change_position.setToolTip(
+            "Click to change overlay position. Click again to fix its position."
+        )
+        self.btn_change_position.clicked.connect(
+            self.overlay_widget.change_state)
+        overlay_layout.addWidget(self.btn_change_position, 2, 0, 1, 2)
 
         # Create update button
         self.update_button = QtWidgets.QPushButton("New update!")
-        self.update_button.setStatusTip(
-            "Click here to download new app version")
+        self.update_button.setToolTip("Click here to download new app version")
         self.update_button.setStyleSheet(
             'background-color: #3bb825; color: black')
         self.update_button.hide()
-        self.main_layout.addWidget(self.update_button, 6, 0)
+        self.main_layout.addWidget(self.update_button)
 
     def start(self):
         # Initialize
@@ -122,7 +141,7 @@ class SettingsTab(QtWidgets.QWidget):
             self.key_showhide.setKeySequence(
                 QtGui.QKeySequence.fromString(settings.overlay_hotkey))
             keyboard.add_hotkey(settings.overlay_hotkey,
-                                self.overlay_widget.show_hide)
+                                self.show_hide_overlay.emit)
 
         if settings.steam_id or settings.profile_id:
             self.new_profile.emit()
@@ -186,4 +205,4 @@ class SettingsTab(QtWidgets.QWidget):
             keyboard.remove_hotkey(settings.overlay_hotkey)
         settings.overlay_hotkey = new_hotkey
         keyboard.add_hotkey(settings.overlay_hotkey,
-                            self.overlay_widget.show_hide)
+                            self.show_hide_overlay.emit)

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -13,13 +13,17 @@ logger = get_logger(__name__)
 class StatsTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.data: Dict[int, Dict[str, Any]] = {}
+        self.leaderboard_data: Dict[int, Dict[str, Any]] = {}
+        self.match_history_data: List[Dict[str, Any]] = []
+        self.initUI()
 
+    def initUI(self):
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(10, 20, 10, 10)
         main_layout.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(main_layout)
 
+        ### Mode stats
         mode_frame = QtWidgets.QFrame()
         main_layout.addWidget(mode_frame)
         layout = QtWidgets.QGridLayout()
@@ -65,8 +69,12 @@ class StatsTab(QtWidgets.QWidget):
             for i, item in enumerate(self.mode_stats[m].values()):
                 layout.addWidget(item, row, i + 1)
 
-    def run_update(self):
-        scheldule(self.update_data, self.get_all_leaderboard_data)
+        ### Other stats
+        
+
+    def run_mode_update(self):
+        """ Runs update for mode stats"""
+        scheldule(self.update_leaderboard_data, self.get_all_leaderboard_data)
 
     def get_all_leaderboard_data(self):
         result = dict()
@@ -74,13 +82,13 @@ class StatsTab(QtWidgets.QWidget):
             result[leaderboard_id] = get_leaderboard_data(leaderboard_id)
         return result
 
-    def update_data(self, leaderboard_data: Dict[int, Dict[str, Any]]):
+    def update_leaderboard_data(self, leaderboard: Dict[int, Dict[str, Any]]):
         """ Update data and widgets"""
-        self.data = leaderboard_data
-        self.update_widgets()
+        self.leaderboard_data = leaderboard
+        self.update_leaderboard_widgets()
 
-    def update_widgets(self):
-        for m, data in self.data.items():
+    def update_leaderboard_widgets(self):
+        for m, data in self.leaderboard_data.items():
             if not data.get('leaderboard', False):
                 for widget in self.mode_stats[m].values():
                     widget.setText("–")
@@ -95,3 +103,13 @@ class StatsTab(QtWidgets.QWidget):
             games = data['wins'] + data['losses'] + data['drops']
             winrate = data['wins'] / games if games else 0
             self.mode_stats[m]['winrate'].setText(f"{winrate:.2%}")
+
+    def update_other_stats(self, match_history: List[Any]):
+        # Add to our match history data
+        present_match_ids = {i['match_id'] for i in self.match_history_data}
+        for match in reversed(match_history):
+            if match['match_id'] not in present_match_ids:
+                self.match_history_data.append(match)
+
+        print("We have now", len(self.match_history_data),
+              "matches for stats!")

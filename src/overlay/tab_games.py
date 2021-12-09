@@ -6,9 +6,8 @@ from typing import Any, Dict, List
 from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
-from overlay.api_checking import get_full_match_history
 from overlay.logging_func import CONFIG_FOLDER, get_logger
-from overlay.worker import scheldule
+from overlay.settings import settings
 
 logger = get_logger(__name__)
 DATA_FILE = os.path.join(CONFIG_FOLDER, "match_data.json")
@@ -29,18 +28,23 @@ class MatchEntry:
         self.in_layout: bool = False
         self.match_id = match_data['match_id']
 
-        teams = dict()
+        # Try to find the main player team first
+        main_team = 1
         for player in match_data["players"]:
-            team = player["team"]
-            if team not in teams:
-                teams[team] = []
-            teams[team].append(f"{player['name']}")
+            if player['profile_id'] == settings.profile_id:
+                main_team = player['team']
+                break
 
         # Teams
+        teams = {1: [], 2: []}
+        for player in match_data["players"]:
+            team = player["team"]
+            if team in teams:
+                teams[team].append(f"{player['name']}")
+
+        other_team = 1 if main_team == 2 else 2
         team_widgets = []
-        for i, team in enumerate(teams):
-            if i > 1:  # Keep it to two teams
-                break
+        for team in (main_team, other_team):
             team_string = "\n".join(teams[team])
             team_widgets.append(QtWidgets.QLabel(team_string))
 
@@ -92,6 +96,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         # List of added matches. New ones at the end.
+        self.logging_matches = True
         self.matches: List[MatchEntry] = []
 
         # Scroll content
@@ -123,36 +128,47 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Rating change"), 0, 6)
 
+        self.header_widgets = set()
         for i in range(self.scroll_layout.count()):
             self.scroll_layout.itemAt(i).widget().setAlignment(
                 QtCore.Qt.AlignHCenter)
             self.scroll_layout.itemAt(i).widget().setStyleSheet(
                 "font-weight: bold")
+            self.header_widgets.add(self.scroll_layout.itemAt(i).widget())
 
         self.scroll_layout.addWidget(Line(), 1, 0, 1, 7)
 
+    def clear_scroll_layout(self):
+        """ Removes all widgets from the scroll layout
+        All except the header widgets"""
+        widgets_in_layout = {
+            self.scroll_layout.itemAt(i).widget()
+            for i in range(self.scroll_layout.count())
+        }
+        for widget in widgets_in_layout:
+            if widget in self.header_widgets:
+                continue
+            self.scroll_layout.removeWidget(widget)
+
     def clear_games(self):
         """ Removes all games from the game tab"""
-        for item in self.matches:
-            item.remove_from_layout()
+        self.clear_scroll_layout()
         self.matches = []
-
-    def run_update(self, amount: int):
-        scheldule(self.update_widgets, get_full_match_history, amount)
 
     def save_game_data(self, match_data: Dict[str, Any]):
         """ Saves match data into a data file for archivation"""
+        if not self.logging_matches:
+            return
         with open(DATA_FILE, 'a') as f:
             try:
-                data = json.dumps(match_data)
+                data = json.dumps(match_data, indent=2)
                 f.write(data)
             except Exception:
                 logger.exception(f"Failed to save match data")
 
     def update_widgets(self, match_history: List[Any]):
         # Remove widgets from the layout
-        for item in self.matches:
-            item.remove_from_layout()
+        self.clear_scroll_layout()
 
         # Add new matches to our list
         present_match_ids = {i.match_id for i in self.matches}

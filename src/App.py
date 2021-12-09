@@ -99,7 +99,6 @@ class MainApp(QtWidgets.QMainWindow):
             action.setChecked(settings.show_graph[str(i)])
             graphs_menu.addAction(action)
 
-        self.statusBar()
         self.show()
         self.centralWidget().start()
 
