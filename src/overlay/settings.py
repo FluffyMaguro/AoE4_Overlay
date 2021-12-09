@@ -2,11 +2,9 @@ import json
 import os
 from typing import List, Optional
 
-from overlay.logging_func import get_logger
+from overlay.logging_func import CONFIG_FOLDER, get_logger
 
 logger = get_logger(__name__)
-
-CONFIG_FOLDER = os.path.join(os.getenv('APPDATA'), "AoE4_Overlay")
 CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
 
 

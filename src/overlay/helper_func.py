@@ -9,15 +9,16 @@ from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
 
-# def isCompiled() -> bool:
-#     """ Checks whether the app is compiled by Nuitka"""
-#     return '__compiled__' in globals()
-
 # def nuitka_exe_folder():
 #     """ Returns the folder of the executable"""
 #     return pathlib.Path(sys.argv[0]).parent.absolute()
 
 ROOT = pathlib.Path(__file__).parent.parent.parent.absolute()
+
+
+def is_compiled() -> bool:
+    """ Checks whether the app is compiled by Nuitka"""
+    return '__compiled__' in globals()
 
 
 def pyqt_wait(miliseconds: int):

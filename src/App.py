@@ -22,7 +22,7 @@ class MainApp(QtWidgets.QMainWindow):
                   QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
 
         # Create central widget
-        self.setCentralWidget(TabWidget(self))
+        self.setCentralWidget(TabWidget(self, VERSION))
 
         ### Create menu bar items
         menubar = self.menuBar()
@@ -101,7 +101,6 @@ class MainApp(QtWidgets.QMainWindow):
 
         self.statusBar()
         self.show()
-        self.centralWidget().check_for_new_version(VERSION)
         self.centralWidget().start()
 
     def update_title(self, name: str):

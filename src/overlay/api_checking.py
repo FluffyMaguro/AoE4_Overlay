@@ -16,7 +16,7 @@ rating_type_id in match history seem to be offset:
 import json
 import time
 from typing import Any, Dict, List, Optional, Tuple
-
+from pprint import pprint
 import requests
 
 from overlay.aoe4_data import mode_data
@@ -196,9 +196,11 @@ def get_full_match_history(amount: int = 100) -> List[Any]:
     return data
 
 
-class API_checker:
+class Api_checker:
     def __init__(self):
         self.force_stop = False
+        self.last_match_timestamp = -1
+        self.last_rating_timestamp = -1
 
     def sleep(self, seconds: int) -> bool:
         """ Sleeps while checking for force_stop
@@ -251,9 +253,24 @@ class API_checker:
         for player in match['players']:
             self.get_player_data(leaderboard_id, player)
 
-        return match  # ***Delete later
-        if match['started'] > rating['timestamp']:
+        # Check for new game
+        if all((match['started'] > rating['timestamp'],
+                match['started'] != self.last_match_timestamp)):
+
+            pprint(match)
+            print(
+                f"{leaderboard_id=}\n{match['started']=}\n{rating['timestamp']=}"
+            )
+
+            self.last_match_timestamp = match['started']
+            self.last_rating_timestamp = rating['timestamp']
             return match
+
+        # Check for new rating data
+        if all((self.last_match_timestamp != -1,
+                rating['timestamp'] > self.last_rating_timestamp)):
+            self.last_rating_timestamp = rating['timestamp']
+            return {"new_rating": True}
 
     def get_player_data(self, leaderboard_id: int, player_dict: Dict[str,
                                                                      Any]):

@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -15,29 +15,28 @@ class PlayerWidget:
         self.flag.setFixedSize(QtCore.QSize(60, 30))
         self.name = QtWidgets.QLabel()
         self.name.setStyleSheet("font-weight: bold")
+        self.name.setContentsMargins(5, 0, 10, 0)
         self.civ = QtWidgets.QLabel()
         self.rating = QtWidgets.QLabel()
-        self.rating.setStyleSheet("color: blue")
+        self.rating.setStyleSheet("color: #7ab6ff; font-weight: bold")
         self.rank = QtWidgets.QLabel()
         self.winrate = QtWidgets.QLabel()
+        self.winrate.setStyleSheet("color: #fffb78")
         self.wins = QtWidgets.QLabel()
-        self.wins.setStyleSheet("color: green")
+        self.wins.setStyleSheet("color: #48bd21")
         self.losses = QtWidgets.QLabel()
         self.losses.setStyleSheet("color: red")
 
         for column, widget in enumerate(
-            (self.flag, self.name, self.civ, self.rating, self.rank,
-             self.winrate, self.wins, self.losses)):
+            (self.flag, self.name, self.rating, self.rank, self.winrate,
+             self.wins, self.losses)):
             toplayout.addWidget(widget, row, column)
 
     def show(self, show: bool = True):
         """ Shows or hides all widgets in this class """
-        for widget in (self.flag, self.name, self.civ, self.rating, self.rank,
+        for widget in (self.flag, self.name, self.rating, self.rank,
                        self.winrate, self.wins, self.losses):
-            if show:
-                widget.show()
-            else:
-                widget.hide()
+            widget.show() if show else widget.hide()
 
     def update_player(self, player_data: Dict[str, Any]):
         self.show()
@@ -51,6 +50,23 @@ class PlayerWidget:
             pixmap = QtGui.QPixmap(image_file)
             pixmap = pixmap.scaled(self.flag.width(), self.flag.height())
             self.flag.setPixmap(pixmap)
+
+        # Indicate team with background color
+        color = (0, 0, 0, 0)
+        if player_data['team'] == 1:
+            color = (74, 255, 2, 0.35)
+        elif player_data['team'] == 2:
+            color = (3, 179, 255, 0.35)
+        elif player_data['team'] == 3:
+            color = (255, 0, 0, 0.35)
+
+        self.name.setStyleSheet("font-weight: bold; "
+                                "background: QLinearGradient("
+                                "x1: 0, y1: 0,"
+                                "x2: 1, y2: 0,"
+                                f"stop: 0 rgba{color},"
+                                f"stop: 0.8 rgba{color},"
+                                "stop: 1 rgba(0,0,0,0))")
 
         # Check whether we have ranked data
         if not 'rank' in player_data:
@@ -68,6 +84,11 @@ class PlayerWidget:
         )
         self.wins.setText(str(player_data['wins']))
         self.losses.setText(str(player_data['losses']))
+
+
+class NFrame(QtWidgets.QFrame):
+    """ Custom frame so background affects only it """
+    pass
 
 
 class AoEOverlay(QtWidgets.QWidget):
@@ -90,29 +111,78 @@ class AoEOverlay(QtWidgets.QWidget):
                             | QtCore.Qt.CoverWindow
                             | QtCore.Qt.NoDropShadowWindowHint
                             | QtCore.Qt.WindowDoesNotAcceptFocus)
-        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
+        # Layouts & inner frame
+        layout = QtWidgets.QVBoxLayout()
+        layout.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        self.setLayout(layout)
+
+        self.inner_frame = NFrame()
+        layout.addWidget(self.inner_frame)
         self.playerlayout = QtWidgets.QGridLayout()
+        self.playerlayout.setContentsMargins(10, 20, 20, 10)
+        self.playerlayout.setHorizontalSpacing(10)
         self.playerlayout.setAlignment(QtCore.Qt.AlignRight
                                        | QtCore.Qt.AlignTop)
-        self.setLayout(self.playerlayout)
-        self.update_font_size(settings.font_size)
+        self.inner_frame.setLayout(self.playerlayout)
+        self.update_style(settings.font_size)
 
-        # Add UI elements
-        self.map = QtWidgets.QLabel("MAP_NAME")
-        self.playerlayout.addWidget(self.map)
+        # Map
+        self.map = QtWidgets.QLabel()
+        self.map.setStyleSheet(
+            "font-weight: bold; font-style: italic; color: #f2ea54")
+        self.map.setAlignment(QtCore.Qt.AlignCenter)
+        self.playerlayout.addWidget(self.map, 0, 0, 1, 2)
 
+        # Header
+        rating = QtWidgets.QLabel("Elo")
+        rating.setStyleSheet("color: #7ab6ff; font-weight: bold")
+        rank = QtWidgets.QLabel("Rank")
+        winrate = QtWidgets.QLabel("Winrate")
+        winrate.setStyleSheet("color: #fffb78")
+        wins = QtWidgets.QLabel("Wins")
+        wins.setStyleSheet("color: #48bd21")
+        losses = QtWidgets.QLabel("Losses")
+        losses.setStyleSheet("color: red")
+
+        for column, widget in enumerate((rating, rank, winrate, wins, losses)):
+            self.playerlayout.addWidget(widget, 0, column + 2)
+
+        # Add players
         self.players = []
         for i in range(8):
             self.players.append(PlayerWidget(i + 1, self.playerlayout))
 
-        self.show()
+        # Save position
+        self.old_pos = self.pos()
 
-    def update_font_size(self, font_size: int):
-        self.setStyleSheet(f"QLabel {{font-size: {font_size}pt }}")
+    def mousePressEvent(self, event: QtGui.QMouseEvent):
+        """ Override used for window dragging"""
+        self.old_pos = event.globalPos()
+
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+        """ Override used for window dragging"""
+        delta = QtCore.QPoint(event.globalPos() - self.old_pos)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.old_pos = event.globalPos()
+
+    def update_style(self, font_size: int):
+        self.setStyleSheet(
+            f"QLabel {{font-size: {font_size}pt; color: white }}"
+            "NFrame"
+            "{"
+            "background: QLinearGradient("
+            "x1: 0, y1: 0,"
+            "x2: 1, y2: 0,"
+            "stop: 0 rgba(0,0,0,0),"
+            "stop: 0.1 rgba(0,0,0,0.5),"
+            "stop: 1 rgba(0,0,0,1))"
+            "}")
 
     def update_data(self, game_data: Dict[str, Any]):
-        self.map.setText(map_data.get(game_data['map_type'], "Unknown map"))
+        self.map.setText(
+            f'{map_data.get(game_data["map_type"], "Unknown map")} ')
 
         [p.show(False) for p in self.players]
         for i, player in enumerate(game_data['players']):
@@ -122,10 +192,7 @@ class AoEOverlay(QtWidgets.QWidget):
             self.show()
 
     def show_hide(self):
-        if self.isVisible():
-            self.hide()
-        else:
-            self.show()
+        self.hide() if self.isVisible() else self.show()
 
     def save_geometry(self):
         """ Saves overlay geometry into settings"""

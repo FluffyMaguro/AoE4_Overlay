@@ -169,7 +169,7 @@ class SettingsTab(QtWidgets.QWidget):
     def font_size_changed(self):
         font_size = self.font_size_combo.currentIndex() + 1
         settings.font_size = font_size
-        self.overlay_widget.update_font_size(font_size)
+        self.overlay_widget.update_style(font_size)
 
     def hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.

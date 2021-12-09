@@ -1,3 +1,5 @@
+import json
+import os
 import time
 from typing import Any, Dict, List
 
@@ -5,7 +7,11 @@ from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
 from overlay.api_checking import get_full_match_history
+from overlay.logging_func import CONFIG_FOLDER, get_logger
 from overlay.worker import scheldule
+
+logger = get_logger(__name__)
+DATA_FILE = os.path.join(CONFIG_FOLDER, "match_data.json")
 
 
 class Line(QtWidgets.QFrame):
@@ -46,7 +52,6 @@ class MatchEntry:
         date = QtWidgets.QLabel(
             time.strftime("%b %d, %H:%M:%S",
                           time.localtime(match_data['started'])))
-        date.setStatusTip("year/month/day HH:MM:SS")
 
         # Mode
         mode = QtWidgets.QLabel()
@@ -135,6 +140,15 @@ class MatchHistoryTab(QtWidgets.QWidget):
     def run_update(self, amount: int):
         scheldule(self.update_widgets, get_full_match_history, amount)
 
+    def save_game_data(self, match_data: Dict[str, Any]):
+        """ Saves match data into a data file for archivation"""
+        with open(DATA_FILE, 'a') as f:
+            try:
+                data = json.dumps(match_data)
+                f.write(data)
+            except Exception:
+                logger.exception(f"Failed to save match data")
+
     def update_widgets(self, match_history: List[Any]):
         # Remove widgets from the layout
         for item in self.matches:
@@ -148,6 +162,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
             if match['match_id'] in present_match_ids:
                 continue
             self.matches.append(MatchEntry(self.scroll_layout, match))
+            self.save_game_data(match)
 
         # Re-add widgets to the layout
         added_rows = 2  # With header and line
