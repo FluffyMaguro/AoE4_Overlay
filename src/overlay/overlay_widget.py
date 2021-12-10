@@ -86,11 +86,6 @@ class PlayerWidget:
         self.losses.setText(str(player_data['losses']))
 
 
-class NFrame(QtWidgets.QFrame):
-    """ Custom frame so background affects only it """
-    pass
-
-
 class AoEOverlay(QtWidgets.QWidget):
     """Overlay widget showing AOE4 information """
     def __init__(self):
@@ -118,7 +113,8 @@ class AoEOverlay(QtWidgets.QWidget):
         layout.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.setLayout(layout)
 
-        self.inner_frame = NFrame()
+        self.inner_frame = QtWidgets.QFrame()
+        self.inner_frame.setObjectName("inner_frame")
         layout.addWidget(self.inner_frame)
         self.playerlayout = QtWidgets.QGridLayout()
         self.playerlayout.setContentsMargins(10, 20, 20, 10)
@@ -170,7 +166,7 @@ class AoEOverlay(QtWidgets.QWidget):
     def update_style(self, font_size: int):
         self.setStyleSheet(
             f"QLabel {{font-size: {font_size}pt; color: white }}"
-            "NFrame"
+            "QFrame#inner_frame"
             "{"
             "background: QLinearGradient("
             "x1: 0, y1: 0,"

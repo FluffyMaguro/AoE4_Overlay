@@ -58,11 +58,6 @@ class SettingsTab(QtWidgets.QWidget):
             QtCore.Qt.TextSelectableByMouse)
         profile_box_layout.addWidget(self.profile_info)
 
-        # Notification
-        self.notification_label = QtWidgets.QLabel()
-        self.notification_label.hide()
-        profile_box_layout.addWidget(self.notification_label, 0, 0)
-
         # Multi search
         self.multi_search = QtWidgets.QLineEdit()
         self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
@@ -81,6 +76,10 @@ class SettingsTab(QtWidgets.QWidget):
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
         profile_box_layout.addWidget(self.multi_search_btn, 1, 1)
+
+        # Notification
+        self.notification_label = QtWidgets.QLabel()
+        profile_box_layout.addWidget(self.notification_label, 2, 0)
 
         ### Overlay box
         overlay_box = QtWidgets.QGroupBox("Overlay")
@@ -163,13 +162,12 @@ class SettingsTab(QtWidgets.QWidget):
 
     def notification(self, text: str, color: str = "black"):
         """ Shows a notification"""
-        self.notification_label.show()
         self.notification_label.setText(text)
         self.notification_label.setStyleSheet(f"color: {color}")
 
     def find_profile(self):
         """ Attempts to find player ids based on provided text (name, either id)"""
-        self.notification_label.hide()
+        self.notification_label.setText("")
         text = self.multi_search.text().strip()
         if not text:
             return
