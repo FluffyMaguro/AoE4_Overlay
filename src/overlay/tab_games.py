@@ -126,7 +126,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.scroll_layout.addWidget(QtWidgets.QLabel("Date"), 0, 3)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Mode"), 0, 4)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
-        self.scroll_layout.addWidget(QtWidgets.QLabel("Rating change"), 0, 6)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Rating"), 0, 6)
 
         self.header_widgets = set()
         for i in range(self.scroll_layout.count()):

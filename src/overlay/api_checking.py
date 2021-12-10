@@ -156,9 +156,9 @@ def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
 
 def get_full_match_history(amount: int) -> List[Any]:
     """ Gets match history and adds some data its missing"""
-
     # Get player match history
     data = get_match_history(amount=amount)
+    logger.info(f"Asked for {amount} games | obtained {len(data)} from get_match_history")
     # What type of games are there
     leaderboard_ids = {i["rating_type_id"] + 2 for i in data}
     # Get rating histories for those modes

@@ -15,13 +15,13 @@ class StatsTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.leaderboard_data: Dict[int, Dict[str, Any]] = {}
-        self.match_history_data: List[Dict[str, Any]] = []
+        self.match_data: List[Dict[str, Any]] = []
         self.initUI()
 
     def initUI(self):
         main_layout = QtWidgets.QVBoxLayout()
-        main_layout.setContentsMargins(10, 20, 10, 10)
-        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(10, 10, 10, 5)
+        main_layout.setSpacing(10)
         main_layout.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(main_layout)
 
@@ -30,7 +30,6 @@ class StatsTab(QtWidgets.QWidget):
         main_layout.addWidget(mode_frame)
         layout = QtWidgets.QGridLayout()
         layout.setAlignment(QtCore.Qt.AlignTop)
-        layout.setContentsMargins(10, 10, 10, 10)
         mode_frame.setSizePolicy(QtWidgets.QSizePolicy.Minimum,
                                  QtWidgets.QSizePolicy.Minimum)
         mode_frame.setLayout(layout)
@@ -73,14 +72,41 @@ class StatsTab(QtWidgets.QWidget):
         ### Filtering
         slayout = QtWidgets.QHBoxLayout()
         slayout.setAlignment(QtCore.Qt.AlignLeft)
+        slayout.setSpacing(5)
         main_layout.addLayout(slayout)
 
-        # Note
+        # Games found
+        self.games_found = QtWidgets.QLabel("Analyzed games: 0 (?)")
+        self.games_found.setToolTip(
+            "The number of analyzed games might be lower due to API not providing all data"
+        )
+        self.games_found.setMinimumWidth(150)
+        self.games_found.setStyleSheet("QLabel {font-weight: bold}")
+        slayout.addWidget(self.games_found)
+        slayout.addItem(QtWidgets.QSpacerItem(50, 0))
+
+        # Filtering mode label
+        mode = QtWidgets.QLabel("Filter mode:")
+        mode.setStyleSheet("font-weight: bold")
+        slayout.addWidget(mode)
+
+        # Filtering mode combobox
+        self.mode_box = QtWidgets.QComboBox()
+        self.mode_box.setMaximumWidth(200)
+        self.mode_box.setToolTip("Filter data for a mode")
+        slayout.addWidget(self.mode_box)
+        self.mode_box.addItem("All")
+        for mode in mode_data.values():
+            self.mode_box.addItem(mode)
+        self.mode_box.currentIndexChanged.connect(self.update_civ_map_stats)
+        slayout.addItem(QtWidgets.QSpacerItem(50, 0))
+
+        # Filtering civ label
         note = QtWidgets.QLabel("Filter civilization:")
         note.setStyleSheet("font-weight: bold")
         slayout.addWidget(note)
 
-        # Civ combobox
+        # Filtering civ combobox
         self.civ_box = QtWidgets.QComboBox()
         self.civ_box.setMaximumWidth(200)
         self.civ_box.setToolTip("Filter data for a civilization")
@@ -88,19 +114,14 @@ class StatsTab(QtWidgets.QWidget):
         self.civ_box.addItem("All")
         for civ in civ_data.values():
             self.civ_box.addItem(civ)
-        self.civ_box.currentIndexChanged.connect(self.calculate_other_stats)
-
-        # Games found
-        self.games_found = QtWidgets.QLabel("→ Valid games: 0")
-        self.games_found.setStyleSheet("font-weight: bold")
-        slayout.addWidget(self.games_found)
+        self.civ_box.currentIndexChanged.connect(self.update_civ_map_stats)
 
         ### Results
         result_layout = QtWidgets.QHBoxLayout()
         main_layout.addLayout(result_layout)
 
         ### Civ stats
-        civ_group = QtWidgets.QGroupBox("Civilizations")
+        civ_group = QtWidgets.QGroupBox("Civilization statistics")
         result_layout.addWidget(civ_group)
         civg_layout = QtWidgets.QGridLayout()
         civg_layout.setAlignment(QtCore.Qt.AlignTop)
@@ -123,6 +144,7 @@ class StatsTab(QtWidgets.QWidget):
             row += 1
             self.civ_widgets[civ] = dict()
             self.civ_widgets[civ]['name'] = QtWidgets.QLabel(civ)
+            self.civ_widgets[civ]['name'].setMinimumWidth(130)
             civg_layout.addWidget(self.civ_widgets[civ]['name'], row, 0)
             self.civ_widgets[civ]['wins'] = QtWidgets.QLabel("–")
             civg_layout.addWidget(self.civ_widgets[civ]['wins'], row, 1)
@@ -132,7 +154,7 @@ class StatsTab(QtWidgets.QWidget):
             civg_layout.addWidget(self.civ_widgets[civ]['winrate'], row, 3)
 
         # Map stats
-        map_group = QtWidgets.QGroupBox("Maps")
+        map_group = QtWidgets.QGroupBox("Map statistics")
         result_layout.addWidget(map_group)
         map_layout = QtWidgets.QGridLayout()
         map_group.setLayout(map_layout)
@@ -154,6 +176,7 @@ class StatsTab(QtWidgets.QWidget):
             row += 1
             self.map_widgets[m] = dict()
             self.map_widgets[m]['name'] = QtWidgets.QLabel(m)
+            self.map_widgets[m]['name'].setMinimumWidth(130)
             map_layout.addWidget(self.map_widgets[m]['name'], row, 0)
             self.map_widgets[m]['wins'] = QtWidgets.QLabel("–")
             map_layout.addWidget(self.map_widgets[m]['wins'], row, 1)
@@ -196,40 +219,83 @@ class StatsTab(QtWidgets.QWidget):
 
     def update_other_stats(self, match_history: List[Any]):
         # Add to our match history data
-        present_match_ids = {i['match_id'] for i in self.match_history_data}
+        present_match_ids = {m['match_id'] for m in self.match_data}
         for match in reversed(match_history):
             if match['match_id'] not in present_match_ids:
-                self.match_history_data.append(match)
-        self.calculate_other_stats()
-
-    def calculate_other_stats(self):
-        """ Calculates and updates other stats"""
-
-        # Get the useful information from matches
-        data = []
-        for match in self.match_history_data:
-            game = {"map": None, "win": None, "mode": None, "civ": None}
-            if match['result'] not in {"Loss", "Win"}:
-                continue
-            game['map'] = match['map_type']
-            game['win'] = match['result'] == "Win"
-            game['mode'] = match['rating_type_id'] + 2
-            for player in match['players']:
-                if player['profile_id'] == settings.profile_id:
-                    game['civ'] = player['civ']
-                    break
-            data.append(game)
-
-        # Filter games based on the selected civilization
-        filter_civ = self.civ_box.currentIndex() - 1
-        if filter_civ != -1:
-            filtered_games = [g for g in data if g['civ'] == filter_civ]
-        else:
-            filtered_games = data
-
-        print(
-            f"Filtering {len(self.match_history_data)} → {len(data)} → {len(filtered_games)}"
+                self.add_match_data(match)
+        self.update_civ_map_stats()
+        logger.info(
+            f'Received {len(match_history)} | Saved {len(self.match_data)} games'
         )
-        self.games_found.setText(f"→ Valid games: {len(filtered_games)}")
 
-        ### !!! Update map and civ data
+    def add_match_data(self, match: Dict[str, Any]):
+        """ Saves only specific data from the match history data"""
+        game = dict()  # includes: win, mode, map, civ
+        if match['result'] not in {"Loss", "Win"}:
+            return
+        game['map'] = match['map_type']
+        game['win'] = match['result'] == "Win"
+        game['mode'] = match['rating_type_id'] + 2
+        game['match_id'] = match['match_id']
+        for player in match['players']:
+            if player['profile_id'] == settings.profile_id:
+                game['civ'] = player['civ']
+                break
+        if 'civ' not in game:
+            return
+        self.match_data.append(game)
+
+    def clear_match_data(self):
+        self.match_data = []
+        self.update_civ_map_stats()
+
+    def update_civ_map_stats(self):
+        # Filter games based on the selected civilization
+        fdata = self.match_data
+        if self.civ_box.currentIndex() != 0:
+            filter_civ = self.civ_box.currentIndex() - 1
+            fdata = [g for g in self.match_data if g['civ'] == filter_civ]
+
+        # Filter games based on the selected mode
+        if self.mode_box.currentIndex() != 0:
+            filter_mode = self.mode_box.currentIndex() + 16
+            fdata = [g for g in fdata if g['mode'] == filter_mode]
+
+        # Update the number of analyzed games
+        self.games_found.setText(f"Analyzed games: {len(fdata)} (?)")
+
+        # Get specific civ and map data from filtered games
+        civ_stats = {c_index: {"wins": 0, "losses": 0} for c_index in civ_data}
+        map_stats = {m_index: {"wins": 0, "losses": 0} for m_index in map_data}
+        # game = {"map": None, "win": None, "mode": None, "civ": None}
+        for game in fdata:
+            c = game['civ']
+            m = game['map']
+            if game['win']:
+                civ_stats[c]['wins'] += 1
+                map_stats[m]['wins'] += 1
+            else:
+                civ_stats[c]['losses'] += 1
+                map_stats[m]['losses'] += 1
+
+        # Update civ widgets
+        for civ_index, c_data in civ_stats.items():
+            civ_name = civ_data[civ_index]
+            swins = str(c_data['wins']) if c_data['wins'] else "–"
+            self.civ_widgets[civ_name]['wins'].setText(swins)
+            slosses = str(c_data['losses']) if c_data['losses'] else "–"
+            self.civ_widgets[civ_name]['losses'].setText(slosses)
+            games = c_data['wins'] + c_data['losses']
+            swinrate = f"{c_data['wins']/games:.1%}" if games else "–"
+            self.civ_widgets[civ_name]['winrate'].setText(swinrate)
+
+        # Update map widgets
+        for map_index, m_data in map_stats.items():
+            map_name = map_data[map_index]
+            swins = str(m_data['wins']) if m_data['wins'] else "–"
+            self.map_widgets[map_name]['wins'].setText(swins)
+            slosses = str(m_data['losses']) if m_data['losses'] else "–"
+            self.map_widgets[map_name]['losses'].setText(slosses)
+            games = m_data['wins'] + m_data['losses']
+            swinrate = f"{m_data['wins']/games:.1%}" if games else "–"
+            self.map_widgets[map_name]['winrate'].setText(swinrate)

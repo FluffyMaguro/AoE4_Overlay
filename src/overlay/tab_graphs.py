@@ -4,11 +4,8 @@ from PyQt5 import QtWidgets
 
 from overlay.api_checking import get_rating_history
 from overlay.graph_widget import GraphWidget
-from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.worker import scheldule
-
-logger = get_logger(__name__)
 
 
 class GraphTab(QtWidgets.QWidget):

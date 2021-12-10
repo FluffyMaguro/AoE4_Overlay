@@ -5,10 +5,6 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.logging_func import get_logger
-
-logger = get_logger(__name__)
-
 # Basic color palette as used in matplotlib
 COLORS = ((51, 120, 182), (246, 126, 0), (65, 160, 33), (205, 35, 33),
           (145, 103, 191), (136, 86, 74), (220, 119, 195), (127, 127, 127),

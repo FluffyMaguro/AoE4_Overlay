@@ -51,6 +51,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab.run_update()
         self.stats_tab.run_mode_update()
         self.games_tab.clear_games()
+        self.stats_tab.clear_match_data()
         self.update_with_match_history_data(10000)
         self.parent().update_title(settings.player_name)
 
