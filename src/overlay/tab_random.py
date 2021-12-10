@@ -1,4 +1,5 @@
 import random
+from typing import Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -11,7 +12,12 @@ class RandomTab(QtWidgets.QWidget):
         super().__init__(parent)
         self.current_map = None
         self.current_civ = None
+        self.pixmaps: Dict[str, QtGui.QPixmap] = dict()
+        self.initUI()
+        self.randomize_map()
+        self.randomize_civ()
 
+    def initUI(self):
         layout = QtWidgets.QHBoxLayout()
         layout.setContentsMargins(10, 40, 10, 10)
         self.setLayout(layout)
@@ -20,7 +26,6 @@ class RandomTab(QtWidgets.QWidget):
         civ_layout = QtWidgets.QVBoxLayout()
         civ_layout.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         layout.addLayout(civ_layout)
-
         civ_layout.addItem(QtWidgets.QSpacerItem(0, 50))
 
         # Civ image
@@ -33,8 +38,7 @@ class RandomTab(QtWidgets.QWidget):
         self.civ_label.setAlignment(QtCore.Qt.AlignHCenter)
         self.civ_label.setStyleSheet("font-weight: bold; font-size: 20px")
         civ_layout.addWidget(self.civ_label)
-
-        civ_layout.addItem(QtWidgets.QSpacerItem(0, 70))
+        civ_layout.addItem(QtWidgets.QSpacerItem(0, 100))
 
         # Randomize civ
         rnd_civ = QtWidgets.QPushButton("Randomize civ")
@@ -57,8 +61,7 @@ class RandomTab(QtWidgets.QWidget):
         self.map_label.setAlignment(QtCore.Qt.AlignHCenter)
         self.map_label.setStyleSheet("font-weight: bold; font-size: 20px")
         map_layout.addWidget(self.map_label)
-
-        civ_layout.addItem(QtWidgets.QSpacerItem(0, 20))
+        map_layout.addItem(QtWidgets.QSpacerItem(0, 30))
 
         # Randomize map
         rnd_map = QtWidgets.QPushButton("Randomize map")
@@ -66,9 +69,19 @@ class RandomTab(QtWidgets.QWidget):
         rnd_map.setMinimumHeight(30)
         map_layout.addWidget(rnd_map)
 
-        # Initial randomize
-        self.randomize_map()
-        self.randomize_civ()
+    def get_pixmap(self, file_path: str,
+                   widget: QtWidgets.QWidget) -> QtGui.QPixmap:
+        """ Asset manager for pixmaps
+
+        Returns a pixmap from `file_path` scaled for `widget`"""
+        if file_path in self.pixmaps:
+            return self.pixmaps[file_path]
+        pixmap = QtGui.QPixmap(file_path)
+        pixmap = pixmap.scaled(widget.width(), widget.height(),
+                               QtCore.Qt.KeepAspectRatio,
+                               QtCore.Qt.FastTransformation)
+        self.pixmaps[file_path] = pixmap
+        return pixmap
 
     def randomize_civ(self):
         civ_name = random.choice(tuple(civ_data.values()))
@@ -78,10 +91,7 @@ class RandomTab(QtWidgets.QWidget):
         self.current_civ = civ_name
 
         img_path = file_path(f"src/img/flags/{civ_name}.webp")
-        pixmap = QtGui.QPixmap(img_path)
-        pixmap = pixmap.scaled(self.civ_image.width(), self.civ_image.height(),
-                               QtCore.Qt.KeepAspectRatio,
-                               QtCore.Qt.FastTransformation)
+        pixmap = self.get_pixmap(img_path, self.civ_image)
         self.civ_image.setPixmap(pixmap)
         self.civ_label.setText(civ_name)
 
@@ -93,9 +103,6 @@ class RandomTab(QtWidgets.QWidget):
         self.current_map = map_name
 
         img_path = file_path(f"src/img/maps/{map_name.replace(' ','_')}.png")
-        pixmap = QtGui.QPixmap(img_path)
-        pixmap = pixmap.scaled(self.map_image.width(), self.map_image.height(),
-                               QtCore.Qt.KeepAspectRatio,
-                               QtCore.Qt.FastTransformation)
+        pixmap = self.get_pixmap(img_path, self.map_image)
         self.map_image.setPixmap(pixmap)
         self.map_label.setText(map_name)

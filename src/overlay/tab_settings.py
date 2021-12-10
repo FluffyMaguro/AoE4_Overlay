@@ -192,8 +192,8 @@ class SettingsTab(QtWidgets.QWidget):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
         if new_hotkey == "Del":
-            self.key_showhide.setKeySequence(
-                QtGui.QKeySequence.fromString(None))
+            self.key_showhide.setKeySequence(QtGui.QKeySequence.fromString(""))
+            settings.overlay_hotkey = ""
             return
         elif not new_hotkey or new_hotkey == settings.overlay_hotkey:
             return

@@ -8,12 +8,11 @@ from PyQt5 import QtCore
 from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
+ROOT = pathlib.Path(__file__).parent.parent.parent.absolute()
 
 # def nuitka_exe_folder():
 #     """ Returns the folder of the executable"""
 #     return pathlib.Path(sys.argv[0]).parent.absolute()
-
-ROOT = pathlib.Path(__file__).parent.parent.parent.absolute()
 
 
 def is_compiled() -> bool:

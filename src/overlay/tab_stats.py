@@ -26,7 +26,7 @@ class StatsTab(QtWidgets.QWidget):
         self.setLayout(main_layout)
 
         ### Mode stats
-        mode_frame = QtWidgets.QGroupBox("Mode")
+        mode_frame = QtWidgets.QGroupBox("Mode stats")
         main_layout.addWidget(mode_frame)
         layout = QtWidgets.QGridLayout()
         layout.setAlignment(QtCore.Qt.AlignTop)
@@ -40,9 +40,11 @@ class StatsTab(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel("Wins"), row, 1)
         layout.addWidget(QtWidgets.QLabel("Losses"), row, 2)
         layout.addWidget(QtWidgets.QLabel("Drops"), row, 3)
-        layout.addWidget(QtWidgets.QLabel("Winrate"), row, 4)
-        layout.addWidget(QtWidgets.QLabel("Rating"), row, 5)
-        layout.addWidget(QtWidgets.QLabel("Streak"), row, 6)
+        layout.addWidget(QtWidgets.QLabel("Games"), row, 4)
+        layout.addWidget(QtWidgets.QLabel("Winrate"), row, 5)
+        layout.addWidget(QtWidgets.QLabel("Rating"), row, 6)
+        layout.addWidget(QtWidgets.QLabel("Max rating"), row, 7)
+        layout.addWidget(QtWidgets.QLabel("Max streak"), row, 8)
 
         for i in range(layout.count()):
             layout.itemAt(i).widget().setStyleSheet("font-weight: bold")
@@ -54,16 +56,20 @@ class StatsTab(QtWidgets.QWidget):
             wins = QtWidgets.QLabel("–")
             losses = QtWidgets.QLabel("–")
             drops = QtWidgets.QLabel("–")
+            games = QtWidgets.QLabel("–")
             winrate = QtWidgets.QLabel("–")
             rating = QtWidgets.QLabel("–")
+            hrating = QtWidgets.QLabel("–")
             streak = QtWidgets.QLabel("–")
 
             self.mode_stats[m] = {
                 "wins": wins,
                 "losses": losses,
                 "drops": drops,
+                "games": games,
                 "winrate": winrate,
                 "rating": rating,
+                "hrating": hrating,
                 "streak": streak
             }
             for i, item in enumerate(self.mode_stats[m].values()):
@@ -121,7 +127,7 @@ class StatsTab(QtWidgets.QWidget):
         main_layout.addLayout(result_layout)
 
         ### Civ stats
-        civ_group = QtWidgets.QGroupBox("Civilization statistics")
+        civ_group = QtWidgets.QGroupBox("Civilization stats")
         result_layout.addWidget(civ_group)
         civg_layout = QtWidgets.QGridLayout()
         civg_layout.setAlignment(QtCore.Qt.AlignTop)
@@ -154,7 +160,7 @@ class StatsTab(QtWidgets.QWidget):
             civg_layout.addWidget(self.civ_widgets[civ]['winrate'], row, 3)
 
         # Map stats
-        map_group = QtWidgets.QGroupBox("Map statistics")
+        map_group = QtWidgets.QGroupBox("Map stats")
         result_layout.addWidget(map_group)
         map_layout = QtWidgets.QGridLayout()
         map_group.setLayout(map_layout)
@@ -210,10 +216,12 @@ class StatsTab(QtWidgets.QWidget):
             data = data['leaderboard'][0]
             self.mode_stats[m]['wins'].setText(str(data['wins']))
             self.mode_stats[m]['losses'].setText(str(data['losses']))
+            self.mode_stats[m]['games'].setText(str(data['games']))
             self.mode_stats[m]['drops'].setText(str(data['drops']))
             self.mode_stats[m]['rating'].setText(str(data['rating']))
-            self.mode_stats[m]['streak'].setText(str(data['streak']))
-            games = data['wins'] + data['losses'] + data['drops']
+            self.mode_stats[m]['hrating'].setText(str(data['highest_rating']))
+            self.mode_stats[m]['streak'].setText(str(data['highest_streak']))
+            games = data['wins'] + data['losses']
             winrate = data['wins'] / games if games else 0
             self.mode_stats[m]['winrate'].setText(f"{winrate:.2%}")
 

@@ -49,8 +49,7 @@ class GraphTab(QtWidgets.QWidget):
             if not values:
                 continue
             index = id - 16
-            label = f"{index}v{index} rating"
-
+            label = f"{index}v{index}"
             y = [i['rating'] for i in values]
             x = [i['timestamp'] for i in values]
             self.graph.plot(x,
