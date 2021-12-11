@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import sys
 
 import requests
 from PyQt5 import QtCore
@@ -8,16 +9,7 @@ from PyQt5 import QtCore
 from overlay.logging_func import get_logger
 
 logger = get_logger(__name__)
-ROOT = pathlib.Path(__file__).parent.parent.parent.absolute()
-
-# def nuitka_exe_folder():
-#     """ Returns the folder of the executable"""
-#     return pathlib.Path(sys.argv[0]).parent.absolute()
-
-
-def is_compiled() -> bool:
-    """ Checks whether the app is compiled by Nuitka"""
-    return '__compiled__' in globals()
+ROOT = pathlib.Path(sys.argv[0]).parent.absolute()
 
 
 def pyqt_wait(miliseconds: int):
@@ -25,6 +17,11 @@ def pyqt_wait(miliseconds: int):
     loop = QtCore.QEventLoop()
     QtCore.QTimer.singleShot(miliseconds, loop.quit)
     loop.exec_()
+
+
+def is_compiled() -> bool:
+    """ Checks whether the app is compiled by Nuitka"""
+    return '__compiled__' in globals()
 
 
 def file_path(file: str) -> str:

@@ -45,7 +45,7 @@ class PlayerWidget:
         self.civ.setText(f"({civ_name})")
 
         # Flag
-        image_file = file_path(f'src/img/flags/{civ_name}.webp')
+        image_file = file_path(f'img/flags/{civ_name}.webp')
         if os.path.isfile(image_file):
             pixmap = QtGui.QPixmap(image_file)
             pixmap = pixmap.scaled(self.flag.width(), self.flag.height())
@@ -91,11 +91,10 @@ class AoEOverlay(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.fixed = True
-
         if settings.overlay_geometry is None:
-            self.setGeometry(0, 0, 600, 600)
+            self.setGeometry(0, 0, 700, 400)
             sg = QtWidgets.QDesktopWidget().screenGeometry(0)
-            self.move(sg.width() - self.width() - 10, sg.top() + 10)
+            self.move(sg.width() - self.width() + 10, sg.top() - 20)
         else:
             self.setGeometry(*settings.overlay_geometry)
 
@@ -228,7 +227,7 @@ class AoEOverlay(QtWidgets.QWidget):
                                 | QtCore.Qt.CustomizeWindowHint
                                 | QtCore.Qt.WindowTitleHint)
             self.setAttribute(QtCore.Qt.WA_TranslucentBackground, False)
-            self.move(pos.x() - 8, pos.y() - 31)
+            self.move(pos.x() - 1, pos.y() - 31)
         else:
             self.fixed = True
             self.setWindowFlags(QtCore.Qt.FramelessWindowHint

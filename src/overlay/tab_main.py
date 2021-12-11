@@ -41,7 +41,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def start(self):
         logger.info(
-            f"Starting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
+            f"\nStarting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
         )
         self.check_for_new_version()
         self.settigns_tab.start()

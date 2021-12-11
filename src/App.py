@@ -16,7 +16,7 @@ class MainApp(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
-        self.setWindowIcon(QtGui.QIcon(file_path('src/img/icon.ico')))
+        self.setWindowIcon(QtGui.QIcon(file_path('img/icon.ico')))
         self.setGeometry(0, 0, settings.app_width, settings.app_height)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
                   QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
@@ -35,8 +35,8 @@ class MainApp(QtWidgets.QMainWindow):
             getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
         htmlAction = QtWidgets.QAction(icon, 'Html files', self)
         htmlAction.setStatusTip('Open the folder with HTML layout files')
-        htmlAction.triggered.connect(lambda: subprocess.run(
-            ['explorer', file_path("src/html")]))
+        htmlAction.triggered.connect(
+            lambda: subprocess.run(['explorer', file_path("html")]))
         file_menu.addAction(htmlAction)
 
         # Config
@@ -57,7 +57,7 @@ class MainApp(QtWidgets.QMainWindow):
         file_menu.addAction(exitAction)
 
         # Github
-        icon = QtGui.QIcon(file_path("src/img/github.png"))
+        icon = QtGui.QIcon(file_path("img/github.png"))
         githubAction = QtWidgets.QAction(icon, 'Overlay on Github', self)
         githubAction.triggered.connect(
             partial(webbrowser.open,
@@ -65,21 +65,21 @@ class MainApp(QtWidgets.QMainWindow):
         link_menu.addAction(githubAction)
 
         # Discord
-        icon = QtGui.QIcon(file_path("src/img/discord.png"))
+        icon = QtGui.QIcon(file_path("img/discord.png"))
         mdiscordAction = QtWidgets.QAction(icon, 'My discord', self)
         mdiscordAction.triggered.connect(
             partial(webbrowser.open, "https://discord.gg/FtGdhqD"))
         link_menu.addAction(mdiscordAction)
 
         # Maguro
-        icon = QtGui.QIcon(file_path("src/img/maguro.jpg"))
+        icon = QtGui.QIcon(file_path("img/maguro.jpg"))
         maguroAction = QtWidgets.QAction(icon, 'Maguro.one', self)
         maguroAction.triggered.connect(
             partial(webbrowser.open, "https://www.maguro.one/"))
         link_menu.addAction(maguroAction)
 
         # AoEIV.net
-        icon = QtGui.QIcon(file_path("src/img/aoeivnet.png"))
+        icon = QtGui.QIcon(file_path("img/aoeivnet.png"))
         maguroAction = QtWidgets.QAction(icon, 'AoEIV.net', self)
         maguroAction.triggered.connect(
             partial(webbrowser.open, "https://aoeiv.net/"))

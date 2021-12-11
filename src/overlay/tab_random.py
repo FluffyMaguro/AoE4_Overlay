@@ -90,7 +90,7 @@ class RandomTab(QtWidgets.QWidget):
             return
         self.current_civ = civ_name
 
-        img_path = file_path(f"src/img/flags/{civ_name}.webp")
+        img_path = file_path(f"img/flags/{civ_name}.webp")
         pixmap = self.get_pixmap(img_path, self.civ_image)
         self.civ_image.setPixmap(pixmap)
         self.civ_label.setText(civ_name)
@@ -102,7 +102,7 @@ class RandomTab(QtWidgets.QWidget):
             return
         self.current_map = map_name
 
-        img_path = file_path(f"src/img/maps/{map_name.replace(' ','_')}.png")
+        img_path = file_path(f"img/maps/{map_name.replace(' ','_')}.png")
         pixmap = self.get_pixmap(img_path, self.map_image)
         self.map_image.setPixmap(pixmap)
         self.map_label.setText(map_name)

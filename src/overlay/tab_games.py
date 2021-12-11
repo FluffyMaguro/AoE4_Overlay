@@ -79,24 +79,28 @@ class MatchEntry:
             item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
             item.setAlignment(QtCore.Qt.AlignCenter)
 
+        # Line
+        self.line = Line()
+
     def add_to_layout(self, row: int):
         """ Adds widgets back to the layout"""
         self.in_layout = True
         for column, widget in enumerate(self.widgets):
             self.main_layout.addWidget(widget, row, column)
+        self.main_layout.addWidget(self.line, row + 1, 0, 1, 7)
 
     def remove_from_layout(self):
         """ Removes its widgets from the layout"""
         self.in_layout = False
         for widget in self.widgets:
             self.main_layout.removeWidget(widget)
+        self.main_layout.removeWidget(self.line)
 
 
 class MatchHistoryTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         # List of added matches. New ones at the end.
-        self.logging_matches = False
         self.matches: List[MatchEntry] = []
 
         # Scroll content
@@ -136,8 +140,6 @@ class MatchHistoryTab(QtWidgets.QWidget):
                 "font-weight: bold")
             self.header_widgets.add(self.scroll_layout.itemAt(i).widget())
 
-        self.scroll_layout.addWidget(Line(), 1, 0, 1, 7)
-
     def clear_scroll_layout(self):
         """ Removes all widgets from the scroll layout
         All except the header widgets"""
@@ -155,17 +157,6 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.clear_scroll_layout()
         self.matches = []
 
-    def save_game_data(self, match_data: Dict[str, Any]):
-        """ Saves match data into a data file for archivation"""
-        if not self.logging_matches:
-            return
-        with open(DATA_FILE, 'a') as f:
-            try:
-                data = json.dumps(match_data, indent=2)
-                f.write(data)
-            except Exception:
-                logger.exception(f"Failed to save match data")
-
     def update_widgets(self, match_history: List[Any]):
         # Remove widgets from the layout
         self.clear_scroll_layout()
@@ -178,13 +169,11 @@ class MatchHistoryTab(QtWidgets.QWidget):
             if match['match_id'] in present_match_ids:
                 continue
             self.matches.append(MatchEntry(self.scroll_layout, match))
-            self.save_game_data(match)
 
         # Re-add widgets to the layout
-        added_rows = 2  # With header and line
+        added_rows = 1  # With header
         for match_entry in reversed(self.matches):
             if match_entry.in_layout:
                 continue
             match_entry.add_to_layout(added_rows)
-            self.scroll_layout.addWidget(Line(), added_rows + 1, 0, 1, 7)
             added_rows += 2

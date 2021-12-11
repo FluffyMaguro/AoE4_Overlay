@@ -37,9 +37,6 @@ class _Settings:
 
     def save(self):
         """ Saves configuration to app data"""
-        if not os.path.isdir(CONFIG_FOLDER):
-            os.mkdir(CONFIG_FOLDER)
-
         with open(CONFIG_FILE, 'w') as f:
             f.write(json.dumps(self.__dict__))
 
