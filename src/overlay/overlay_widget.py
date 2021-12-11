@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -181,11 +181,31 @@ class AoEOverlay(QtWidgets.QWidget):
             f'{map_data.get(game_data["map_type"], "Unknown map")} ')
 
         [p.show(False) for p in self.players]
-        for i, player in enumerate(game_data['players']):
+        player_data = self.sort_game_data(game_data['players'])
+        for i, player in enumerate(player_data):
             self.players[i].update_player(player)
 
         if not self.isVisible():
             self.show()
+
+    def sort_game_data(
+            self, player_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """ Sorts player data so the main player team is always on top"""
+        # Find main player team
+        team = None
+        for player in player_data:
+            if player['profile_id'] == settings.profile_id:
+                team = player['team']
+                break
+        if team is None:
+            return player_data
+
+        def sortingf(player: Dict[str, Any]) -> int:
+            if player['team'] == team:
+                return -1
+            return player['team']
+
+        return sorted(player_data, key=sortingf)
 
     def show_hide(self):
         self.hide() if self.isVisible() else self.show()

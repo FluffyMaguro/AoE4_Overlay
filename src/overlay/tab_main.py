@@ -73,13 +73,12 @@ class TabWidget(QtWidgets.QTabWidget):
         if self.force_stop:
             return
         if game_data is not None and "new_rating" in game_data:
-            logger.info("New game finished...")
+            logger.info("Game finished...")
             self.graph_tab.run_update()
             self.stats_tab.run_mode_update()
             self.update_with_match_history_data(3)
-            self.new_game_finished()
         elif game_data is not None:
-            logger.info("New live game...")
+            logger.info(f"New live game (match_id: {game_data['match_id']})")
             self.settigns_tab.overlay_widget.update_data(game_data)
 
         self.run_new_game_check(delayed_seconds=30)

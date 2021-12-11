@@ -96,7 +96,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         # List of added matches. New ones at the end.
-        self.logging_matches = True
+        self.logging_matches = False
         self.matches: List[MatchEntry] = []
 
         # Scroll content

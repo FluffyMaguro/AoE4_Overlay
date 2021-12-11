@@ -257,7 +257,7 @@ class Api_checker:
         if all((match['started'] > rating['timestamp'],
                 match['started'] != self.last_match_timestamp)):
 
-            pprint(match)
+            # pprint(match)
             print(
                 f"{leaderboard_id=}\n{match['started']=}\n{rating['timestamp']=}"
             )
