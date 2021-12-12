@@ -256,10 +256,9 @@ class Api_checker:
             self.get_player_data(leaderboard_id, player)
 
         # Check for new game
-        if all((match['started'] > rating['timestamp'],
+        if all((match['started'] + 600 > rating['timestamp'],
                 match['started'] > self.last_match_timestamp)):
             self.last_match_timestamp = match['started']
-            self.last_rating_timestamp = rating['timestamp']
             return match
 
         # Check for new rating data

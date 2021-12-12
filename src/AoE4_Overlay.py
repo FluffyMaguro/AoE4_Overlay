@@ -42,7 +42,7 @@ class MainApp(QtWidgets.QMainWindow):
         # Config
         icon = self.style().standardIcon(
             getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
-        htmlAction = QtWidgets.QAction(icon, 'Config file', self)
+        htmlAction = QtWidgets.QAction(icon, 'Config/logs', self)
         htmlAction.setStatusTip('Open the folder with config files')
         htmlAction.triggered.connect(
             lambda: subprocess.run(['explorer', CONFIG_FOLDER]))
@@ -58,11 +58,21 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Github
         icon = QtGui.QIcon(file_path("img/github.png"))
-        githubAction = QtWidgets.QAction(icon, 'Overlay on Github', self)
+        githubAction = QtWidgets.QAction(icon, 'App on Github', self)
         githubAction.triggered.connect(
             partial(webbrowser.open,
                     "https://github.com/FluffyMaguro/AoE4_Overlay"))
         link_menu.addAction(githubAction)
+
+        # Changelog
+        icon = QtGui.QIcon(file_path("img/github.png"))
+        changelogAction = QtWidgets.QAction(icon, 'Changelog', self)
+        changelogAction.triggered.connect(
+            partial(
+                webbrowser.open,
+                "https://github.com/FluffyMaguro/AoE4_Overlay/blob/main/changelog.md"
+            ))
+        link_menu.addAction(changelogAction)
 
         # Discord
         icon = QtGui.QIcon(file_path("img/discord.png"))
@@ -77,6 +87,14 @@ class MainApp(QtWidgets.QMainWindow):
         maguroAction.triggered.connect(
             partial(webbrowser.open, "https://www.maguro.one/"))
         link_menu.addAction(maguroAction)
+
+        # Paypal
+        icon = QtGui.QIcon(file_path("img/paypal.png"))
+        paypalAction = QtWidgets.QAction(icon, 'Donate', self)
+        paypalAction.triggered.connect(
+            partial(webbrowser.open,
+                    "https://www.paypal.com/paypalme/FluffyMaguro"))
+        link_menu.addAction(paypalAction)
 
         # AoEIV.net
         icon = QtGui.QIcon(file_path("img/aoeivnet.png"))

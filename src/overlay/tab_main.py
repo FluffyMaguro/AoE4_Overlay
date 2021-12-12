@@ -34,9 +34,9 @@ class TabWidget(QtWidgets.QTabWidget):
         self.settigns_tab.new_profile.connect(self.new_profile_found)
 
         self.addTab(self.settigns_tab, "Settings")
+        self.addTab(self.games_tab, "Games")
         self.addTab(self.graph_tab, "Rating")
         self.addTab(self.stats_tab, "Stats")
-        self.addTab(self.games_tab, "Games")
         self.addTab(self.random_tab, "Randomize")
 
     def start(self):
