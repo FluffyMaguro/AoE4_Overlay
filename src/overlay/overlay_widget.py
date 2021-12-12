@@ -52,13 +52,8 @@ class PlayerWidget:
             self.flag.setPixmap(pixmap)
 
         # Indicate team with background color
-        color = (0, 0, 0, 0)
-        if player_data['team'] == 1:
-            color = (74, 255, 2, 0.35)
-        elif player_data['team'] == 2:
-            color = (3, 179, 255, 0.35)
-        elif player_data['team'] == 3:
-            color = (255, 0, 0, 0.35)
+        color = settings.team_colors[(player_data['team'] - 1) %
+                                     len(settings.team_colors)]
 
         self.name.setStyleSheet("font-weight: bold; "
                                 "background: QLinearGradient("

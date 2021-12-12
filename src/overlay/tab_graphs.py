@@ -4,8 +4,11 @@ from PyQt5 import QtWidgets
 
 from overlay.api_checking import get_rating_history
 from overlay.graph_widget import GraphWidget
+from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.worker import scheldule
+
+logger = get_logger(__name__)
 
 
 class GraphTab(QtWidgets.QWidget):
@@ -34,6 +37,11 @@ class GraphTab(QtWidgets.QWidget):
         self.graph.set_plot_visibility(index + 1, action.isChecked())
         self.graph.update()
 
+    def limit_to_day(self, action: QtWidgets.QAction):
+        """ Limits the graph x-axis to 1 day if `action` is checked"""
+        self.graph.max_x_diff = 24 * 60 * 60 if action.isChecked() else -1
+        self.graph.update()
+
     @staticmethod
     def get_all_rating_history() -> Dict[int, List[Any]]:
         """ Gets rating history for all game modes"""
@@ -43,6 +51,9 @@ class GraphTab(QtWidgets.QWidget):
         return result
 
     def plot_data(self, data: Dict[int, List[Any]]):
+        if data is None:
+            logger.warning("No graph data")
+            return
         self.graph.title = f"Rating history ({settings.player_name})"
         self.graph.clear_data()
         for id, values in data.items():

@@ -41,7 +41,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def start(self):
         logger.info(
-            f"\nStarting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
+            f"Starting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
         )
         self.check_for_new_version()
         self.settigns_tab.start()
@@ -60,6 +60,9 @@ class TabWidget(QtWidgets.QTabWidget):
         scheldule(self.got_match_history, get_full_match_history, amount)
 
     def got_match_history(self, match_history: List[Any]):
+        if match_history is None:
+            logger.warning("No match history data")
+            return
         self.stats_tab.update_other_stats(match_history)
         self.games_tab.update_widgets(match_history)
 
@@ -73,12 +76,15 @@ class TabWidget(QtWidgets.QTabWidget):
         if self.force_stop:
             return
         if game_data is not None and "new_rating" in game_data:
-            logger.info("Game finished...")
+            logger.info(
+                f"Game finished (rating_timestamp: {game_data['timestamp']})")
             self.graph_tab.run_update()
             self.stats_tab.run_mode_update()
-            self.update_with_match_history_data(3)
+            self.update_with_match_history_data(2)
         elif game_data is not None:
-            logger.info(f"New live game (match_id: {game_data['match_id']})")
+            logger.info(
+                f"New live game (match_id: {game_data['match_id']} | mode: {game_data['rating_type_id']-14})"
+            )
             self.settigns_tab.overlay_widget.update_data(game_data)
 
         self.run_new_game_check(delayed_seconds=30)

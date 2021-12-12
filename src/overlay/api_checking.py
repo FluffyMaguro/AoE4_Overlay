@@ -16,7 +16,7 @@ rating_type_id in match history seem to be offset:
 import json
 import time
 from typing import Any, Dict, List, Optional, Tuple
-from pprint import pprint
+
 import requests
 
 from overlay.aoe4_data import mode_data
@@ -158,7 +158,9 @@ def get_full_match_history(amount: int) -> List[Any]:
     """ Gets match history and adds some data its missing"""
     # Get player match history
     data = get_match_history(amount=amount)
-    logger.info(f"Asked for {amount} games | obtained {len(data)} from get_match_history")
+    logger.info(
+        f"Asked for {amount} games | obtained {len(data)} from get_match_history"
+    )
     # What type of games are there
     leaderboard_ids = {i["rating_type_id"] + 2 for i in data}
     # Get rating histories for those modes
@@ -255,13 +257,7 @@ class Api_checker:
 
         # Check for new game
         if all((match['started'] > rating['timestamp'],
-                match['started'] != self.last_match_timestamp)):
-
-            # pprint(match)
-            print(
-                f"{leaderboard_id=}\n{match['started']=}\n{rating['timestamp']=}"
-            )
-
+                match['started'] > self.last_match_timestamp)):
             self.last_match_timestamp = match['started']
             self.last_rating_timestamp = rating['timestamp']
             return match
@@ -270,7 +266,7 @@ class Api_checker:
         if all((self.last_match_timestamp != -1,
                 rating['timestamp'] > self.last_rating_timestamp)):
             self.last_rating_timestamp = rating['timestamp']
-            return {"new_rating": True}
+            return {"new_rating": True, 'timestamp': rating['timestamp']}
 
     def get_player_data(self, leaderboard_id: int, player_dict: Dict[str,
                                                                      Any]):

@@ -143,14 +143,8 @@ class MatchHistoryTab(QtWidgets.QWidget):
     def clear_scroll_layout(self):
         """ Removes all widgets from the scroll layout
         All except the header widgets"""
-        widgets_in_layout = {
-            self.scroll_layout.itemAt(i).widget()
-            for i in range(self.scroll_layout.count())
-        }
-        for widget in widgets_in_layout:
-            if widget in self.header_widgets:
-                continue
-            self.scroll_layout.removeWidget(widget)
+        for match in self.matches:
+            match.remove_from_layout()
 
     def clear_games(self):
         """ Removes all games from the game tab"""

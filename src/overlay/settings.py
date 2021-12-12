@@ -19,6 +19,8 @@ class _Settings:
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
+        self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35), (255, 0,
+                                                                      0, 0.35))
 
     def load(self):
         """ Loads configuration from app data"""
@@ -38,7 +40,7 @@ class _Settings:
     def save(self):
         """ Saves configuration to app data"""
         with open(CONFIG_FILE, 'w') as f:
-            f.write(json.dumps(self.__dict__))
+            f.write(json.dumps(self.__dict__, indent=2))
 
 
 settings = _Settings()

@@ -99,6 +99,12 @@ class MainApp(QtWidgets.QMainWindow):
             action.setChecked(settings.show_graph[str(i)])
             graphs_menu.addAction(action)
 
+        lastday = QtWidgets.QAction("Last 24h", self)
+        lastday.setCheckable(True)
+        lastday.changed.connect(
+            partial(self.centralWidget().graph_tab.limit_to_day, lastday))
+        graphs_menu.addAction(lastday)
+
         self.show()
         self.centralWidget().start()
 

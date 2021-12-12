@@ -42,9 +42,10 @@ class StatsTab(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel("Drops"), row, 3)
         layout.addWidget(QtWidgets.QLabel("Games"), row, 4)
         layout.addWidget(QtWidgets.QLabel("Winrate"), row, 5)
-        layout.addWidget(QtWidgets.QLabel("Rating"), row, 6)
-        layout.addWidget(QtWidgets.QLabel("Max rating"), row, 7)
-        layout.addWidget(QtWidgets.QLabel("Max streak"), row, 8)
+        layout.addWidget(QtWidgets.QLabel("Rank"), row, 6)
+        layout.addWidget(QtWidgets.QLabel("Rating"), row, 7)
+        layout.addWidget(QtWidgets.QLabel("Max rating"), row, 8)
+        layout.addWidget(QtWidgets.QLabel("Max streak"), row, 9)
 
         for i in range(layout.count()):
             layout.itemAt(i).widget().setStyleSheet("font-weight: bold")
@@ -58,6 +59,7 @@ class StatsTab(QtWidgets.QWidget):
             drops = QtWidgets.QLabel("–")
             games = QtWidgets.QLabel("–")
             winrate = QtWidgets.QLabel("–")
+            rank = QtWidgets.QLabel("–")
             rating = QtWidgets.QLabel("–")
             hrating = QtWidgets.QLabel("–")
             streak = QtWidgets.QLabel("–")
@@ -68,6 +70,7 @@ class StatsTab(QtWidgets.QWidget):
                 "drops": drops,
                 "games": games,
                 "winrate": winrate,
+                "rank": rank,
                 "rating": rating,
                 "hrating": hrating,
                 "streak": streak
@@ -82,14 +85,14 @@ class StatsTab(QtWidgets.QWidget):
         main_layout.addLayout(slayout)
 
         # Games found
-        self.games_found = QtWidgets.QLabel("Analyzed games: 0 (?)")
+        self.games_found = QtWidgets.QLabel("Recent games analyzed: 0 (?)")
         self.games_found.setToolTip(
             "The number of analyzed games might be lower due to API not providing all data"
         )
-        self.games_found.setMinimumWidth(150)
+        self.games_found.setMinimumWidth(200)
         self.games_found.setStyleSheet("QLabel {font-weight: bold}")
         slayout.addWidget(self.games_found)
-        slayout.addItem(QtWidgets.QSpacerItem(50, 0))
+        slayout.addItem(QtWidgets.QSpacerItem(40, 0))
 
         # Filtering mode label
         mode = QtWidgets.QLabel("Filter mode:")
@@ -105,7 +108,7 @@ class StatsTab(QtWidgets.QWidget):
         for mode in mode_data.values():
             self.mode_box.addItem(mode)
         self.mode_box.currentIndexChanged.connect(self.update_civ_map_stats)
-        slayout.addItem(QtWidgets.QSpacerItem(50, 0))
+        slayout.addItem(QtWidgets.QSpacerItem(20, 0))
 
         # Filtering civ label
         note = QtWidgets.QLabel("Filter civilization:")
@@ -203,6 +206,9 @@ class StatsTab(QtWidgets.QWidget):
 
     def update_leaderboard_data(self, leaderboard: Dict[int, Dict[str, Any]]):
         """ Update data and widgets"""
+        if leaderboard is None:
+            logger.warning("No leaderboard data")
+            return
         self.leaderboard_data = leaderboard
         self.update_leaderboard_widgets()
 
@@ -218,6 +224,7 @@ class StatsTab(QtWidgets.QWidget):
             self.mode_stats[m]['losses'].setText(str(data['losses']))
             self.mode_stats[m]['games'].setText(str(data['games']))
             self.mode_stats[m]['drops'].setText(str(data['drops']))
+            self.mode_stats[m]['rank'].setText(str(data['rank']))
             self.mode_stats[m]['rating'].setText(str(data['rating']))
             self.mode_stats[m]['hrating'].setText(str(data['highest_rating']))
             self.mode_stats[m]['streak'].setText(str(data['highest_streak']))
@@ -270,7 +277,7 @@ class StatsTab(QtWidgets.QWidget):
             fdata = [g for g in fdata if g['mode'] == filter_mode]
 
         # Update the number of analyzed games
-        self.games_found.setText(f"Analyzed games: {len(fdata)} (?)")
+        self.games_found.setText(f"Recent games analyzed: {len(fdata)} (?)")
 
         # Get specific civ and map data from filtered games
         civ_stats = {c_index: {"wins": 0, "losses": 0} for c_index in civ_data}

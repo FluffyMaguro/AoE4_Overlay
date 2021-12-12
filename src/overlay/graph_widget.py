@@ -11,6 +11,14 @@ COLORS = ((51, 120, 182), (246, 126, 0), (65, 160, 33), (205, 35, 33),
           (187, 189, 0), (68, 190, 208))
 
 
+def mmin(i: Iterable):
+    return min(i) if i else 0
+
+
+def mmax(i: Iterable):
+    return max(i) if i else 1
+
+
 def best_tick(span: float, most_ticks: float) -> float:
     """ Calculates a decent tick value given these parameters"""
     minimum = span / most_ticks
@@ -114,6 +122,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.y_label: str = ""
         self._data = []
         self.x_is_timestamp: bool = False
+        # Used for limiting x-axis. Max difference in x shown from the max value.
+        self.max_x_diff: int = -1
 
     def paintEvent(self, event):
         """ Override for draw event"""
@@ -168,16 +178,33 @@ class GraphWidget(QtWidgets.QWidget):
 
         Returns:
             (x_min, x_max, y_min, y_max) """
-        def mmin(i: Iterable):
-            return min(i) if i else 0
 
-        def mmax(i: Iterable):
-            return max(i) if i else 1
+        if self.max_x_diff > 0:
+            # In case we are limiting maximum diff from x_max
+            x_min = mmin([min(i['x']) for i in self._data if i["show"]])
+            x_max = mmax([max(i['x']) for i in self._data if i["show"]])
+            if x_max - x_min > self.max_x_diff:
+                x_min = x_max - self.max_x_diff
 
-        x_min = mmin([min(i['x']) for i in self._data if i["show"]])
-        x_max = mmax([max(i['x']) for i in self._data if i["show"]])
-        y_min = mmin([min(i['y']) for i in self._data if i["show"]])
-        y_max = mmax([max(i['y']) for i in self._data if i["show"]])
+            y_mins = []
+            y_maxs = []
+            for plot in self._data:
+                if not plot['show']:
+                    continue
+                sy = [
+                    y for x, y in zip(plot['x'], plot['y'])
+                    if x_max - x < self.max_x_diff
+                ]
+                y_mins.append(mmin(sy))
+                y_maxs.append(mmax(sy))
+            y_min = mmin(y_mins)
+            y_max = mmax(y_maxs)
+        else:
+            x_min = mmin([min(i['x']) for i in self._data if i["show"]])
+            x_max = mmax([max(i['x']) for i in self._data if i["show"]])
+            y_min = mmin([min(i['y']) for i in self._data if i["show"]])
+            y_max = mmax([max(i['y']) for i in self._data if i["show"]])
+
         return x_min, x_max, y_min, y_max
 
     @staticmethod
@@ -199,10 +226,12 @@ class GraphWidget(QtWidgets.QWidget):
         font.setPointSize(size)
         qp.setFont(font)
 
-    @staticmethod
-    def _format_ticks(value,
+    def _format_ticks(self,
+                      value,
                       percent: bool = False,
                       timestamp: bool = False) -> str:
+        if timestamp and self.max_x_diff > 0:
+            return time.strftime("%I:%M %p", time.localtime(value))
         if timestamp:
             return time.strftime("%b %d, %y", time.localtime(value))
         elif percent:
@@ -297,12 +326,20 @@ class GraphWidget(QtWidgets.QWidget):
             if not data["show"]:
                 continue
             elif data["type"] == "lineplot":
-                points = [trans(x, y) for x, y in zip(data['x'], data['y'])]
+                points = [
+                    trans(x, y) for x, y in zip(data['x'], data['y'])
+                    if self.max_x_diff <= 0 or x_max - x < self.max_x_diff
+                ]
                 used_colors.append(QtGui.QColor(*COLORS[idx % len(COLORS)]))
                 self._draw_line(qp,
                                 points,
                                 color=used_colors[-1],
                                 linewidth=data['linewidth'])
+
+                # For limited range draw points as well
+                if self.max_x_diff > 0:
+                    qp.setPen(QtGui.QPen(QtCore.Qt.black, 3))
+                    [qp.drawEllipse(x - 2, y - 2, 4, 4) for x, y in points]
 
             elif data["type"] == "text":
                 point = trans(data['x'][0], data['y'][0])
