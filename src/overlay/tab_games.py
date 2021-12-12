@@ -127,7 +127,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.scroll_layout.addWidget(QtWidgets.QLabel("Team 1"), 0, 0)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Team 2"), 0, 1)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Map"), 0, 2)
-        self.scroll_layout.addWidget(QtWidgets.QLabel("Date"), 0, 3)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Started"), 0, 3)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Mode"), 0, 4)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Rating"), 0, 6)

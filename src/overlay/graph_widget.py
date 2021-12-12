@@ -186,17 +186,20 @@ class GraphWidget(QtWidgets.QWidget):
             if x_max - x_min > self.max_x_diff:
                 x_min = x_max - self.max_x_diff
 
+            x_mins = []
             y_mins = []
             y_maxs = []
             for plot in self._data:
                 if not plot['show']:
                     continue
-                sy = [
-                    y for x, y in zip(plot['x'], plot['y'])
-                    if x_max - x < self.max_x_diff
-                ]
-                y_mins.append(mmin(sy))
-                y_maxs.append(mmax(sy))
+                xy = [(x, y) for x, y in zip(plot['x'], plot['y'])
+                      if x_max - x < self.max_x_diff]
+                x = [i[0] for i in xy]
+                y = [i[1] for i in xy]
+                x_mins.append(mmin(x))
+                y_mins.append(mmin(y))
+                y_maxs.append(mmax(y))
+            x_min = mmin(x_mins)
             y_min = mmin(y_mins)
             y_max = mmax(y_maxs)
         else:
