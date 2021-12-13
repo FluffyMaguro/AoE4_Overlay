@@ -15,6 +15,7 @@ from overlay.tab_override import OverrideTab
 from overlay.tab_random import RandomTab
 from overlay.tab_settings import SettingsTab
 from overlay.tab_stats import StatsTab
+from overlay.websocket import Websocket_manager
 from overlay.worker import scheldule
 
 logger = get_logger(__name__)
@@ -25,7 +26,9 @@ class TabWidget(QtWidgets.QTabWidget):
         super().__init__(parent)
         self.version = version
         self.api_checker = Api_checker()
+        self.websocket_manager = Websocket_manager()
         self.force_stop = False
+        self.prevent_overlay_update = False
 
         self.games_tab = MatchHistoryTab(self)
         self.graph_tab = GraphTab(self)
@@ -51,6 +54,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.check_for_new_version()
         self.settigns_tab.start()
         self.run_new_game_check()
+        self.websocket_manager.run()
 
     def new_profile_found(self):
         self.graph_tab.run_update()
@@ -90,8 +94,10 @@ class TabWidget(QtWidgets.QTabWidget):
             logger.info(
                 f"New live game (match_id: {game_data['match_id']} | mode: {game_data['rating_type_id']-14})"
             )
-            self.settigns_tab.overlay_widget.update_data(game_data)
             self.override_tab.update_data(game_data)
+            if not self.prevent_overlay_update:
+                self.settigns_tab.overlay_widget.update_data(game_data)
+                self.websocket_manager.send({"type": "raw", "data": game_data})
 
         self.run_new_game_check(delayed_seconds=30)
 
@@ -111,6 +117,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def override_event(self, data: Dict[str, Any]):
         self.settigns_tab.overlay_widget.override(data)
+        self.websocket_manager.send({"type": "override", "data": data})
 
     def override_update_event(self, prevent: bool):
-        self.settigns_tab.overlay_widget.prevent_update_change(prevent)
+        self.prevent_overlay_update = prevent

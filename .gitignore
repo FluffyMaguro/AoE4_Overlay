@@ -9,3 +9,5 @@ _vsc.bat
 *.pyc
 file.log
 test.py
+custom.css
+custom.js

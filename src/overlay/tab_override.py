@@ -165,7 +165,7 @@ class OverrideTab(QtWidgets.QWidget):
         override_btn = QtWidgets.QPushButton("Override")
         override_btn.clicked.connect(self.override_overlay)
         override_btn.setMaximumWidth(150)
-        override_btn.setShortcut("Enter")
+        override_btn.setShortcut("Return")
         hlayout.addWidget(override_btn)
 
         # Reset overlay

@@ -109,7 +109,6 @@ class AoEOverlay(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.fixed = True
-        self.prevent_update = False
         self.players = []
         self.setup_as_overlay()
         self.initUI()
@@ -203,9 +202,6 @@ class AoEOverlay(QtWidgets.QWidget):
             "}")
 
     def update_data(self, game_data: Dict[str, Any]):
-        if self.prevent_update:
-            return
-
         self.map.setText(
             f'{map_data.get(game_data["map_type"], "Unknown map")} ')
 
@@ -275,6 +271,3 @@ class AoEOverlay(QtWidgets.QWidget):
         for i, player in enumerate(data['players']):
             self.players[i].override(player)
         self.show()
-
-    def prevent_update_change(self, prevent: bool):
-        self.prevent_update = prevent

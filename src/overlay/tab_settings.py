@@ -71,7 +71,7 @@ class SettingsTab(QtWidgets.QWidget):
         # Multi search button
         self.multi_search_btn = QtWidgets.QPushButton("Search")
         self.multi_search_btn.clicked.connect(self.find_profile)
-        self.multi_search_btn.setShortcut("Enter")
+        self.multi_search_btn.setShortcut("Return")
         self.multi_search_btn.setToolTip(
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
