@@ -46,3 +46,12 @@ def version_check(version: str) -> str:
     except Exception:
         logger.warning("Failed to check for a new version")
     return ""
+
+
+def create_custom_files():
+    """ Creates custom.css and custom.js files if they don't exist"""
+    for file_name in ("custom.css", "custom.js"):
+        path = file_path(f"html/{file_name}")
+        if not os.path.isfile(path):
+            with open(path, "w") as f:
+                f.write("")

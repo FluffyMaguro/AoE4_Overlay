@@ -15,6 +15,10 @@ VERSION = "1.0.0"
 class MainApp(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.initUI()
+        self.centralWidget().start()
+
+    def initUI(self):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
         self.setWindowIcon(QtGui.QIcon(file_path('img/icon.ico')))
         self.setGeometry(0, 0, settings.app_width, settings.app_height)
@@ -122,9 +126,7 @@ class MainApp(QtWidgets.QMainWindow):
         lastday.changed.connect(
             partial(self.centralWidget().graph_tab.limit_to_day, lastday))
         graphs_menu.addAction(lastday)
-
         self.show()
-        self.centralWidget().start()
 
     def update_title(self, name: str):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION}) – {name}")

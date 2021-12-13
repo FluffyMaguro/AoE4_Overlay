@@ -29,6 +29,8 @@ for root, directories, files in os.walk(folder):
 print('Compressing files...')
 with ZipFile(file_name, 'w', compression=ZIP_DEFLATED) as zip:
     for f in to_zip:
+        if "custom.js" in f or "custom.css" in f:
+            continue
         zip.write(f, f"AoE4_Overlay/{f[len(folder)+1:]}")
 
 # Cleanup

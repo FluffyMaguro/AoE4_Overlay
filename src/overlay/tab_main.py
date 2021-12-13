@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 from PyQt5 import QtWidgets
 
 from overlay.api_checking import Api_checker, get_full_match_history
-from overlay.helper_func import is_compiled, version_check
+from overlay.helper_func import create_custom_files, is_compiled, version_check
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.tab_games import MatchHistoryTab
@@ -52,6 +52,7 @@ class TabWidget(QtWidgets.QTabWidget):
             f"Starting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
         )
         self.check_for_new_version()
+        create_custom_files()
         self.settigns_tab.start()
         self.run_new_game_check()
         self.websocket_manager.run()
