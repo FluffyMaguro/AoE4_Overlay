@@ -11,6 +11,7 @@ from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.tab_games import MatchHistoryTab
 from overlay.tab_graphs import GraphTab
+from overlay.tab_override import OverrideTab
 from overlay.tab_random import RandomTab
 from overlay.tab_settings import SettingsTab
 from overlay.tab_stats import StatsTab
@@ -30,6 +31,9 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab = GraphTab(self)
         self.random_tab = RandomTab(self)
         self.stats_tab = StatsTab(self)
+        self.override_tab = OverrideTab(self)
+        self.override_tab.data_override.connect(self.override_event)
+        self.override_tab.update_override.connect(self.override_update_event)
         self.settigns_tab = SettingsTab(self)
         self.settigns_tab.new_profile.connect(self.new_profile_found)
 
@@ -37,6 +41,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.games_tab, "Games")
         self.addTab(self.graph_tab, "Rating")
         self.addTab(self.stats_tab, "Stats")
+        self.addTab(self.override_tab, "Override")
         self.addTab(self.random_tab, "Randomize")
 
     def start(self):
@@ -86,6 +91,7 @@ class TabWidget(QtWidgets.QTabWidget):
                 f"New live game (match_id: {game_data['match_id']} | mode: {game_data['rating_type_id']-14})"
             )
             self.settigns_tab.overlay_widget.update_data(game_data)
+            self.override_tab.update_data(game_data)
 
         self.run_new_game_check(delayed_seconds=30)
 
@@ -102,3 +108,9 @@ class TabWidget(QtWidgets.QTabWidget):
         logger.info("New version available!")
         self.update_button.clicked.connect(partial(webbrowser.open, link))
         self.update_button.show()
+
+    def override_event(self, data: Dict[str, Any]):
+        self.settigns_tab.overlay_widget.override(data)
+
+    def override_update_event(self, prevent: bool):
+        self.settigns_tab.overlay_widget.prevent_update_change(prevent)

@@ -234,7 +234,7 @@ class GraphWidget(QtWidgets.QWidget):
                       percent: bool = False,
                       timestamp: bool = False) -> str:
         if timestamp and self.max_x_diff > 0:
-            return time.strftime("%I:%M %p", time.localtime(value))
+            return time.strftime("%b %d, %I:%M%p", time.localtime(value))
         if timestamp:
             return time.strftime("%b %d, %y", time.localtime(value))
         elif percent:
