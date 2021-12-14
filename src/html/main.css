@@ -1,16 +1,16 @@
 body {
     background-color: rgba(0, 0, 0, 0);
-    margin: 0px auto;
+    margin: 0vh auto;
     overflow: hidden;
 }
 
 #score {
     position: relative;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, .9), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
-    padding: 5px;
+    padding: .5vh;
     text-align: center;
     color: white;
-    text-shadow: 1px 1px 1px black;
+    text-shadow: .1vh .1vh .1vh black;
     font-weight: bold;
     font-size: 2.6vh;
     font-family: Verdana, Geneva, Tahoma, sans-serif
@@ -41,13 +41,13 @@ body {
     width: 14vh;
 }
 
-#team1 .name, #team1 .stats td {
-    padding-left: 1vh
-}
-
 #team1 {
     border-right: 0.2vh solid rgb(48, 47, 47);
     padding-right: 1vh
+}
+
+#team1 .name, #team1 .stats td {
+    padding-left: 1vh
 }
 
 #team2 .name, #team2 .stats td {
@@ -55,11 +55,11 @@ body {
 }
 
 .player .name {
-    color: rgb(255, 255, 255)
+    color: #fff
 }
 
 .stats .rank {
-    color: #bbb
+    color: #ccc
 }
 
 .stats .rating {

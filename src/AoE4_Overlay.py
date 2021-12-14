@@ -117,7 +117,6 @@ class MainApp(QtWidgets.QMainWindow):
             action.changed.connect(
                 partial(self.centralWidget().graph_tab.change_plot_visibility,
                         i - 1, action))
-            # This will cause the update trigger on load
             action.setChecked(settings.show_graph[str(i)])
             graphs_menu.addAction(action)
 

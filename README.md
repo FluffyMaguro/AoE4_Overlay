@@ -9,48 +9,45 @@
 
 1. Showing information about your opponents and teammates while you play
 2. Personal statistics
-3. Separarate overlay for streaming (as html, very customizable via CSS/JS).
+3. Separate overlay for streaming (as html, very customizable via CSS/JS).
 4. Information about players that are streaming and don't have any overlay
 
-API calls are done through [AoEIV.net](https://aoeiv.net/). For question and issues visit my [discord server](https://discord.gg/FtGdhqD).
+API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
 # Screenshots
 Settings:
-
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
 
 Game history:
-
 ![Screenshot](https://i.imgur.com/L1V1wp2.png)
 
 Rating history:
-
 ![Screenshot](https://i.imgur.com/QqojOJI.png)
 
 Various stats:
-
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
 
 Built-in randomizer:
-
 ![Screenshot](https://i.imgur.com/tV4dMfi.png)
 
 # Streaming
-To use custom streaming overlay simply drag the `overlay.html` file to OBS or other streaming software. Move and rescale as necessary once some game information is shown.
+To use the custom streaming overlay simply drag the `overlay.html` file to OBS or other streaming software. Move and rescale as necessary once some game information is shown.
 
 ![Screenshot](https://i.imgur.com/BK9AC6h.png)
 
-* The streaming overlay can be fully customized with CSS and JS, see the next section.
+Overlay active:
+![Screenshot](https://i.imgur.com/orp46Tg.png)
 
-* Override tab can be used to change the information on the overlay. This might be useful when casting from replays or changing a player barcode to their actual name.
+* Streaming overlay supports team games as well
+* The streaming overlay can be fully customized with CSS and JS, see the next section.
+* The override tab can be used to change the information on the overlay. This might be useful when casting from replays or changing a player's barcode to their actual name.
 
 ![Screenshot](https://i.imgur.com/F5I3AAQ.png)
 
 # Customization
 
 1. Overlay position and font size can be changed in the app.
-
-2. To change team colors navigate to the config file (`File/Config`). In the `config.json` change team_colors. Colors are stored as a list of RGBA colors for team 1, 2 and so on.
+2. To change team colors navigate to the config file (`File/Config`). In the `config.json` change team_colors. Colors are stored as a list of RGBA colors for team 1, 2, and so on.
 
 ```json
 "team_colors": [
@@ -60,7 +57,7 @@ To use custom streaming overlay simply drag the `overlay.html` file to OBS or ot
   ]
 ```
 
-3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overriden with an app update. In `custom.js` you can define this function that's run after each update.
+3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. In `custom.js` you can define this function that's run after each update.
 
 ```javascript
 function custom_func(data) {
