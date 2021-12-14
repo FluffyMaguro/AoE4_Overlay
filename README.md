@@ -1,7 +1,7 @@
 # AoE4 Overlay
  
-* **DOWNLOAD HERE** (Windows)
-* Or run the script with Python 3.6+ (should work on Mac and Linux)
+* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.0.0/AoE4_Overlay.zip)** (Windows)
+* Or run the script with Python 3.6+ (Windows/Mac/Linux)
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
 
@@ -15,6 +15,7 @@
 API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
 # Screenshots
+
 Settings:
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
 
@@ -36,7 +37,7 @@ To use the custom streaming overlay simply drag the `overlay.html` file to OBS o
 ![Screenshot](https://i.imgur.com/BK9AC6h.png)
 
 Overlay active:
-![Screenshot](https://i.imgur.com/orp46Tg.png)
+![Screenshot](https://i.imgur.com/aMDuW25.png)
 
 * Streaming overlay supports team games as well
 * The streaming overlay can be fully customized with CSS and JS, see the next section.
