@@ -27,7 +27,10 @@ class InnerPlayer(PlayerWidget):
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
         super().__init__(row, toplayout)
         self.change_style()
+        self.update_name_color()
         self.callable: Callable = print
+        toplayout.addWidget(self.team_cb, row, 7)
+        self.team_cb.currentIndexChanged.connect(self.update_team)
 
     def create_widgets(self):
         self.flag = QtWidgets.QComboBox()
@@ -36,11 +39,24 @@ class InnerPlayer(PlayerWidget):
             self.flag.setItemIcon(i, get_icon(civ))
 
         self.name = QtWidgets.QLineEdit()
+        self.team_cb = QtWidgets.QComboBox()
+        self.team_cb.addItem("No team")
+        for i in range(1, 3):
+            self.team_cb.addItem(f"Team {i}")
         self.rating = QtWidgets.QLineEdit()
         self.rank = QtWidgets.QLineEdit()
         self.winrate = QtWidgets.QLineEdit()
         self.wins = QtWidgets.QLineEdit()
         self.losses = QtWidgets.QLineEdit()
+
+    def show(self, show: bool = True):
+        super().show(show)
+        self.team_cb.show() if show else self.team_cb.hide()
+
+    def update_team(self, index: int):
+        self.team = index
+        self.update_name_color()
+        self.callable()
 
     def change_style(self):
         for item in (self.rating, self.rank, self.winrate, self.wins,
@@ -77,6 +93,7 @@ class InnerPlayer(PlayerWidget):
         # We don't want the automatic update to look like the user made the change
         self.disconnect_changes()
         super().update_player(player_data)
+        self.team_cb.setCurrentIndex(self.team)
         self.connect_to_function(self.callable)
 
     def get_data(self) -> Dict[str, Any]:

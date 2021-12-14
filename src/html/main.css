@@ -29,11 +29,15 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-#score #team1 {
+.name {
+    min-width: 40vh;
+}
+
+#team1 {
     text-align: left;
 }
 
-#score #team2 {
+#team2, #team2 tr {
     text-align: right;
 }
 

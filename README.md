@@ -49,7 +49,11 @@ Overlay active:
 * The streaming overlay can be fully customized with CSS and JS, see the next section.
 * The override tab can be used to change the information on the overlay. This might be useful when casting from replays or changing a player's barcode to their actual name.
 
-![Screenshot](https://i.imgur.com/F5I3AAQ.png)
+![Screenshot](https://i.imgur.com/f1OGmyz.png)
+
+Or change values to something completely different
+
+![Screenshot](https://i.imgur.com/02YsXdI.png)
 
 # Customization
 
@@ -64,7 +68,7 @@ Overlay active:
   ]
 ```
 
-3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. In `custom.js` you can define this function that's run after each update.
+3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
 
 ```javascript
 function custom_func(data) {
