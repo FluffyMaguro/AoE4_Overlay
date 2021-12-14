@@ -17,18 +17,23 @@ API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and is
 # Screenshots
 
 Settings:
+
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
 
 Game history:
+
 ![Screenshot](https://i.imgur.com/L1V1wp2.png)
 
 Rating history:
+
 ![Screenshot](https://i.imgur.com/QqojOJI.png)
 
 Various stats:
+
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
 
 Built-in randomizer:
+
 ![Screenshot](https://i.imgur.com/tV4dMfi.png)
 
 # Streaming
@@ -37,6 +42,7 @@ To use the custom streaming overlay simply drag the `overlay.html` file to OBS o
 ![Screenshot](https://i.imgur.com/BK9AC6h.png)
 
 Overlay active:
+
 ![Screenshot](https://i.imgur.com/aMDuW25.png)
 
 * Streaming overlay supports team games as well
