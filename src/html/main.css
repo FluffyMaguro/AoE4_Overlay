@@ -2,4 +2,70 @@ body {
     background-color: rgba(0, 0, 0, 0);
     margin: 0px auto;
     overflow: hidden;
+    /* debug */
+    background-image: url("ships.jpg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+#score {
+    position: relative;
+    background-color: rgba(0, 0, 0, .3);
+    padding: 5px;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    font-weight: bold;
+    font-size: 3vh
+}
+
+#score>div, #score>table {
+    display: inline-block;
+}
+
+/* #score td {
+    border: 1px solid pink;
+} */
+
+#score #team1 {
+    text-align: left;
+}
+
+#score #team2 {
+    text-align: right;
+}
+
+.player img {
+    display: inline-block;
+    width: 10%;
+}
+
+.player .ptext {
+    display: inline-block;
+}
+
+.player .ptext span, .player .name {
+    margin: 0 1vh 0 1vh;
+}
+
+#score #map {
+    color: yellow;
+    position: absolute;
+    transform: translate(-50%);
+}
+
+.player .rating {
+    color: blue
+}
+
+.player .winrate {
+    color: yellow
+}
+
+#score .player .wins {
+    color: green
+}
+
+#score .player .losses {
+    color: red
 }

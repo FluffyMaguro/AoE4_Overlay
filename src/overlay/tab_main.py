@@ -26,7 +26,7 @@ class TabWidget(QtWidgets.QTabWidget):
         super().__init__(parent)
         self.version = version
         self.api_checker = Api_checker()
-        self.websocket_manager = Websocket_manager()
+        self.websocket_manager = Websocket_manager(settings.websocket_port)
         self.force_stop = False
         self.prevent_overlay_update = False
 

@@ -1,4 +1,4 @@
-# AoE4_Overlay
+# AoE4 Overlay
  
 * **DOWNLOAD HERE** (Windows)
 * Or run the script with Python 3.6+ (should work in Mac and Linux)
@@ -12,9 +12,7 @@
 3. Separarate overlay for streaming (as html, very customizable via CSS/JS).
 4. Information about players that are streaming and don't have any overlay
 
-API calls are done through [AoEIV.net](https://aoeiv.net/).
-
-For question and issues visit my [discord server](https://discord.gg/FtGdhqD).
+API calls are done through [AoEIV.net](https://aoeiv.net/). For question and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)

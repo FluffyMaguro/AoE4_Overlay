@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 class Websocket_manager():
     """ Class managing connection through a websocket to the HTML file"""
-    def __init__(self, port: int = 7307):
+    def __init__(self, port: int):
         self.overlay_messages = []
         self.port = port
 
