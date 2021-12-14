@@ -2,30 +2,32 @@ body {
     background-color: rgba(0, 0, 0, 0);
     margin: 0px auto;
     overflow: hidden;
-    /* debug */
-    background-image: url("ships.jpg");
-    background-repeat: no-repeat;
-    background-size: 100%;
 }
 
 #score {
     position: relative;
-    background-color: rgba(0, 0, 0, .3);
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, .9), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
     padding: 5px;
     text-align: center;
     color: white;
     text-shadow: 1px 1px 1px black;
     font-weight: bold;
-    font-size: 3vh
+    font-size: 2.6vh;
+    font-family: Verdana, Geneva, Tahoma, sans-serif
 }
 
 #score>div, #score>table {
     display: inline-block;
 }
 
-/* #score td {
-    border: 1px solid pink;
-} */
+#score #map {
+    color: #29e0f8;
+    position: absolute;
+    transform: translate(-50%);
+    text-transform: uppercase;
+    font-style: italic;
+    background-color: rgba(0, 0, 0, 0.5);
+}
 
 #score #team1 {
     text-align: left;
@@ -35,37 +37,43 @@ body {
     text-align: right;
 }
 
-.player img {
-    display: inline-block;
-    width: 10%;
+.player .flag img {
+    width: 14vh;
 }
 
-.player .ptext {
-    display: inline-block;
+#team1 .name, #team1 .stats td {
+    padding-left: 1vh
 }
 
-.player .ptext span, .player .name {
-    margin: 0 1vh 0 1vh;
+#team1 {
+    border-right: 0.2vh solid rgb(48, 47, 47);
+    padding-right: 1vh
 }
 
-#score #map {
-    color: yellow;
-    position: absolute;
-    transform: translate(-50%);
+#team2 .name, #team2 .stats td {
+    padding-right: 1vh
 }
 
-.player .rating {
-    color: blue
+.player .name {
+    color: rgb(255, 255, 255)
 }
 
-.player .winrate {
-    color: yellow
+.stats .rank {
+    color: #bbb
 }
 
-#score .player .wins {
-    color: green
+.stats .rating {
+    color: #7ab6ff
 }
 
-#score .player .losses {
+.stats .winrate {
+    color: #fffb78
+}
+
+.stats .wins {
+    color: #48bd21
+}
+
+.stats .losses {
     color: red
 }

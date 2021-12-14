@@ -25,6 +25,7 @@ class PlayerWidget:
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
         self.team: int = 0
         self.civ: str = ""
+        self.visible = True
         self.create_widgets()
         self.name.setStyleSheet("font-weight: bold")
         self.name.setContentsMargins(5, 0, 10, 0)
@@ -50,6 +51,7 @@ class PlayerWidget:
         self.losses = QtWidgets.QLabel()
 
     def show(self, show: bool = True):
+        self.visible = show
         """ Shows or hides all widgets in this class """
         for widget in (self.flag, self.name, self.rating, self.rank,
                        self.winrate, self.wins, self.losses):
@@ -244,6 +246,6 @@ class AoEOverlay(QtWidgets.QWidget):
     def get_data(self) -> Dict[str, Any]:
         result = {"map": self.map.text(), "players": []}
         for player in self.players:
-            if player.name.text():
+            if player.visible:
                 result["players"].append(player.get_data())
         return result

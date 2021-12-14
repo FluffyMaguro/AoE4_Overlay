@@ -1,9 +1,9 @@
 # AoE4 Overlay
  
 * **DOWNLOAD HERE** (Windows)
-* Or run the script with Python 3.6+ (should work in Mac and Linux)
+* Or run the script with Python 3.6+ (should work on Mac and Linux)
 
-![Screenshot](https://i.imgur.com/tkgKCxL.jpg)
+![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
 
 **Use cases:**
 
@@ -14,18 +14,35 @@
 
 API calls are done through [AoEIV.net](https://aoeiv.net/). For question and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
+# Screenshots
+Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
+
+Game history:
+
 ![Screenshot](https://i.imgur.com/L1V1wp2.png)
+
+Rating history:
+
 ![Screenshot](https://i.imgur.com/QqojOJI.png)
+
+Various stats:
+
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
+
+Built-in randomizer:
+
 ![Screenshot](https://i.imgur.com/tV4dMfi.png)
 
 # Streaming
+To use custom streaming overlay simply drag the `overlay.html` file to OBS or other streaming software. Move and rescale as necessary once some game information is shown.
 
-** HOW to drag overlay and rescale
+![Screenshot](https://i.imgur.com/BK9AC6h.png)
 
-Override tab can be used to change the information on the overlay. This might be useful when casting from replays or changing a player barcode to their actual name.
+* The streaming overlay can be fully customized with CSS and JS, see the next section.
+
+* Override tab can be used to change the information on the overlay. This might be useful when casting from replays or changing a player barcode to their actual name.
 
 ![Screenshot](https://i.imgur.com/F5I3AAQ.png)
 
@@ -43,9 +60,14 @@ Override tab can be used to change the information on the overlay. This might be
   ]
 ```
 
-3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overriden with an update.
+3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overriden with an app update. In `custom.js` you can define this function that's run after each update.
 
+```javascript
+function custom_func(data) {
+    console.log("These are all the player data:", data);
+}
+```
 
 # Changelog
 
-[link](https://github.com/FluffyMaguro/AoE4_Overlay/blob/main/changelog.md)
+[All changes are here.](https://github.com/FluffyMaguro/AoE4_Overlay/blob/main/changelog.md)

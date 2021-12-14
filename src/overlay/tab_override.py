@@ -194,6 +194,7 @@ class OverrideTab(QtWidgets.QWidget):
         self.live_data = player_data
         if not self.prevent_ck.isChecked():
             self.overlay_widget.update_data(player_data)
+            self.changed_data = player_data
 
     def overlay_changed(self, data: Dict[str, Any]):
         self.changed_data = data
