@@ -47,9 +47,12 @@ class Websocket_manager():
         """ Manages websocket connection for each client """
         logger.info(f"Opening: {websocket}")
 
-        # Send the last message if there is one
+        # Send the first one (init) and last one message if there is one
         if self.overlay_messages:
-            await self._send_ws_message(websocket, self.overlay_messages[-1])
+            await self._send_ws_message(websocket, self.overlay_messages[0])
+            if self.overlay_messages[0] != self.overlay_messages[-1]:
+                await self._send_ws_message(websocket,
+                                            self.overlay_messages[-1])
 
         sent = len(self.overlay_messages)
 
@@ -60,7 +63,7 @@ class Websocket_manager():
                 await self._send_ws_message(websocket,
                                             self.overlay_messages[sent])
                 sent += 1
-                
+
             except asyncio.TimeoutError:
                 logger.warning(f'#{sent-1} message was timed-out.')
             except websockets.exceptions.ConnectionClosedOK:

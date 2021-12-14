@@ -1,8 +1,7 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.aoe4_data import civ_data, map_data
 from overlay.helper_func import file_path
 from overlay.settings import settings
 
@@ -24,6 +23,8 @@ def set_pixmap(civ: str, widget: QtWidgets.QWidget):
 class PlayerWidget:
     """ Player widget shown on the overlay"""
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
+        self.team: int = 0
+        self.civ: str = ""
         self.create_widgets()
         self.name.setStyleSheet("font-weight: bold")
         self.name.setContentsMargins(5, 0, 10, 0)
@@ -54,7 +55,10 @@ class PlayerWidget:
                        self.winrate, self.wins, self.losses):
             widget.show() if show else widget.hide()
 
-    def update_name_color(self, color: Tuple[int, int, int, float]):
+    def update_name_color(self):
+        color = settings.team_colors[(self.team - 1) %
+                                     len(settings.team_colors)]
+        color = tuple(color)
         self.name.setStyleSheet("font-weight: bold; "
                                 "background: QLinearGradient("
                                 "x1: 0, y1: 0,"
@@ -63,45 +67,39 @@ class PlayerWidget:
                                 f"stop: 0.8 rgba{color},"
                                 "stop: 1 rgba(0,0,0,0))")
 
-    def update_flag(self, civ_name: str):
-        set_pixmap(civ_name, self.flag)
+    def update_flag(self, ):
+        set_pixmap(self.civ, self.flag)
 
     def update_player(self, player_data: Dict[str, Any]):
-        self.show()
-        civ_name = civ_data.get(player_data['civ'], "Unknown civ")
-        self.name.setText(player_data['name'])
-
         # Flag
-        self.update_flag(civ_name)
+        self.civ = player_data['civ']
+        self.update_flag()
 
         # Indicate team with background color
-        color = settings.team_colors[(player_data['team'] - 1) %
-                                     len(settings.team_colors)]
-        self.update_name_color(color)
+        self.team = player_data['team']
+        self.update_name_color()
 
-        # Check whether we have ranked data
-        if not 'rank' in player_data:
-            self.rank.setText("")
-            self.winrate.setText("")
-            self.wins.setText("")
-            self.losses.setText("")
-            self.rating.setText("")
-            return
-
-        self.rating.setText(str(player_data['rating']))
-        self.rank.setText(f"#{player_data['rank']}")
-        self.winrate.setText(
-            f"{player_data['wins']/(player_data['wins']+player_data['losses']):.1%}"
-        )
+        # Fill the rest
+        self.name.setText(player_data['name'])
+        self.rating.setText(player_data['rating'])
+        self.rank.setText(player_data['rank'])
+        self.winrate.setText(player_data['winrate'])
         self.wins.setText(str(player_data['wins']))
-        self.losses.setText(str(player_data['losses']))
-
-    def override(self, data: List[str]):
-        for i, item in enumerate((self.name, self.rating, self.rank,
-                                  self.winrate, self.wins, self.losses)):
-            item.setText(data[i])
-        set_pixmap(data[-1], self.flag)
+        self.losses.setText(player_data['losses'])
         self.show() if self.name.text() else self.show(False)
+
+    def get_data(self) -> Dict[str, Any]:
+        data = {
+            'civ': self.civ,
+            'name': self.name.text(),
+            'team': self.team,
+            'rating': self.rating.text(),
+            'rank': self.rank.text(),
+            'wins': self.wins.text(),
+            'losses': self.losses.text(),
+            'winrate': self.winrate.text(),
+        }
+        return data
 
 
 class AoEOverlay(QtWidgets.QWidget):
@@ -202,34 +200,11 @@ class AoEOverlay(QtWidgets.QWidget):
             "}")
 
     def update_data(self, game_data: Dict[str, Any]):
-        self.map.setText(
-            f'{map_data.get(game_data["map_type"], "Unknown map")} ')
-
+        self.map.setText(game_data['map'])
         [p.show(False) for p in self.players]
-        player_data = self.sort_game_data(game_data['players'])
-        for i, player in enumerate(player_data):
+        for i, player in enumerate(game_data['players']):
             self.players[i].update_player(player)
-
         self.show()
-
-    def sort_game_data(
-            self, player_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """ Sorts player data so the main player team is always on top"""
-        # Find main player team
-        team = None
-        for player in player_data:
-            if player['profile_id'] == settings.profile_id:
-                team = player['team']
-                break
-        if team is None:
-            return player_data
-
-        def sortingf(player: Dict[str, Any]) -> int:
-            if player['team'] == team:
-                return -1
-            return player['team']
-
-        return sorted(player_data, key=sortingf)
 
     def show_hide(self):
         self.hide() if self.isVisible() else self.show()
@@ -266,8 +241,9 @@ class AoEOverlay(QtWidgets.QWidget):
             self.save_geometry()
         self.show()
 
-    def override(self, data: Dict[str, Any]):
-        self.map.setText(data['map'])
-        for i, player in enumerate(data['players']):
-            self.players[i].override(player)
-        self.show()
+    def get_data(self) -> Dict[str, Any]:
+        result = {"map": self.map.text(), "players": []}
+        for player in self.players:
+            if player.name.text():
+                result["players"].append(player.get_data())
+        return result

@@ -15,7 +15,7 @@ function connect_to_socket() {
     socket.onmessage = function (event) {
         let data = JSON.parse(event.data);
         console.log(`New event: ${event.data}`);
-        player_message(data);
+        parse_message(data);
     };
 
     socket.onclose = function (event) {
@@ -30,6 +30,8 @@ function connect_to_socket() {
     };
 }
 
+var team_colors = [[74, 255, 2, 0.35], [3, 179, 255, 0.35], [255, 0, 0, 0.35]];
+
 function reconnect_to_socket(message) {
     console.log('Reconnecting..')
     function_is_running = false;
@@ -38,6 +40,21 @@ function reconnect_to_socket(message) {
     }, 500);
 }
 
-// Different msg types: raw, override
-function player_message(data) {
+function parse_message(data) {
+    if (data.type == "color") {
+        team_colors = data.data;
+        console.log("Updated colors")
+    } else if (data.type == "player_data") {
+        console.log("players");
+        update_player_data(data.data)
+    }
 }
+
+
+function update_player_data(data) {
+    console.log("addting data", data)
+}
+
+// DEBUG
+var data = {"type": "override", "data": {"map": "Altai ", "players": [["REEEEEEEEEEEEEEEEEEEEEEE", "1703", "#67", "65.5%", "76", "40", "Chinese", 1], ["Armeria", "1635", "#119", "53.4%", "347", "303", "Abbasid Dynasty", 2], ["", "", "", "", "", "", "", 0], ["", "", "", "", "", "", "", 0], ["", "", "", "", "", "", "", 0], ["", "", "", "", "", "", "", 0], ["", "", "", "", "", "", "", 0], ["", "", "", "", "", "", "", 0]]}}
+update_player_data(data.data)

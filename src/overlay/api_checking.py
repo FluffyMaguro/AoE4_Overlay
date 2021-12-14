@@ -204,6 +204,11 @@ class Api_checker:
         self.last_match_timestamp = -1
         self.last_rating_timestamp = -1
 
+    def reset(self):
+        """ Resets last timestamps"""
+        self.last_match_timestamp = -1
+        self.last_rating_timestamp = -1
+
     def sleep(self, seconds: int) -> bool:
         """ Sleeps while checking for force_stop
         Returns `True` if we need to stop the parent function"""

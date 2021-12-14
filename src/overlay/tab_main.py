@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional
 
 from PyQt5 import QtWidgets
 
+import overlay.helper_func as hf
 from overlay.api_checking import Api_checker, get_full_match_history
-from overlay.helper_func import create_custom_files, is_compiled, version_check
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.tab_games import MatchHistoryTab
@@ -49,15 +49,17 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def start(self):
         logger.info(
-            f"Starting (v{self.version}) (c:{is_compiled()}) [{platform.platform()}]"
+            f"Starting (v{self.version}) (c:{hf.is_compiled()}) [{platform.platform()}]"
         )
         self.check_for_new_version()
-        create_custom_files()
+        hf.create_custom_files()
         self.settigns_tab.start()
         self.run_new_game_check()
         self.websocket_manager.run()
+        self.send_ws_colors()
 
     def new_profile_found(self):
+        self.api_checker.reset()
         self.graph_tab.run_update()
         self.stats_tab.run_mode_update()
         self.stats_tab.clear_match_data()
@@ -92,13 +94,17 @@ class TabWidget(QtWidgets.QTabWidget):
             self.stats_tab.run_mode_update()
             self.update_with_match_history_data(2)
         elif game_data is not None:
+            processed = hf.process_game(game_data)
             logger.info(
-                f"New live game (match_id: {game_data['match_id']} | mode: {game_data['rating_type_id']-14})"
+                f"New live game (match_id: {processed['match_id']} | mode: {processed['mode']-16})"
             )
-            self.override_tab.update_data(game_data)
+            self.override_tab.update_data(processed)
             if not self.prevent_overlay_update:
-                self.settigns_tab.overlay_widget.update_data(game_data)
-                self.websocket_manager.send({"type": "raw", "data": game_data})
+                self.settigns_tab.overlay_widget.update_data(processed)
+                self.websocket_manager.send({
+                    "type": "player_data",
+                    "data": processed
+                })
 
         self.run_new_game_check(delayed_seconds=30)
 
@@ -109,7 +115,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def check_for_new_version(self):
         """ Checks for a new version, creates a button if there is one """
-        link = version_check(self.version)
+        link = hf.version_check(self.version)
         if not link:
             return
         logger.info("New version available!")
@@ -117,8 +123,14 @@ class TabWidget(QtWidgets.QTabWidget):
         self.update_button.show()
 
     def override_event(self, data: Dict[str, Any]):
-        self.settigns_tab.overlay_widget.override(data)
-        self.websocket_manager.send({"type": "override", "data": data})
+        self.settigns_tab.overlay_widget.update_data(data)
+        self.websocket_manager.send({"type": "player_data", "data": data})
 
     def override_update_event(self, prevent: bool):
         self.prevent_overlay_update = prevent
+
+    def send_ws_colors(self):
+        self.websocket_manager.send({
+            "type": "color",
+            "data": settings.team_colors
+        })

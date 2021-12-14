@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -6,6 +6,7 @@ from overlay.aoe4_data import civ_data
 from overlay.helper_func import file_path
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay, PlayerWidget
+from overlay.settings import settings
 
 logger = get_logger(__name__)
 ICON_CACHE = {}
@@ -42,8 +43,8 @@ class InnerPlayer(PlayerWidget):
         self.losses = QtWidgets.QLineEdit()
 
     def change_style(self):
-        for item in (self.name, self.rating, self.rank, self.winrate,
-                     self.wins, self.losses):
+        for item in (self.rating, self.rank, self.winrate, self.wins,
+                     self.losses):
             style = item.styleSheet()
             item.setStyleSheet(
                 f"{style}; border: 1px solid #444; font-size: 11pt")
@@ -61,11 +62,16 @@ class InnerPlayer(PlayerWidget):
                      self.wins, self.losses):
             item.textChanged.disconnect()
 
-    def update_name_color(self, color: Tuple[int, int, int, float]):
-        ...
+    def update_name_color(self):
+        color = settings.team_colors[(self.team - 1) %
+                                     len(settings.team_colors)]
+        color = tuple(color)
+        self.name.setStyleSheet(
+            f"background-color: rgba{color};font-weight: bold;"
+            "border: 1px solid #444; font-size: 11pt")
 
-    def update_flag(self, civ_name: str):
-        self.flag.setCurrentText(civ_name)
+    def update_flag(self):
+        self.flag.setCurrentText(self.civ)
 
     def update_player(self, player_data: Dict[str, Any]):
         # We don't want the automatic update to look like the user made the change
@@ -73,12 +79,18 @@ class InnerPlayer(PlayerWidget):
         super().update_player(player_data)
         self.connect_to_function(self.callable)
 
-    def get_data(self) -> List[str]:
-        data = []
-        for item in (self.name, self.rating, self.rank, self.winrate,
-                     self.wins, self.losses):
-            data.append(item.text())
-        data.append(self.flag.currentText())
+    def get_data(self) -> Dict[str, Any]:
+        # Override to get civ from flag
+        data = {
+            'civ': self.flag.currentText(),
+            'name': self.name.text(),
+            'team': self.team,
+            'rating': self.rating.text(),
+            'rank': self.rank.text(),
+            'wins': self.wins.text(),
+            'losses': self.losses.text(),
+            'winrate': self.winrate.text(),
+        }
         return data
 
 
@@ -119,12 +131,6 @@ class InnerOverlay(AoEOverlay):
         self.map.textChanged.disconnect()
         super().update_data(player_data)
         self.map.textChanged.connect(self.changed)
-
-    def get_data(self) -> Dict[str, Any]:
-        result = {"map": self.map.text(), "players": []}
-        for player in self.players:
-            result["players"].append(player.get_data())
-        return result
 
     def changed(self):
         self.parent().overlay_changed(self.get_data())
