@@ -30,7 +30,7 @@ Rating history:
 
 Last 24 hours:
 
-![Screenshot](https://i.imgur.com/xtsiWI5.png)
+![Screenshot](https://i.imgur.com/8ODqTrw.png)
 
 Various stats:
 
