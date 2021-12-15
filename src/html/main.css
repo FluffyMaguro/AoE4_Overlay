@@ -26,7 +26,7 @@ body {
     transform: translate(-50%);
     text-transform: uppercase;
     font-style: italic;
-    background-color: rgba(0, 0, 0, 0.5);
+    text-shadow: .1vh .1vh .5vh black;
 }
 
 .name {
@@ -45,17 +45,28 @@ body {
     width: 14vh;
 }
 
-#team1 {
-    border-right: 0.2vh solid rgb(48, 47, 47);
-    padding-right: 1vh
+#team1 .stats td {
+    padding-right: .8vh
 }
 
-#team1 .name, #team1 .stats td {
-    padding-left: 1vh
+#team2 .stats td {
+    padding-left: .8vh
 }
 
-#team2 .name, #team2 .stats td {
-    padding-right: 1vh
+#team1 .stats td:last-child {
+    padding-right: 8vh
+}
+
+#team2 .stats td:first-child {
+    padding-left: 8vh
+}
+
+#team1 .flag {
+    padding-right: 2vh
+}
+
+#team2 .flag {
+    padding-left: 2vh
 }
 
 .player .name {
@@ -63,7 +74,7 @@ body {
 }
 
 .stats .rank {
-    color: #ccc
+    color: #ddd
 }
 
 .stats .rating {
