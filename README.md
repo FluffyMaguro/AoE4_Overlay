@@ -47,7 +47,7 @@ To use the custom streaming overlay simply drag the `overlay.html` file to OBS o
 
 Overlay active:
 
-![Screenshot](https://i.imgur.com/aMDuW25.png)
+![Screenshot](https://i.imgur.com/gNbxJBY.png)
 
 * Streaming overlay supports team games as well
 * The streaming overlay can be fully customized with CSS and JS, see the next section.
