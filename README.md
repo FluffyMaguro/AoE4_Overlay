@@ -28,6 +28,10 @@ Rating history:
 
 ![Screenshot](https://i.imgur.com/QqojOJI.png)
 
+Last 24 hours:
+
+![Screenshot](https://i.imgur.com/xtsiWI5.png)
+
 Various stats:
 
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
