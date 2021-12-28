@@ -45,7 +45,7 @@ To use the custom streaming overlay simply drag the `overlay.html` file to OBS o
 
 ![Screenshot](https://i.imgur.com/BK9AC6h.png)
 
-If drag & drop doesn't work, add new source to your scene. The source will be type of `Browser` and point to a local file of `overlay.html`.
+If drag & drop doesn't work, add new source to your scene manually. The source type will be `Browser` and point to a local file `overlay.html`.
 
 Overlay active:
 
