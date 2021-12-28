@@ -1,6 +1,6 @@
 # AoE4 Overlay
  
-* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.0.0/AoE4_Overlay.zip)** (Windows)
+* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.0.1/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
@@ -41,9 +41,11 @@ Built-in randomizer:
 ![Screenshot](https://i.imgur.com/tV4dMfi.png)
 
 # Streaming
-To use the custom streaming overlay simply drag the `overlay.html` file to OBS or other streaming software. Move and rescale as necessary once some game information is shown.
+To use the custom streaming overlay simply drag the `overlay.html` file to OBS or other streaming software. The file is located in `src/html` directory in the app folder. Move and rescale as necessary once some game information is shown.
 
 ![Screenshot](https://i.imgur.com/BK9AC6h.png)
+
+If drag & drop doesn't work, add new source to your scene. The source will be type of `Browser` and point to a local file of `overlay.html`.
 
 Overlay active:
 
@@ -80,6 +82,6 @@ function custom_func(data) {
 }
 ```
 
-# Changelog
+# Changelog & releases
 
-[All changes are here.](https://github.com/FluffyMaguro/AoE4_Overlay/blob/main/changelog.md)
+[Here](https://github.com/FluffyMaguro/AoE4_Overlay/releases)
