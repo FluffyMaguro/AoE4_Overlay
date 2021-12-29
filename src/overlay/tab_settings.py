@@ -37,7 +37,7 @@ class SettingsTab(QtWidgets.QWidget):
         # Layout
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setAlignment(QtCore.Qt.AlignTop)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setContentsMargins(25, 25, 25, 25)
         self.main_layout.setSpacing(25)
         self.setLayout(self.main_layout)
 
@@ -123,6 +123,10 @@ class SettingsTab(QtWidgets.QWidget):
             self.overlay_widget.change_state)
         overlay_layout.addWidget(self.btn_change_position, 2, 0, 1, 2)
 
+        ### Messages
+        self.msg = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.msg)
+
         # Create update button
         self.update_button = QtWidgets.QPushButton("New update!")
         self.update_button.setToolTip("Click here to download new app version")
@@ -164,6 +168,11 @@ class SettingsTab(QtWidgets.QWidget):
         """ Shows a notification"""
         self.notification_label.setText(text)
         self.notification_label.setStyleSheet(f"color: {color}")
+
+    def message(self, text: str, color: str = "black"):
+        """ Shows a message"""
+        self.msg.setText(text)
+        self.msg.setStyleSheet(f"color: {color}")
 
     def find_profile(self):
         """ Attempts to find player ids based on provided text (name, either id)"""

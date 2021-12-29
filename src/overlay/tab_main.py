@@ -73,8 +73,12 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def got_match_history(self, match_history: List[Any]):
         if match_history is None:
+            self.settigns_tab.message(
+                "Failed to get match history! Possibly an issue with AoEIV.net",
+                color='red')
             logger.warning("No match history data")
             return
+        self.settigns_tab.message("")
         self.stats_tab.update_other_stats(match_history)
         self.games_tab.update_widgets(match_history)
 

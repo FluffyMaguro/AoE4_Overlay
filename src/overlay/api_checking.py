@@ -103,7 +103,8 @@ def find_player(text: str) -> bool:
     return False
 
 
-def get_match_history(amount: int = 1) -> List[Any]:
+def get_match_history(amount: int = 1,
+                      raise_exception: bool = False) -> List[Any]:
     """ Gets player match history"""
     if settings.steam_id:
         url = f"https://aoeiv.net/api/player/matches?game=aoe4&steam_id={settings.steam_id}&count={amount}"
@@ -115,6 +116,8 @@ def get_match_history(amount: int = 1) -> List[Any]:
         return json.loads(session.get(url).text)
     except Exception:
         logger.exception("Failed to parse match history")
+        if raise_exception:
+            raise Exception
         return []
 
 
@@ -154,10 +157,14 @@ def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
         return {}
 
 
-def get_full_match_history(amount: int) -> List[Any]:
+def get_full_match_history(amount: int) -> Optional[List[Any]]:
     """ Gets match history and adds some data its missing"""
     # Get player match history
-    data = get_match_history(amount=amount)
+    try:
+        data = get_match_history(amount=amount, raise_exception=True)
+    except Exception:
+        return None
+
     logger.info(
         f"Asked for {amount} games | obtained {len(data)} from get_match_history"
     )
