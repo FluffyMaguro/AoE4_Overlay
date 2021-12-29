@@ -1,6 +1,6 @@
 import sys
 import traceback
-from typing import Callable
+from typing import Callable, Optional
 
 from PyQt5 import QtCore
 
@@ -72,8 +72,13 @@ class Worker(QtCore.QRunnable):
             logger.exception("")
 
 
-def scheldule(callback_function: Callable, worker_function: Callable, *args):
+def scheldule(result_callback: Callable,
+              worker_function: Callable,
+              *args,
+              error_callback: Optional[Callable] = None):
     """ Scheldules work on the worker function and passes the result to the callback function"""
     thread = Worker(worker_function, *args)
-    thread.signals.result.connect(callback_function)
+    thread.signals.result.connect(result_callback)
+    if error_callback is not None:
+        thread.signals.error.connect(error_callback)
     THREADPOOL.start(thread)

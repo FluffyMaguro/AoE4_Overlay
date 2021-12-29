@@ -1,6 +1,6 @@
 # AoE4 Overlay
  
-* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.0.1/AoE4_Overlay.zip)** (Windows)
+* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.1.0/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
