@@ -239,7 +239,7 @@ class Api_checker:
             if result is not None:
                 return result
 
-            if self.sleep(10):
+            if self.sleep(settings.interval):
                 return
 
     def get_data(self) -> Optional[Dict[str, Any]]:
@@ -248,7 +248,7 @@ class Api_checker:
             return
 
         # Match history
-        match_history = get_match_history()
+        match_history = get_match_history(amount=1)
         if not match_history:
             return
         match = match_history[0]
@@ -258,19 +258,20 @@ class Api_checker:
             return
 
         # Rating history
-        rating_history = get_rating_history(leaderboard_id)
+        rating_history = get_rating_history(leaderboard_id, amount=1)
         if not rating_history:
             return
         rating = rating_history[0]
-
-        # Gets additional player data from leaderboards stats (in-place)
-        for player in match['players']:
-            self.get_player_data(leaderboard_id, player)
 
         # Check for new game
         if all((match['started'] + 600 > rating['timestamp'],
                 match['started'] > self.last_match_timestamp)):
             self.last_match_timestamp = match['started']
+
+            # Gets additional player data from leaderboards stats (in-place)
+            for player in match['players']:
+                self.get_player_data(leaderboard_id, player)
+
             return match
 
         # Check for new rating data
