@@ -123,8 +123,9 @@ class TabWidget(QtWidgets.QTabWidget):
         if not link:
             return
         logger.info("New version available!")
-        self.update_button.clicked.connect(partial(webbrowser.open, link))
-        self.update_button.show()
+        self.settigns_tab.update_button.clicked.connect(
+            partial(webbrowser.open, link))
+        self.settigns_tab.update_button.show()
 
     def override_event(self, data: Dict[str, Any]):
         self.settigns_tab.overlay_widget.update_data(data)
