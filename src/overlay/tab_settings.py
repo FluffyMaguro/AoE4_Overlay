@@ -129,6 +129,7 @@ class SettingsTab(QtWidgets.QWidget):
 
         # Create update button
         self.update_button = QtWidgets.QPushButton("New update!")
+        self.update_button.setMaximumWidth(400)
         self.update_button.setToolTip("Click here to download new app version")
         self.update_button.setStyleSheet(
             'background-color: #3bb825; color: black')
