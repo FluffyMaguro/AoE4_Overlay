@@ -68,16 +68,6 @@ class MainApp(QtWidgets.QMainWindow):
                     "https://github.com/FluffyMaguro/AoE4_Overlay"))
         link_menu.addAction(githubAction)
 
-        # Changelog
-        icon = QtGui.QIcon(file_path("img/github.png"))
-        changelogAction = QtWidgets.QAction(icon, 'Changelog', self)
-        changelogAction.triggered.connect(
-            partial(
-                webbrowser.open,
-                "https://github.com/FluffyMaguro/AoE4_Overlay/blob/main/changelog.md"
-            ))
-        link_menu.addAction(changelogAction)
-
         # Discord
         icon = QtGui.QIcon(file_path("img/discord.png"))
         mdiscordAction = QtWidgets.QAction(icon, 'My discord', self)
