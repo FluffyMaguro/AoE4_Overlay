@@ -67,6 +67,9 @@ def attempt_to_find_profile_id():
     Only works if the player is ranked any team mode."""
     if not settings.steam_id:
         return
+
+    settings.profile_id = None
+    settings.player_name = None
     for id in mode_data:
         url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&steam_id={settings.steam_id}&count=1"
         data = json.loads(session.get(url).text)
@@ -251,11 +254,20 @@ class Api_checker:
         match_history = get_match_history(amount=1)
         if not match_history:
             return
+
         match = match_history[0]
         leaderboard_id = match['rating_type_id'] + 2
 
         if self.force_stop:
             return
+
+        # Show the last game
+        if match['started'] > self.last_match_timestamp:
+            self.last_match_timestamp = match['started']
+            # Gets additional player data from leaderboards stats (in-place)
+            for player in match['players']:
+                self.get_player_data(leaderboard_id, player)
+            return match
 
         # Rating history
         rating_history = get_rating_history(leaderboard_id, amount=1)
@@ -263,20 +275,10 @@ class Api_checker:
             return
         rating = rating_history[0]
 
-        # Check for new game
-        if all((match['started'] + 600 > rating['timestamp'],
-                match['started'] > self.last_match_timestamp)):
-            self.last_match_timestamp = match['started']
-
-            # Gets additional player data from leaderboards stats (in-place)
-            for player in match['players']:
-                self.get_player_data(leaderboard_id, player)
-
-            return match
-
         # Check for new rating data
-        if all((self.last_match_timestamp != -1,
-                rating['timestamp'] > self.last_rating_timestamp)):
+        if self.last_match_timestamp != -1 and \
+            rating['timestamp'] > self.last_rating_timestamp:
+
             self.last_rating_timestamp = rating['timestamp']
             return {"new_rating": True, 'timestamp': rating['timestamp']}
 
