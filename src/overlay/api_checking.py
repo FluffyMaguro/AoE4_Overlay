@@ -84,6 +84,10 @@ def find_player(text: str) -> bool:
     """ Tries to find a player based on a text containing either name, steam_id or profile_id
     Returns `True` if the player was found. Settings are automatically updated."""
     id = None
+    # Save & reset current player settings
+    old = (settings.player_name, settings.profile_id, settings.steam_id)
+    settings.player_name, settings.profile_id, settings.steam_id = None, None, None
+
     try:
         id = int(text)
     except Exception:
@@ -103,6 +107,8 @@ def find_player(text: str) -> bool:
             logger.info("Found player by profile_id: {id}")
             return True
     logger.info(f"Failed to find a player with: {text}")
+    # Restore player settings
+    settings.player_name, settings.profile_id, settings.steam_id = old
     return False
 
 
