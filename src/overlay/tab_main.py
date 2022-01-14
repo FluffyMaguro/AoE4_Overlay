@@ -9,6 +9,7 @@ import overlay.helper_func as hf
 from overlay.api_checking import Api_checker, get_full_match_history
 from overlay.logging_func import get_logger
 from overlay.settings import settings
+from overlay.tab_buildorders import BoTab
 from overlay.tab_games import MatchHistoryTab
 from overlay.tab_graphs import GraphTab
 from overlay.tab_override import OverrideTab
@@ -34,6 +35,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab = GraphTab(self)
         self.random_tab = RandomTab(self)
         self.stats_tab = StatsTab(self)
+        self.buildorder_tab = BoTab(self)
         self.override_tab = OverrideTab(self)
         self.override_tab.data_override.connect(self.override_event)
         self.override_tab.update_override.connect(self.override_update_event)
@@ -45,6 +47,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.graph_tab, "Rating")
         self.addTab(self.stats_tab, "Stats")
         self.addTab(self.override_tab, "Override")
+        self.addTab(self.buildorder_tab, "Build orders")
         self.addTab(self.random_tab, "Randomize")
 
     def start(self):

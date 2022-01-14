@@ -9,7 +9,7 @@ from overlay.helper_func import file_path, pyqt_wait
 from overlay.settings import CONFIG_FOLDER, settings
 from overlay.tab_main import TabWidget
 
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 
 
 class MainApp(QtWidgets.QMainWindow):

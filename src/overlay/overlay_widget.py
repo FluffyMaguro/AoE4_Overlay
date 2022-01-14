@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from overlay.custom_widgets import OverlayWidget
 from overlay.helper_func import file_path
 from overlay.settings import settings
 
@@ -104,11 +105,10 @@ class PlayerWidget:
         return data
 
 
-class AoEOverlay(QtWidgets.QWidget):
+class AoEOverlay(OverlayWidget):
     """Overlay widget showing AOE4 information """
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.fixed = True
         self.players = []
         self.setup_as_overlay()
         self.initUI()
@@ -122,13 +122,6 @@ class AoEOverlay(QtWidgets.QWidget):
             self.setGeometry(*settings.overlay_geometry)
 
         self.setWindowTitle('AoE IV: Overlay')
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint
-                            | QtCore.Qt.WindowTransparentForInput
-                            | QtCore.Qt.WindowStaysOnTopHint
-                            | QtCore.Qt.CoverWindow
-                            | QtCore.Qt.NoDropShadowWindowHint
-                            | QtCore.Qt.WindowDoesNotAcceptFocus)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
     def initUI(self):
         # Layouts & inner frame
@@ -171,22 +164,9 @@ class AoEOverlay(QtWidgets.QWidget):
         # Add players
         self.init_players()
 
-        # Save position
-        self.old_pos = self.pos()
-
     def init_players(self):
         for i in range(8):
             self.players.append(PlayerWidget(i + 1, self.playerlayout))
-
-    def mousePressEvent(self, event: QtGui.QMouseEvent):
-        """ Override used for window dragging"""
-        self.old_pos = event.globalPos()
-
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
-        """ Override used for window dragging"""
-        delta = QtCore.QPoint(event.globalPos() - self.old_pos)
-        self.move(self.x() + delta.x(), self.y() + delta.y())
-        self.old_pos = event.globalPos()
 
     def update_style(self, font_size: int):
         self.setStyleSheet(
@@ -201,15 +181,15 @@ class AoEOverlay(QtWidgets.QWidget):
             "stop: 1 rgba(0,0,0,1))"
             "}")
 
+        if self.isVisible():
+            self.show()
+
     def update_data(self, game_data: Dict[str, Any]):
         self.map.setText(game_data['map'])
         [p.show(False) for p in self.players]
         for i, player in enumerate(game_data['players']):
             self.players[i].update_player(player)
         self.show()
-
-    def show_hide(self):
-        self.hide() if self.isVisible() else self.show()
 
     def save_geometry(self):
         """ Saves overlay geometry into settings"""
@@ -218,30 +198,6 @@ class AoEOverlay(QtWidgets.QWidget):
             pos.x(), pos.y(), self.width(),
             self.height()
         ]
-
-    def change_state(self):
-        """ Changes the widget to be movable or not"""
-        pos = self.pos()
-
-        if self.fixed:
-            self.fixed = False
-            self.setWindowFlags(QtCore.Qt.Window
-                                | QtCore.Qt.CustomizeWindowHint
-                                | QtCore.Qt.WindowTitleHint)
-            self.setAttribute(QtCore.Qt.WA_TranslucentBackground, False)
-            self.move(pos.x() - 1, pos.y() - 31)
-        else:
-            self.fixed = True
-            self.setWindowFlags(QtCore.Qt.FramelessWindowHint
-                                | QtCore.Qt.WindowTransparentForInput
-                                | QtCore.Qt.WindowStaysOnTopHint
-                                | QtCore.Qt.CoverWindow
-                                | QtCore.Qt.NoDropShadowWindowHint
-                                | QtCore.Qt.WindowDoesNotAcceptFocus)
-            self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-            self.move(pos.x() + 8, pos.y() + 31)
-            self.save_geometry()
-        self.show()
 
     def get_data(self) -> Dict[str, Any]:
         result = {"map": self.map.text(), "players": []}

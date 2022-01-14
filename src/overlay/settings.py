@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from overlay.logging_func import CONFIG_FOLDER, get_logger
 
@@ -20,6 +20,14 @@ class _Settings:
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
+        self.bo_font_size: int = 12
+        self.bo_title_color: str = "orange"
+        self.bo_overlay_hotkey_show: str = ""
+        self.bo_overlay_hotkey_cycle: str = ""
+        self.bo_overlay_geometry: Optional[List[int]] = None
+        self.buildorders: Dict[str, str] = {
+            "The best build order": "> Make units\n> Attack\n> Profit"
+        }
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
         self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35), (255, 0,
                                                                       0, 0.35))

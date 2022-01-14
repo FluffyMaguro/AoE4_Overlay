@@ -2,25 +2,13 @@ import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.api_checking import find_player
+from overlay.custom_widgets import CustomKeySequenceEdit
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay
 from overlay.settings import settings
 from overlay.worker import scheldule
 
 logger = get_logger(__name__)
-
-
-class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
-    key_changed = QtCore.pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        super(CustomKeySequenceEdit, self).__init__(parent)
-
-    def keyPressEvent(self, QKeyEvent):
-        super(CustomKeySequenceEdit, self).keyPressEvent(QKeyEvent)
-        value = self.keySequence()
-        self.setKeySequence(QtGui.QKeySequence(value))
-        self.key_changed.emit(value.toString())
 
 
 class SettingsTab(QtWidgets.QWidget):
