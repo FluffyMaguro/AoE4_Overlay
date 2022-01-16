@@ -1,5 +1,6 @@
 import os
 import time
+from collections import defaultdict
 from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtWidgets
@@ -36,11 +37,10 @@ class MatchEntry:
                 break
 
         # Teams
-        teams = {1: [], 2: []}
+        teams = defaultdict(list)
         for player in match_data["players"]:
             team = player["team"]
-            if team in teams:
-                teams[team].append(f"{player['name']}")
+            teams[team].append(f"{player['name']}")
 
         other_team = 1 if main_team == 2 else 2
         team_widgets = []
