@@ -19,7 +19,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-from overlay.aoe4_data import mode_data
+from overlay.aoe4_data import QM_ids, mode_data
+from overlay.helper_func import match_mode, quickmatch_game
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -178,7 +179,9 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
         f"Asked for {amount} games | obtained {len(data)} from get_match_history"
     )
     # What type of games are there
-    leaderboard_ids = {i["rating_type_id"] + 2 for i in data}
+    leaderboard_ids = {match_mode(i, convert_customs=False) for i in data}
+    leaderboard_ids = {i for i in leaderboard_ids if i in QM_ids}
+
     # Get rating histories for those modes
     rating_hist = {
         i: get_rating_history(i, amount + 1)
@@ -188,6 +191,10 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
     def find_rating_change(leaderboard_id: int,
                            timestamp: int) -> Tuple[Optional[int], int]:
         """ Finds a rating change for given match"""
+        # If not quick match
+        if leaderboard_id not in QM_ids:
+            return None, -1
+
         # Go through rating histories, the first that's newer than our game has new rating
         reversed = rating_hist[leaderboard_id][::-1]
         for i, entry in enumerate(reversed):
@@ -200,9 +207,8 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
         return None, -1
 
     for match in data:
-        rating_diff, rating = find_rating_change(match["rating_type_id"] + 2,
-                                                 match['started'])
-
+        rating_diff, rating = find_rating_change(
+            match_mode(match, convert_customs=False), match['started'])
         match["my_rating"] = rating
         if rating_diff is None:
             match['result'] = "?"
@@ -262,7 +268,7 @@ class Api_checker:
             return
 
         match = match_history[0]
-        leaderboard_id = match['rating_type_id'] + 2
+        leaderboard_id = match_mode(match)
 
         if self.force_stop:
             return
@@ -272,10 +278,15 @@ class Api_checker:
             self.last_match_timestamp = match['started']
             # Gets additional player data from leaderboards stats (in-place)
             for player in match['players']:
-                self.get_player_data(leaderboard_id, player)
+                try:
+                    self.get_player_data(leaderboard_id, player)
+                except Exception:
+                    logger.exception("")
             return match
 
         # Rating history
+        if not quickmatch_game(match):
+            return
         rating_history = get_rating_history(leaderboard_id, amount=1)
         if not rating_history:
             return

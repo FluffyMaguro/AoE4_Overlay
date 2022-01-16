@@ -18,6 +18,9 @@ mode_data = {
     20: "4v4",
 }
 
+QM_ids = {17, 18, 19, 20}
+"""Leaderboard ids of quick match leagues"""
+
 civ_data = {
     0: 'Abbasid Dynasty',
     1: 'Chinese',

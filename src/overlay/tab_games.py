@@ -4,7 +4,8 @@ from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtWidgets
 
-from overlay.aoe4_data import map_data
+from overlay.aoe4_data import QM_ids, map_data
+from overlay.helper_func import quickmatch_game
 from overlay.logging_func import CONFIG_FOLDER, get_logger
 from overlay.settings import settings
 
@@ -66,9 +67,13 @@ class MatchEntry:
         result = QtWidgets.QLabel(match_data["result"])
 
         # ELO change
-        plus = not isinstance(match_data['my_rating_diff'],
-                              str) and match_data['my_rating_diff'] > 0
-        rating_string = f"{'+' if plus else ''}{match_data['my_rating_diff']} → {match_data['my_rating']}"
+        if quickmatch_game(match_data):
+            plus = not isinstance(match_data['my_rating_diff'],
+                                  str) and match_data['my_rating_diff'] > 0
+            rating_string = f"{'+' if plus else ''}{match_data['my_rating_diff']} → {match_data['my_rating']}"
+        else:
+            rating_string = "Custom game"
+
         elo_change = QtWidgets.QLabel(rating_string)
 
         self.widgets = (*team_widgets, map_name, date, mode, result,
@@ -157,7 +162,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         # Add new matches to our list
         present_match_ids = {i.match_id for i in self.matches}
         for match in reversed(match_history):
-            if match['my_rating'] == -1:
+            if match['my_rating'] == -1 and quickmatch_game(match):
                 continue
             if match['match_id'] in present_match_ids:
                 continue

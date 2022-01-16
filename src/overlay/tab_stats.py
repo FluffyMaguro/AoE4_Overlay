@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import civ_data, map_data, mode_data
 from overlay.api_checking import get_leaderboard_data
+from overlay.helper_func import match_mode
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 from overlay.worker import scheldule
@@ -250,7 +251,7 @@ class StatsTab(QtWidgets.QWidget):
             return
         game['map'] = match['map_type']
         game['win'] = match['result'] == "Win"
-        game['mode'] = match['rating_type_id'] + 2
+        game['mode'] = match_mode(match)
         game['match_id'] = match['match_id']
         for player in match['players']:
             if player['profile_id'] == settings.profile_id:

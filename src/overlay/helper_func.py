@@ -7,7 +7,7 @@ from typing import Any, Dict, Union
 import requests
 from PyQt5 import QtCore
 
-from overlay.aoe4_data import civ_data, map_data
+from overlay.aoe4_data import QM_ids, civ_data, map_data
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -60,6 +60,20 @@ def create_custom_files():
                 f.write("")
 
 
+def match_mode(match: Dict[str, Any], convert_customs: bool = True) -> int:
+    """ Returns match mode (e.g., 17 for both QM 1v1)
+    
+    Returns the same value for Custom 1v1 if `convert_customs` == True
+    """
+    leaderboard_id = match['rating_type_id'] + 2
+    if convert_customs and leaderboard_id not in QM_ids:
+        leaderboard_id = 16 + match['num_slots'] / 2
+    return int(leaderboard_id)
+
+def quickmatch_game(match: Dict[str, Any]) -> bool:
+    """ Checks whether the game is a quickmatch"""
+    return match_mode(match, convert_customs=False) in QM_ids
+
 def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     """ Processes game data returned by API
     
@@ -67,7 +81,7 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     Gets text for civs and maps. Apart from `team`, all player data returned as string."""
     result = {}
     result['map'] = map_data.get(game_data["map_type"], "Unknown map")
-    result['mode'] = game_data['rating_type_id'] + 2
+    result['mode'] = match_mode(game_data)
     result['started'] = game_data['started']
     result['ranked'] = game_data['ranked']
     result['server'] = game_data['server']
