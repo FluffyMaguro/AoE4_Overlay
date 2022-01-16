@@ -48,7 +48,7 @@ class Buildorder_overlay(OverlayWidget):
         self.title.setWordWrap(True)
         if not settings.bo_showtitle:
             self.title.hide()
-            
+
         flayout.addWidget(self.title)
 
         self.text = QtWidgets.QLabel()
@@ -96,8 +96,15 @@ class BoTab(QtWidgets.QWidget):
         super().__init__(parent)
         self.overlay = Buildorder_overlay()
         self.initUI()
+        self.init_hotkeys()
 
-        # Load hotkeys
+        # Connect signals
+        self.show_hide_overlay.connect(self.overlay.show_hide)
+        self.cycle_buildorder.connect(self.cycle_overlay)
+
+        self.update_overlay()
+
+    def init_hotkeys(self):
         if settings.bo_overlay_hotkey_show:
             self.key_showhide.setKeySequence(
                 QtGui.QKeySequence.fromString(settings.bo_overlay_hotkey_show))
@@ -110,12 +117,6 @@ class BoTab(QtWidgets.QWidget):
                     settings.bo_overlay_hotkey_cycle))
             keyboard.add_hotkey(settings.bo_overlay_hotkey_cycle,
                                 self.cycle_buildorder.emit)
-
-        # Connect signals
-        self.show_hide_overlay.connect(self.overlay.show_hide)
-        self.cycle_buildorder.connect(self.cycle_overlay)
-
-        self.update_overlay()
 
     def initUI(self):
         hlayout = QtWidgets.QHBoxLayout()

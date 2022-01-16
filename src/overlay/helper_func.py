@@ -2,7 +2,7 @@ import json
 import os
 import pathlib
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import requests
 from PyQt5 import QtCore
@@ -109,3 +109,26 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         result['players'].append(data)
 
     return result
+
+
+def strtime(t: Union[int, float], show_seconds: bool = False) -> str:
+    """ Returns formatted string 
+    X days, Y hours, Z minutes
+    """
+    years, delta = divmod(t, 31557600)
+    days, delta = divmod(delta, 86400)
+    hours, delta = divmod(delta, 3600)
+    minutes, seconds = divmod(delta, 60)
+
+    s = []
+    if years:
+        s.append(f"{years:.0f} years")
+    if days:
+        s.append(f"{days:.0f} days")
+    if hours:
+        s.append(f"{hours:.0f} hours")
+    if minutes or (not show_seconds and not s):
+        s.append(f"{minutes:.0f} minutes")
+    if show_seconds:
+        s.append(f"{seconds:.0f} seconds")
+    return " ".join(s)

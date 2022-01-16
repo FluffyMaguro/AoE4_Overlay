@@ -127,16 +127,17 @@ class SettingsTab(QtWidgets.QWidget):
     def start(self):
         # Initialize
         self.update_profile_info()
+        self.init_hotkeys()
 
-        # Hotkey
+        if settings.steam_id or settings.profile_id:
+            self.new_profile.emit()
+
+    def init_hotkeys(self):
         if settings.overlay_hotkey:
             self.key_showhide.setKeySequence(
                 QtGui.QKeySequence.fromString(settings.overlay_hotkey))
             keyboard.add_hotkey(settings.overlay_hotkey,
                                 self.show_hide_overlay.emit)
-
-        if settings.steam_id or settings.profile_id:
-            self.new_profile.emit()
 
     def update_profile_info(self):
         """ Updates profile information based on found steam_id and profile_id"""

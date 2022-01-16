@@ -1,8 +1,11 @@
+import importlib
 import platform
+import time
 import webbrowser
 from functools import partial
 from typing import Any, Dict, List, Optional
 
+import keyboard
 from PyQt5 import QtWidgets
 
 import overlay.helper_func as hf
@@ -60,6 +63,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.run_new_game_check()
         self.websocket_manager.run()
         self.send_ws_colors()
+        self.check_waking()
 
     def new_profile_found(self):
         self.api_checker.reset()
@@ -142,3 +146,49 @@ class TabWidget(QtWidgets.QTabWidget):
             "type": "color",
             "data": settings.team_colors
         })
+
+    ### Functionality dedicated to checking for PC waking, and resetting keyboard threads
+
+    def check_waking(self):
+        """ Manages all checks and keyboard resets"""
+        scheldule(self.pc_waken_from_sleep, self.wait_for_wake)
+
+    def wait_for_wake(self):
+        """ Function that checks for a interruption"""
+        interval = 10  # Seconds
+        while True:
+            start = time.time()
+            # Wait 5s
+            for _ in range(interval * 2):
+                time.sleep(0.5)
+                if self.force_stop:
+                    return None
+            # Check the difference
+            diff = time.time() - start
+            if diff > interval + 5:
+                time.sleep(4)
+                return diff - interval
+
+    def pc_waken_from_sleep(self, diff: Optional[float]):
+        """ This function is run when the PC is awoken """
+        if diff is None:
+            return
+
+        logger.info(f'PC awoke! ({hf.strtime(diff, show_seconds=True)})')
+        self.check_waking()
+
+        # Check for new updates & reset keyboard threads
+        self.check_for_new_version()
+        self.reset_keyboard_threads()
+
+    def reset_keyboard_threads(self):
+        """ Resets keyboard thread"""
+        global keyboard
+        try:
+            logger.info(f'Resetting keyboard thread')
+            keyboard.unhook_all()
+            keyboard = importlib.reload(keyboard)
+            self.settigns_tab.init_hotkeys()
+            self.buildorder_tab.init_hotkeys()
+        except Exception:
+            logger.exception(f"Failed to reset keyboard")
