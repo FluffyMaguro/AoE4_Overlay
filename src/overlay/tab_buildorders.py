@@ -46,6 +46,9 @@ class Buildorder_overlay(OverlayWidget):
         self.title = QtWidgets.QLabel()
         self.title.setObjectName("botitle")
         self.title.setWordWrap(True)
+        if not settings.bo_showtitle:
+            self.title.hide()
+            
         flayout.addWidget(self.title)
 
         self.text = QtWidgets.QLabel()
@@ -63,15 +66,14 @@ class Buildorder_overlay(OverlayWidget):
             f"QLabel {{font-size: {font_size}pt; color: white }}"
             f"QLabel#botitle {{font-size: {font_size + 2}pt;"
             f"font-weight: bold; color: {settings.bo_title_color}}}"
-            "QFrame#inner_frame"
-            "{"
+            "QFrame#inner_frame {"
             "background: QLinearGradient("
             "x1: 0, y1: 0,"
             "x2: 1, y2: 0,"
             "stop: 0 rgba(0,0,0,0),"
-            "stop: 0.1 rgba(0,0,0,0.6),"
-            "stop: 1 rgba(0,0,0,0.7))"
-            "}")
+            f"stop: 0.1 rgba(0,0,0,{max(settings.bo_bg_opacity - 0.1, 0)}),"
+            f"stop: 0.98 rgba(0,0,0,{settings.bo_bg_opacity}),"
+            "stop: 1 rgba(0,0,0,0))}")
 
         # Updates style (prevents ghosting)
         if self.isVisible():
@@ -134,6 +136,7 @@ class BoTab(QtWidgets.QWidget):
         # Renaming buildorders
         self.rename_widget = QtWidgets.QLineEdit()
         self.rename_widget.setToolTip("Rename buildorder here")
+        self.rename_widget.setTextMargins(3, 0, 0, 0)
         clayout.addWidget(self.rename_widget)
 
         # Buildorder list

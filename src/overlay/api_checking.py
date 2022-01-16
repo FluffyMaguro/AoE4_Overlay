@@ -56,7 +56,7 @@ def find_player_by_name(name: str) -> bool:
         data = json.loads(session.get(url).text)
         if data['leaderboard'] and name == data['leaderboard'][0]['name']:
             settings.profile_id = data['leaderboard'][0]['profile_id']
-            settings.steam_id = data['leaderboard'][0]['steam_id']
+            settings.steam_id = int(data['leaderboard'][0]['steam_id'])
             settings.player_name = data['leaderboard'][0]['name']
             return True
     return False

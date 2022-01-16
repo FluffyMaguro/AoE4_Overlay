@@ -16,6 +16,10 @@ API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and is
 
 # Screenshots
 
+Build order widget:
+
+![Screenshot](https://i.imgur.com/SnR3p7d.png)
+
 Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
@@ -35,6 +39,10 @@ Last 24 hours:
 Various stats:
 
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
+
+Build order tab:
+
+![Screenshot](https://i.imgur.com/zuAdlX6.png)
 
 Built-in randomizer:
 
@@ -63,24 +71,35 @@ Or change values to something completely different
 
 # Customization
 
-1. Overlay position and font size can be changed in the app.
-2. To change team colors navigate to the config file (`File/Config`). In the `config.json` change team_colors. Colors are stored as a list of RGBA colors for team 1, 2, and so on.
+1. **Overlay position and font size** can be changed in the app.
 
-```json
-"team_colors": [
-    [74, 255, 2, 0.35],
-    [3, 179, 255, 0.35],
-    [255, 0, 0, 0.35]
-  ]
-```
+2. **Build order** font and position can be changed in the app. 
+   But other attributres can be also customized in `config.json` (click `File/config & logs` in the app):
 
-3. Streaming overlay customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
+    `"bo_bg_opacity": 0.5,` controls its background opacity (default: 0.5 = 50%; accepts values between 0 and 1)
 
-```javascript
-function custom_func(data) {
-    console.log("These are all the player data:", data);
-}
-```
+    `"bo_showtitle": true,` sets whether build order name is visible (accepts true/false)
+
+    `"bo_title_color": "orange",` changes the color of build order name (title), also accepts hex and rgb values as string
+
+
+3. **Team colors** can be changed in the `config.json`. Colors are stored as a list of RGBA colors for team 1, 2, and so on.
+
+    ```json
+    "team_colors": [
+        [74, 255, 2, 0.35],
+        [3, 179, 255, 0.35],
+        [255, 0, 0, 0.35]
+      ]
+    ```
+
+1. **Streaming overlay** customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
+
+    ```javascript
+    function custom_func(data) {
+        console.log("These are all the player data:", data);
+    }
+    ```
 
 # Changelog & releases
 

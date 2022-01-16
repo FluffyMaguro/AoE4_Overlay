@@ -20,6 +20,8 @@ class _Settings:
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
+        self.bo_bg_opacity: float = 0.5
+        self.bo_showtitle: bool = True
         self.bo_font_size: int = 12
         self.bo_title_color: str = "orange"
         self.bo_overlay_hotkey_show: str = ""
