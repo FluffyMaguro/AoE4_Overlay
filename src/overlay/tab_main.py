@@ -31,8 +31,8 @@ class TabWidget(QtWidgets.QTabWidget):
         self.version = version
         self.api_checker = Api_checker()
         self.websocket_manager = Websocket_manager(settings.websocket_port)
-        self.force_stop = False
-        self.prevent_overlay_update = False
+        self.force_stop: bool = False
+        self.prevent_overlay_update: bool = False
 
         self.games_tab = MatchHistoryTab(self)
         self.graph_tab = GraphTab(self)

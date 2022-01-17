@@ -1,5 +1,5 @@
 import random
-from typing import Dict
+from typing import Dict, Optional
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -10,8 +10,8 @@ from overlay.helper_func import file_path
 class RandomTab(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.current_map = None
-        self.current_civ = None
+        self.current_map: Optional[str] = None
+        self.current_civ: Optional[str] = None
         self.pixmaps: Dict[str, QtGui.QPixmap] = dict()
         self.initUI()
         self.randomize_map()

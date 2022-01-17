@@ -1,17 +1,15 @@
-import os
 import time
 from collections import defaultdict
 from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtWidgets
 
-from overlay.aoe4_data import QM_ids, map_data
+from overlay.aoe4_data import map_data
 from overlay.helper_func import quickmatch_game
-from overlay.logging_func import CONFIG_FOLDER, get_logger
+from overlay.logging_func import get_logger
 from overlay.settings import settings
 
 logger = get_logger(__name__)
-DATA_FILE = os.path.join(CONFIG_FOLDER, "match_data.json")
 
 
 class Line(QtWidgets.QFrame):
