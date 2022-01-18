@@ -16,7 +16,7 @@ API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and is
 
 # How to use
 
-* Download and extract archive
+* Download and extract the archive
 * Run `AoE4_Overlay.exe`
 * Find your profile by entering your profile_id, steam_id or player name
 * Set up the hotkey for showing/hiding overlay
@@ -87,7 +87,7 @@ Or change values to something completely different
 1. **Overlay position and font size** can be changed in the app.
 
 2. **Build order** font and position can be changed in the app. 
-   But other attributres can be also customized in `config.json` (click `File/config & logs` in the app):
+   Other attributres can be also customized in `config.json` (to find the file click `File/config & logs` in the app). You have to close the app before making changes to the config file. What can be changed:
 
     `"bo_bg_opacity": 0.5,` controls its background opacity (default: 0.5 = 50%; accepts values between 0 and 1)
 
@@ -106,7 +106,7 @@ Or change values to something completely different
       ]
     ```
 
-1. **Streaming overlay** customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
+4. **Streaming overlay** customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
 
     ```javascript
     function custom_func(data) {
