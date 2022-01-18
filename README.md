@@ -14,6 +14,19 @@
 
 API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
+# How to use
+
+* Download and extract archive
+* Run `AoE4_Overlay.exe`
+* Find your profile by entering your profile_id, steam_id or player name
+* Set up the hotkey for showing/hiding overlay
+  * Overlay will be automatically shown when a new game starts (or app starts)
+* Build orders:
+  * Add new build orders
+  * Set up hotkeys for showing/hiding overlay and cycling between build orders
+  * Use hotkeys to show/hide/cycle build orders  
+
+
 # Screenshots
 
 Build order widget:
