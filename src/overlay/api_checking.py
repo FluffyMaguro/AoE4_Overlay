@@ -56,9 +56,12 @@ def find_player_by_name(name: str) -> bool:
         url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&search={name}&count=1"
         data = json.loads(session.get(url).text)
         if data['leaderboard'] and name == data['leaderboard'][0]['name']:
-            settings.profile_id = data['leaderboard'][0]['profile_id']
-            settings.steam_id = int(data['leaderboard'][0]['steam_id'])
             settings.player_name = data['leaderboard'][0]['name']
+            settings.profile_id = data['leaderboard'][0]['profile_id']
+            try:
+                settings.steam_id = int(data['leaderboard'][0]['steam_id'])
+            except Exception:
+                pass
             return True
     return False
 
