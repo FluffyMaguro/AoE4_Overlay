@@ -1,15 +1,42 @@
 import subprocess
 import sys
+import traceback
 import webbrowser
 from functools import partial
+from types import TracebackType
+from typing import Type
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.helper_func import file_path, pyqt_wait
+from overlay.logging_func import get_logger
 from overlay.settings import CONFIG_FOLDER, settings
 from overlay.tab_main import TabWidget
 
-VERSION = "1.2.0"
+logger = get_logger(__name__)
+
+VERSION = "1.2.1"
+
+
+def excepthook(exc_type: Type[BaseException], exc_value: Exception, exc_tback: TracebackType):
+    """ Provides the top-most exception handling. Logs unhandled exceptions and cleanly shuts down the app."""
+    # Log the exception
+    s = "".join(traceback.format_exception(exc_type, exc_value, exc_tback))
+    logger.warning(f"Unhandled exception! {s}")
+    # Try to save settings
+    try:
+        settings.save()
+    except Exception:
+        logger.exception("Failed to save settings")
+    # Shut down other threads
+    try:
+        Main.centralWidget().stop_checking_api()
+    except Exception:
+        logger.exception("Failed to order the app to stop checking api")
+    sys.exit()
+
+
+sys.excepthook = excepthook
 
 
 class MainApp(QtWidgets.QMainWindow):
