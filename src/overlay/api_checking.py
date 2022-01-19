@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-from overlay.aoe4_data import QM_ids, mode_data
+from overlay.aoe4_data import QM_ids, mode_data, net_to_world
 from overlay.helper_func import match_mode, quickmatch_game
 from overlay.logging_func import get_logger
 from overlay.settings import settings
@@ -39,14 +39,14 @@ def validate_id(id: Optional[int],
 
     # When looking for profile we might want to find player name also
     text = session.get(url).text
-    if text != "[]" and update_name and idtype == "profile":
+    if update_name and text != "[]" and "<body>" not in text and idtype == "profile":
         data = json.loads(text)
         for player in data[0]['players']:
             if player["profile_id"] == id:
                 settings.player_name = player["name"]
                 return True
 
-    return text != "[]"
+    return text != "[]" and "<body>" not in text
 
 
 def find_player_by_name(name: str) -> bool:
@@ -66,14 +66,14 @@ def find_player_by_name(name: str) -> bool:
     return False
 
 
-def attempt_to_find_profile_id():
+def attempt_to_find_profile_id() -> bool:
     """ Attempts to find player profile ID based on steam_id.
-    Only works if the player is ranked any team mode."""
+    Only works if the player is ranked any team mode.
+    
+    Returns `True` if successful"""
     if not settings.steam_id:
-        return
+        return False
 
-    settings.profile_id = None
-    settings.player_name = None
     for id in mode_data:
         url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&steam_id={settings.steam_id}&count=1"
         data = json.loads(session.get(url).text)
@@ -81,7 +81,8 @@ def attempt_to_find_profile_id():
             settings.profile_id = data['leaderboard'][0]['profile_id']
             settings.player_name = data['leaderboard'][0]['name']
             logger.info("Found player profile_id based on steam_id")
-            return
+            return True
+    return False
 
 
 def find_player(text: str) -> bool:
@@ -104,8 +105,8 @@ def find_player(text: str) -> bool:
         if validate_id(id, idtype="steam"):
             settings.steam_id = id
             logger.info("Found player by steam_id: {id}")
-            attempt_to_find_profile_id()
-            return True
+            if attempt_to_find_profile_id():
+                return True
         if validate_id(id, idtype="profile", update_name=True):
             settings.profile_id = id
             logger.info("Found player by profile_id: {id}")
