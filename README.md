@@ -12,7 +12,7 @@
 3. Separate overlay for streaming (as html, very customizable via CSS/JS).
 4. Information about players that are streaming and don't have any overlay
 
-API calls are done through [AoEIV.net](https://aoeiv.net/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
+API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](https://aoe4world.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
 # How to use
 

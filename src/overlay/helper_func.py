@@ -2,6 +2,7 @@ import json
 import os
 import pathlib
 import sys
+import time
 from typing import Any, Dict, Union
 
 import requests
@@ -70,9 +71,11 @@ def match_mode(match: Dict[str, Any], convert_customs: bool = True) -> int:
         leaderboard_id = 16 + match['num_slots'] / 2
     return int(leaderboard_id)
 
+
 def quickmatch_game(match: Dict[str, Any]) -> bool:
     """ Checks whether the game is a quickmatch"""
     return match_mode(match, convert_customs=False) in QM_ids
+
 
 def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     """ Processes game data returned by API
@@ -110,6 +113,14 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         losses = player.get('losses', 0)
         games = wins + losses
         winrate = wins / games if games else 0
+        civ_win_median = ''
+        if 'civ_win_length_median' in player:
+            civ_win_median = time.strftime(
+                "%M:%S", time.gmtime(player['civ_win_length_median']))
+        civ_winrate = ''
+        if 'civ_winrate' in player:
+            civ_winrate = f"{player['civ_winrate']/100:.1%}"
+
         data = {
             'civ': civ_data.get(player['civ'], "Unknown civ"),
             'name': player['name'],
@@ -119,6 +130,9 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
             'wins': str(wins) if wins else '',
             'losses': str(losses) if losses else '',
             'winrate': f"{winrate:.1%}",
+            'civ_games': str(player.get('civ_games', '')),
+            'civ_winrate': civ_winrate,
+            'civ_win_length_median': civ_win_median
         }
         result['players'].append(data)
 

@@ -26,10 +26,11 @@ class InnerPlayer(PlayerWidget):
     """ Overriding player widget and making fields editable"""
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
         super().__init__(row, toplayout)
+        self.hiding_civ_stats = False
         self.change_style()
         self.update_name_color()
         self.callable: Callable = print
-        toplayout.addWidget(self.team_cb, row, 7)
+        toplayout.addWidget(self.team_cb, row, 10)
         self.team_cb.currentIndexChanged.connect(self.update_team)
 
     def create_widgets(self):
@@ -48,6 +49,9 @@ class InnerPlayer(PlayerWidget):
         self.winrate = QtWidgets.QLineEdit()
         self.wins = QtWidgets.QLineEdit()
         self.losses = QtWidgets.QLineEdit()
+        self.civ_games = QtWidgets.QLineEdit()
+        self.civ_winrate = QtWidgets.QLineEdit()
+        self.civ_median_wins = QtWidgets.QLineEdit()
 
     def show(self, show: bool = True):
         super().show(show)
@@ -60,7 +64,8 @@ class InnerPlayer(PlayerWidget):
 
     def change_style(self):
         for item in (self.rating, self.rank, self.winrate, self.wins,
-                     self.losses):
+                     self.losses, self.civ_games, self.civ_winrate,
+                     self.civ_median_wins):
             style = item.styleSheet()
             item.setStyleSheet(
                 f"{style}; border: 1px solid #444; font-size: 11pt")
@@ -69,13 +74,15 @@ class InnerPlayer(PlayerWidget):
         self.callable = function
         self.flag.currentIndexChanged.connect(function)
         for item in (self.name, self.rating, self.rank, self.winrate,
-                     self.wins, self.losses):
+                     self.wins, self.losses, self.civ_games, self.civ_winrate,
+                     self.civ_median_wins):
             item.textChanged.connect(function)
 
     def disconnect_changes(self):
         self.flag.currentIndexChanged.disconnect()
         for item in (self.name, self.rating, self.rank, self.winrate,
-                     self.wins, self.losses):
+                     self.wins, self.losses, self.civ_games, self.civ_winrate,
+                     self.civ_median_wins):
             item.textChanged.disconnect()
 
     def update_name_color(self):
@@ -98,7 +105,7 @@ class InnerPlayer(PlayerWidget):
 
     def get_data(self) -> Dict[str, Any]:
         # Override to get civ from flag
-        data = {
+        return {
             'civ': self.flag.currentText(),
             'name': self.name.text(),
             'team': self.team,
@@ -107,8 +114,10 @@ class InnerPlayer(PlayerWidget):
             'wins': self.wins.text(),
             'losses': self.losses.text(),
             'winrate': self.winrate.text(),
+            'civ_games': self.civ_games.text(),
+            'civ_winrate': self.civ_winrate.text(),
+            'civ_win_length_median': self.civ_median_wins.text(),
         }
-        return data
 
 
 class InnerOverlay(AoEOverlay):
@@ -117,6 +126,7 @@ class InnerOverlay(AoEOverlay):
         self.change_to_editable()
         self.setStyleSheet(
             "background-color: #222; color: white; font-size: 11pt")
+        self.hiding_civ_stats = False
 
     def change_to_editable(self):
         self.map = QtWidgets.QLineEdit("Map")

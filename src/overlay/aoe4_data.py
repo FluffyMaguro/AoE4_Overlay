@@ -17,6 +17,7 @@ mode_data = {
     19: "3v3",
     20: "4v4",
 }
+"""aoe4.net leaderboard index to mode name"""
 
 QM_ids = {17, 18, 19, 20}
 """Leaderboard ids of quick match leagues"""
@@ -31,6 +32,19 @@ civ_data = {
     6: 'Mongols',
     7: 'Rus'
 }
+"""aoe4.net civ index to civ name"""
+
+net_to_world = {
+    0: 'abbasid_dynasty',
+    1: 'chinese',
+    2: 'delhi_sultanate',
+    3: 'english',
+    4: 'french',
+    5: 'holy_roman_empire',
+    6: 'mongols',
+    7: 'rus',
+}
+"""aoe4.net civ index to aoe4world.com civ name"""
 
 map_data = {
     0: 'Dry Arabia',
@@ -51,3 +65,4 @@ map_data = {
     15: 'Nagari',
     16: 'Boulder Bay'
 }
+"""aoe4.net map index to map name"""

@@ -1,6 +1,5 @@
 import subprocess
 import sys
-import traceback
 import webbrowser
 from functools import partial
 from types import TracebackType
@@ -18,11 +17,12 @@ logger = get_logger(__name__)
 VERSION = "1.2.1"
 
 
-def excepthook(exc_type: Type[BaseException], exc_value: Exception, exc_tback: TracebackType):
+def excepthook(exc_type: Type[BaseException], exc_value: Exception,
+               exc_tback: TracebackType):
     """ Provides the top-most exception handling. Logs unhandled exceptions and cleanly shuts down the app."""
     # Log the exception
-    s = "".join(traceback.format_exception(exc_type, exc_value, exc_tback))
-    logger.warning(f"Unhandled exception! {s}")
+    logger.exception("Unhandled exception!",
+                     exc_info=(exc_type, exc_value, exc_tback))
     # Try to save settings
     try:
         settings.save()
@@ -32,7 +32,7 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception, exc_tback: T
     try:
         Main.centralWidget().stop_checking_api()
     except Exception:
-        logger.exception("Failed to order the app to stop checking api")
+        pass
     sys.exit()
 
 
@@ -58,8 +58,8 @@ class MainApp(QtWidgets.QMainWindow):
         ### Create menu bar items
         menubar = self.menuBar()
         file_menu = menubar.addMenu('File')
-        link_menu = menubar.addMenu('Links')
         graphs_menu = menubar.addMenu('Graphs')
+        link_menu = menubar.addMenu('Links')
 
         # Html
         icon = self.style().standardIcon(
@@ -119,10 +119,17 @@ class MainApp(QtWidgets.QMainWindow):
 
         # AoEIV.net
         icon = QtGui.QIcon(file_path("img/aoeivnet.png"))
-        maguroAction = QtWidgets.QAction(icon, 'AoEIV.net', self)
-        maguroAction.triggered.connect(
+        aoe4netaction = QtWidgets.QAction(icon, 'AoEIV.net', self)
+        aoe4netaction.triggered.connect(
             partial(webbrowser.open, "https://aoeiv.net/"))
-        link_menu.addAction(maguroAction)
+        link_menu.addAction(aoe4netaction)
+
+        # AoE4 World
+        icon = QtGui.QIcon(file_path("img/aoe4worldcom.ico"))
+        aoe4worldaction = QtWidgets.QAction(icon, 'AoE4 World', self)
+        aoe4worldaction.triggered.connect(
+            partial(webbrowser.open, "https://aoe4world.com/"))
+        link_menu.addAction(aoe4worldaction)
 
         # Which graphs to show
         self.show_graph_actions = []

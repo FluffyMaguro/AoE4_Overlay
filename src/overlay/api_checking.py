@@ -303,17 +303,47 @@ class Api_checker:
             self.last_rating_timestamp = rating['timestamp']
             return {"new_rating": True, 'timestamp': rating['timestamp']}
 
-    def get_player_data(self, leaderboard_id: int, player_dict: Dict[str,
-                                                                     Any]):
+    @staticmethod
+    def get_player_data(leaderboard_id: int, player_dict: Dict[str, Any]):
         """ Updates player data inplace"""
 
+        # AoE4World.com currently works only for 1v1
+        if leaderboard_id == 17:
+            try:
+                url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
+                data = json.loads(session.get(url).text)
+                data = data['modes']['qm_1v1']
+                player_dict['rank'] = data["rank"]
+                player_dict['rating'] = data["rating"]
+                player_dict['wins'] = data["wins_count"]
+                player_dict[
+                    'losses'] = data["games_count"] - data["wins_count"]
+                player_dict['streak'] = data["streak"]
+
+                civ_name = net_to_world.get(player_dict['civ'])
+                for civ in data['civilizations']:
+                    if civ['civilization'] == civ_name:
+                        player_dict['civ_games'] = civ['games_count']
+                        player_dict['civ_winrate'] = civ['win_rate']
+                        player_dict['civ_win_length_median'] = civ[
+                            'game_length']['wins_median']
+                        return
+                logger.warning(
+                    f"Didn't find civ: {civ_name} in aoe4world.com civ list")
+                return
+            except Exception:
+                logger.exception(
+                    f"AoE4wWorld.com failed for player {player_dict['profile_id']}"
+                )
+
+        # If AoE4World.com fails, default to aoeiv.net
         url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
         data = json.loads(session.get(url).text)
         if not data['leaderboard']:
             return  # not yet ranked player
         data = data["leaderboard"][0]
+        player_dict['rank'] = data["rank"]
         player_dict['rating'] = data["rating"]
         player_dict['wins'] = data["wins"]
         player_dict['losses'] = data["losses"]
-        player_dict['rank'] = data["rank"]
         player_dict['streak'] = data["streak"]

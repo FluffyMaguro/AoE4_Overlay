@@ -14,6 +14,23 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
         self.key_changed.emit(value.toString())
 
 
+class VerticalLabel(QtWidgets.QLabel):
+    def __init__(self, text: str, color: QtGui.QColor, min_width: int = 20):
+        super().__init__()
+        self.setMinimumWidth(min_width)
+        self.textlabel = text
+        self.color = color
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setPen(self.color)
+        painter.rotate(-90)
+        rect = QtCore.QRect(-self.height(), 0, self.height(), self.width())
+        painter.drawText(rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
+                         self.textlabel)
+        painter.end()
+
+
 class OverlayWidget(QtWidgets.QWidget):
     """Custom overlay widget"""
     def __init__(self, parent=None):

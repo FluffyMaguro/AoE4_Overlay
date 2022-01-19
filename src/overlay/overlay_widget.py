@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.custom_widgets import OverlayWidget
+from overlay.custom_widgets import OverlayWidget, VerticalLabel
 from overlay.helper_func import file_path
 from overlay.settings import settings
 
@@ -24,6 +24,7 @@ def set_pixmap(civ: str, widget: QtWidgets.QWidget):
 class PlayerWidget:
     """ Player widget shown on the overlay"""
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
+        self.hiding_civ_stats: bool = True
         self.team: int = 0
         self.civ: str = ""
         self.visible = True
@@ -34,11 +35,19 @@ class PlayerWidget:
         self.winrate.setStyleSheet("color: #fffb78")
         self.wins.setStyleSheet("color: #48bd21")
         self.losses.setStyleSheet("color: red")
+        for widget in (self.civ_games, self.civ_winrate, self.civ_median_wins):
+            widget.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            widget.setStyleSheet(f"color: {settings.civ_stats_color}")
 
+        offset = 0
         for column, widget in enumerate(
             (self.flag, self.name, self.rating, self.rank, self.winrate,
-             self.wins, self.losses)):
-            toplayout.addWidget(widget, row, column)
+             self.wins, self.losses, self.civ_games, self.civ_winrate,
+             self.civ_median_wins)):
+
+            if widget == self.civ_games:
+                offset = 1
+            toplayout.addWidget(widget, row, column + offset)
 
     def create_widgets(self):
         # Separated so this can be changed in a child inner overlay for editing
@@ -50,12 +59,16 @@ class PlayerWidget:
         self.winrate = QtWidgets.QLabel()
         self.wins = QtWidgets.QLabel()
         self.losses = QtWidgets.QLabel()
+        self.civ_games = QtWidgets.QLabel()
+        self.civ_winrate = QtWidgets.QLabel()
+        self.civ_median_wins = QtWidgets.QLabel()
 
     def show(self, show: bool = True):
         self.visible = show
         """ Shows or hides all widgets in this class """
         for widget in (self.flag, self.name, self.rating, self.rank,
-                       self.winrate, self.wins, self.losses):
+                       self.winrate, self.wins, self.losses, self.civ_games,
+                       self.civ_winrate, self.civ_median_wins):
             widget.show() if show else widget.hide()
 
     def update_name_color(self):
@@ -89,10 +102,19 @@ class PlayerWidget:
         self.winrate.setText(player_data['winrate'])
         self.wins.setText(str(player_data['wins']))
         self.losses.setText(player_data['losses'])
-        self.show() if self.name.text() else self.show(False)
+        self.civ_games.setText(player_data['civ_games'])
+        self.civ_winrate.setText(player_data['civ_winrate'])
+        self.civ_median_wins.setText(player_data['civ_win_length_median'])
+        self.show() if player_data['name'] else self.show(False)
+
+        # Hide civ specific data when there are none
+        if not player_data['civ_games'] and self.hiding_civ_stats:
+            for widget in (self.civ_games, self.civ_winrate,
+                           self.civ_median_wins):
+                widget.hide()
 
     def get_data(self) -> Dict[str, Any]:
-        data = {
+        return {
             'civ': self.civ,
             'name': self.name.text(),
             'team': self.team,
@@ -101,14 +123,17 @@ class PlayerWidget:
             'wins': self.wins.text(),
             'losses': self.losses.text(),
             'winrate': self.winrate.text(),
+            'civ_games': self.civ_games.text(),
+            'civ_winrate': self.civ_winrate.text(),
+            'civ_win_length_median': self.civ_median_wins.text(),
         }
-        return data
 
 
 class AoEOverlay(OverlayWidget):
     """Overlay widget showing AOE4 information """
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.hiding_civ_stats: bool = True
         self.players = []
         self.setup_as_overlay()
         self.initUI()
@@ -158,8 +183,26 @@ class AoEOverlay(OverlayWidget):
         losses = QtWidgets.QLabel("Losses")
         losses.setStyleSheet("color: red")
 
-        for column, widget in enumerate((rating, rank, winrate, wins, losses)):
-            self.playerlayout.addWidget(widget, 0, column + 2)
+        self.civ_games = QtWidgets.QLabel("Games")
+        self.civ_winrate = QtWidgets.QLabel("Winrate")
+        self.civ_med_wins = QtWidgets.QLabel("Wins")
+
+        for widget in (self.civ_games, self.civ_winrate, self.civ_med_wins):
+            widget.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            widget.setStyleSheet(f"color: {settings.civ_stats_color}")
+
+        offset = 0
+        for column, widget in enumerate(
+            (rating, rank, winrate, wins, losses, self.civ_games,
+             self.civ_winrate, self.civ_med_wins)):
+            if widget == self.civ_games:
+                offset = 1
+                self.civ_stats_label = VerticalLabel(
+                    "CIV STATS", QtGui.QColor(settings.civ_stats_color))
+                self.playerlayout.addWidget(self.civ_stats_label, 0,
+                                            column + 2, 10, 1)
+
+            self.playerlayout.addWidget(widget, 0, column + offset + 2)
 
         # Add players
         self.init_players()
@@ -187,8 +230,21 @@ class AoEOverlay(OverlayWidget):
     def update_data(self, game_data: Dict[str, Any]):
         self.map.setText(game_data['map'])
         [p.show(False) for p in self.players]
+
+        show_civ_stats = False
         for i, player in enumerate(game_data['players']):
             self.players[i].update_player(player)
+            if player['civ_games']:
+                show_civ_stats = True
+
+        # Show or hide civilization stats
+        for widget in (self.civ_games, self.civ_winrate, self.civ_med_wins,
+                       self.civ_stats_label):
+            if self.hiding_civ_stats and not show_civ_stats:
+                widget.hide()
+            else:
+                widget.show()
+
         self.show()
 
     def save_geometry(self):
