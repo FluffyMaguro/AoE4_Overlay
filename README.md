@@ -113,8 +113,13 @@ Or change values to something completely different
         [255, 0, 0, 0.35]
       ]
     ```
+    
+4. **Civilization stats color** can be changed in `config.json`.
+    ```json
+    "civ_stats_color": "#BC8AEA",
+    ```
 
-4. **Streaming overlay** customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
+5. **Streaming overlay** customization can be done via `custom.css` and `custom.js` in the `html` folder in app directory. These files will not be overridden with an app update. Look at `main.css` to see what you can change. In `custom.js` you can define this function that runs after each update.
 
     ```javascript
     function custom_func(data) {
