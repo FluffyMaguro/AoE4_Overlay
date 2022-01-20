@@ -40,6 +40,7 @@ Additional civilization stats (currently only for 1v1):
 Wintime is the median game length of won games with given civilization (indicates in what game phase the player is the strongest).
 
 ![Screenshot](https://i.imgur.com/cpeq8ob.png)
+
 Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
