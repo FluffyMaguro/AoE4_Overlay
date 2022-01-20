@@ -106,8 +106,10 @@ class TabWidget(QtWidgets.QTabWidget):
             self.update_with_match_history_data(2)
         elif game_data is not None:
             processed = hf.process_game(game_data)
+            start = time.strftime("%Y-%m-%d %H:%M:%S",
+                                  time.localtime(processed['started']))
             logger.info(
-                f"New live game (match_id: {processed['match_id']} | mode: {processed['mode']-16})"
+                f"New live game (match_id: {processed['match_id']} | mode: {processed['mode']-16} | started: {start})"
             )
             self.override_tab.update_data(processed)
             if not self.prevent_overlay_update:

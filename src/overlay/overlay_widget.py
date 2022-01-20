@@ -185,7 +185,7 @@ class AoEOverlay(OverlayWidget):
 
         self.civ_games = QtWidgets.QLabel("Games")
         self.civ_winrate = QtWidgets.QLabel("Winrate")
-        self.civ_med_wins = QtWidgets.QLabel("Wins")
+        self.civ_med_wins = QtWidgets.QLabel("Wintime")
 
         for widget in (self.civ_games, self.civ_winrate, self.civ_med_wins):
             widget.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)

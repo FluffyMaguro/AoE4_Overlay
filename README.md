@@ -1,16 +1,15 @@
 # AoE4 Overlay
  
-* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.2.0/AoE4_Overlay.zip)** (Windows)
+* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.2.1/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
 
-**Use cases:**
-
-1. Showing information about your opponents and teammates while you play
-2. Personal statistics
-3. Separate overlay for streaming (as html, very customizable via CSS/JS).
-4. Information about players that are streaming and don't have any overlay
+# What does the app do?
+* Shows information about players you are in match with
+* Provides additional player statistics in-app
+* Shows an overlay widget for buildorders
+* Supports a highly customizable streaming overlay (with CSS/JS).
 
 API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](https://aoe4world.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
@@ -24,7 +23,10 @@ API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](h
 * Build orders:
   * Add new build orders
   * Set up hotkeys for showing/hiding overlay and cycling between build orders
-  * Use hotkeys to show/hide/cycle build orders  
+  * Use hotkeys to show/hide/cycle build orders 
+
+
+*To update the app delete the app folder and extract the new archive elsewhere.*
 
 
 # Screenshots
@@ -33,6 +35,10 @@ Build order widget:
 
 ![Screenshot](https://i.imgur.com/SnR3p7d.png)
 
+Additional civilization stats (currently only for 1v1):
+
+ Wintime is the median game length of won games with given civilization (indicates in what game phase the player is the strongest).
+![Screenshot](https://i.imgur.com/cpeq8ob.png)
 Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
