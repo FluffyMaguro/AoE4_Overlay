@@ -253,6 +253,8 @@ class BoTab(QtWidgets.QWidget):
         self.save_current_bo()
 
     def remove_buildorder(self):
+        if self.bo_list.count() == 1:
+            return
         del settings.buildorders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
 
@@ -298,9 +300,10 @@ class BoTab(QtWidgets.QWidget):
 
     def update_overlay(self):
         """Send new data to the overlay"""
-        bo_name = self.bo_list.currentItem().text()
-        bo_text = self.edit.toPlainText()
-        self.overlay.update_data(bo_name, bo_text)
+        if self.bo_list.count():
+            bo_name = self.bo_list.currentItem().text()
+            bo_text = self.edit.toPlainText()
+            self.overlay.update_data(bo_name, bo_text)
 
     def cycle_overlay(self):
         """ Cycles through buildorders and sends data to the overlay"""
