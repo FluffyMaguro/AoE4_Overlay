@@ -7,7 +7,8 @@ from typing import Type
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.helper_func import file_path, pyqt_wait
+from overlay.email_log import send_email_log
+from overlay.helper_func import file_path, is_compiled, pyqt_wait
 from overlay.logging_func import get_logger
 from overlay.settings import CONFIG_FOLDER, settings
 from overlay.tab_main import TabWidget
@@ -23,6 +24,14 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
     # Log the exception
     logger.exception("Unhandled exception!",
                      exc_info=(exc_type, exc_value, exc_tback))
+
+    # If compiled, send email log
+    if is_compiled() and settings.send_email_logs:
+        try:
+            send_email_log(VERSION, exc_type, exc_value, exc_tback)
+        except Exception:
+            logger.exception("Failed to send a log through email")
+
     # Try to save settings
     try:
         settings.save()
@@ -59,13 +68,13 @@ class MainApp(QtWidgets.QMainWindow):
         menubar = self.menuBar()
         file_menu = menubar.addMenu('File')
         graphs_menu = menubar.addMenu('Graphs')
+        settings_menu = menubar.addMenu('Settings')
         link_menu = menubar.addMenu('Links')
 
         # Html
         icon = self.style().standardIcon(
             getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
         htmlAction = QtWidgets.QAction(icon, 'Html files', self)
-        htmlAction.setStatusTip('Open the folder with HTML layout files')
         htmlAction.triggered.connect(
             lambda: subprocess.run(['explorer', file_path("html")]))
         file_menu.addAction(htmlAction)
@@ -74,7 +83,6 @@ class MainApp(QtWidgets.QMainWindow):
         icon = self.style().standardIcon(
             getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
         htmlAction = QtWidgets.QAction(icon, 'Config/logs', self)
-        htmlAction.setStatusTip('Open the folder with config files')
         htmlAction.triggered.connect(
             lambda: subprocess.run(['explorer', CONFIG_FOLDER]))
         file_menu.addAction(htmlAction)
@@ -83,9 +91,16 @@ class MainApp(QtWidgets.QMainWindow):
         icon = self.style().standardIcon(
             getattr(QtWidgets.QStyle, 'SP_DialogCloseButton'))
         exitAction = QtWidgets.QAction(icon, 'Exit', self)
-        exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(QtWidgets.qApp.quit)
         file_menu.addAction(exitAction)
+
+        # Report crashes
+        email_action = QtWidgets.QAction('Report crashes', self)
+        email_action.setCheckable(True)
+        email_action.setChecked(settings.send_email_logs)
+        email_action.triggered.connect(lambda: setattr(
+            settings, "send_email_logs", not settings.send_email_logs))
+        settings_menu.addAction(email_action)
 
         # Github
         icon = QtGui.QIcon(file_path("img/github.png"))
