@@ -3,7 +3,7 @@ import os
 import pathlib
 import sys
 import time
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import requests
 from PyQt5 import QtCore
@@ -14,6 +14,11 @@ from overlay.settings import settings
 
 logger = get_logger(__name__)
 ROOT = pathlib.Path(sys.argv[0]).parent.absolute()
+
+
+def zeroed(value: Optional[int]) -> int:
+    """ Returns `value` after replacing `None` with 0"""
+    return value if value is not None else 0
 
 
 def pyqt_wait(miliseconds: int):
@@ -109,8 +114,8 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     # Add player data
     result['players'] = []
     for player in game_data['players']:
-        wins = player.get('wins', 0)
-        losses = player.get('losses', 0)
+        wins = zeroed(player.get('wins'))
+        losses = zeroed(player.get('losses'))
         games = wins + losses
         winrate = wins / games if games else 0
         civ_win_median = ''

@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from overlay.aoe4_data import QM_ids, mode_data, net_to_world
-from overlay.helper_func import match_mode, quickmatch_game
+from overlay.helper_func import match_mode, quickmatch_game, zeroed
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -320,12 +320,12 @@ class Api_checker:
                 url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
                 data = json.loads(session.get(url).text)
                 data = data['modes']['qm_1v1']
-                player_dict['rank'] = data["rank"]
-                player_dict['rating'] = data["rating"]
-                player_dict['wins'] = data["wins_count"]
-                player_dict[
-                    'losses'] = data["games_count"] - data["wins_count"]
-                player_dict['streak'] = data["streak"]
+                player_dict['rank'] = zeroed(data["rank"])
+                player_dict['rating'] = zeroed(data["rating"])
+                player_dict['wins'] = zeroed(data["wins_count"])
+                player_dict['losses'] = zeroed(data["games_count"]) - zeroed(
+                    data["wins_count"])
+                player_dict['streak'] = zeroed(data["streak"])
 
                 civ_name = net_to_world.get(player_dict['civ'])
                 for civ in data['civilizations']:
@@ -336,7 +336,7 @@ class Api_checker:
                             'game_length']['wins_median']
                         return
                 logger.warning(
-                    f"Didn't find civ: {civ_name} in aoe4world.com civ list")
+                    f"Didn't find civ: {civ_name} in aoe4world.com player civ list")
                 return
             except Exception:
                 logger.exception(
