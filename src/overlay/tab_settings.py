@@ -192,6 +192,8 @@ class SettingsTab(QtWidgets.QWidget):
                 'Decoding error when finding a player! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
                 color='red')
             logger.warning(f"Decoding error when finding a player\n{formatted}")
+        else:
+            logger.warning(formatted)
 
     def find_profile_finish(self, result: bool):
         if result:
