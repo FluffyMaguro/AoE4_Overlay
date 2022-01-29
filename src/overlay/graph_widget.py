@@ -5,6 +5,10 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from overlay.logging_func import get_logger
+
+logger = get_logger(__name__)
+
 # Basic color palette as used in matplotlib
 COLORS = ((51, 120, 182), (246, 126, 0), (65, 160, 33), (205, 35, 33),
           (145, 103, 191), (136, 86, 74), (220, 119, 195), (127, 127, 127),
@@ -127,7 +131,10 @@ class GraphWidget(QtWidgets.QWidget):
 
     def paintEvent(self, event):
         """ Override for draw event"""
-        self._draw_plot()
+        try:
+            self._draw_plot()
+        except:
+            logger.exception("Failed to plot")
 
     def plot(self,
              x: Iterable[float],
@@ -276,7 +283,9 @@ class GraphWidget(QtWidgets.QWidget):
 
         # Transforming into image coordinates
         x_scaling = box.inner_width / (x_max - x_min)
-        y_scaling = box.inner_heigth / (y_max - y_min)
+        y_diff = y_max - y_min
+        y_diff = y_diff if y_diff else 1
+        y_scaling = box.inner_heigth / y_diff
 
         def trans(x: float, y: float) -> Tuple[int, int]:
             """ Transforms a point from data to coordinates on image"""
