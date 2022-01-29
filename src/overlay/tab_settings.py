@@ -191,7 +191,8 @@ class SettingsTab(QtWidgets.QWidget):
             self.message(
                 'Decoding error when finding a player! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
                 color='red')
-            logger.warning(f"Decoding error when finding a player\n{formatted}")
+            logger.warning(
+                f"Decoding error when finding a player\n{formatted}")
         else:
             logger.warning(formatted)
 
@@ -211,7 +212,7 @@ class SettingsTab(QtWidgets.QWidget):
     def hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
-        new_hotkey = new_hotkey.replace("Num+", "")
+        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
             self.key_showhide.setKeySequence(QtGui.QKeySequence.fromString(""))

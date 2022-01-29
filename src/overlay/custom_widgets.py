@@ -13,6 +13,22 @@ class CustomKeySequenceEdit(QtWidgets.QKeySequenceEdit):
         self.setKeySequence(QtGui.QKeySequence(value))
         self.key_changed.emit(value.toString())
 
+    @staticmethod
+    def convert_hotkey(hotkey: str) -> str:
+        """ Converts hotkey to the format usable by the keyboard module"""
+        replace_dict = {
+            "Num+": "",
+            "scrolllock": 'scroll lock',
+            "ScrollLock": 'scroll lock'
+        }
+        for item, nitem in replace_dict.items():
+            hotkey = hotkey.replace(item, nitem)
+        return hotkey
+
+    def get_hotkey_string(self) -> str:
+        """ Returns the hotkey string usable by the keyboard module"""
+        return self.convert_hotkey(self.keySequence().toString())
+
 
 class VerticalLabel(QtWidgets.QLabel):
     def __init__(self, text: str, color: QtGui.QColor, min_width: int = 20):

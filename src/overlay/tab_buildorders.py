@@ -265,7 +265,7 @@ class BoTab(QtWidgets.QWidget):
     def show_hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
-        new_hotkey = new_hotkey.replace("Num+", "")
+        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
             self.key_showhide.setKeySequence(QtGui.QKeySequence.fromString(""))
@@ -283,7 +283,7 @@ class BoTab(QtWidgets.QWidget):
     def cycle_hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
-        new_hotkey = new_hotkey.replace("Num+", "")
+        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
             self.key_cycle.setKeySequence(QtGui.QKeySequence.fromString(""))
