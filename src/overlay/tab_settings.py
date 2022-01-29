@@ -1,3 +1,7 @@
+import json
+from types import TracebackType
+from typing import Tuple, Type
+
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -113,6 +117,7 @@ class SettingsTab(QtWidgets.QWidget):
 
         ### Messages
         self.msg = QtWidgets.QLabel()
+        self.msg.setOpenExternalLinks(True)
         self.main_layout.addWidget(self.msg)
 
         # Create update button
@@ -172,7 +177,21 @@ class SettingsTab(QtWidgets.QWidget):
             return
         logger.info(f"Finding a player with key: {text}")
 
-        scheldule(self.find_profile_finish, find_player, text)
+        scheldule(self.find_profile_finish,
+                  find_player,
+                  text,
+                  error_callback=self.error_when_finding_profile)
+
+    def error_when_finding_profile(self,
+                                   exc_data: Tuple[Type[BaseException],
+                                                   Exception, TracebackType]):
+        """ Decoding error when finding player profile indicates an issue with AoEIV.net"""
+        exctype, value, formatted = exc_data
+        if exctype == json.decoder.JSONDecodeError:
+            self.message(
+                'Decoding error when finding a player! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
+                color='red')
+            logger.warning(f"Decoding error when finding a player\n{formatted}")
 
     def find_profile_finish(self, result: bool):
         if result:
