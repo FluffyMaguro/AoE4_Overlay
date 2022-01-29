@@ -267,7 +267,14 @@ class Api_checker:
             return
 
         # Match history
-        match_history = get_match_history(amount=1)
+        try:
+            match_history = get_match_history(amount=1, raise_exception=True)
+        except json.decoder.JSONDecodeError:
+            # AoEIV.net down
+            return {'server_down': True}
+        except Exception:
+            return
+
         if not match_history:
             return
 

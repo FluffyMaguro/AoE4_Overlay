@@ -98,13 +98,21 @@ class TabWidget(QtWidgets.QTabWidget):
         """Received new data from api check, passes data along and reruns the check"""
         if self.force_stop:
             return
-        if game_data is not None and "new_rating" in game_data:
+
+        if game_data is None:
+            pass
+        elif "new_rating" in game_data:
             logger.info(
                 f"Game finished (rating_timestamp: {game_data['timestamp']})")
             self.graph_tab.run_update()
             self.stats_tab.run_mode_update()
             self.update_with_match_history_data(2)
-        elif game_data is not None:
+
+        elif 'server_down' in game_data:
+            self.settigns_tab.message(
+                'Failed to get recent matches! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
+                color='red')
+        else:
             processed = hf.process_game(game_data)
             start = time.strftime("%Y-%m-%d %H:%M:%S",
                                   time.localtime(processed['started']))
