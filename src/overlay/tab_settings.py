@@ -212,6 +212,7 @@ class SettingsTab(QtWidgets.QWidget):
     def hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
+        old_hotkey = settings.overlay_hotkey
         new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
@@ -221,8 +222,14 @@ class SettingsTab(QtWidgets.QWidget):
         elif not new_hotkey or new_hotkey == settings.overlay_hotkey:
             return
 
-        if settings.overlay_hotkey:
-            keyboard.remove_hotkey(settings.overlay_hotkey)
-        logger.info(f"Setting new hotkey to: {new_hotkey}")
-        settings.overlay_hotkey = new_hotkey
-        keyboard.add_hotkey(new_hotkey, self.show_hide_overlay.emit)
+        try:
+            keyboard.add_hotkey(new_hotkey, self.show_hide_overlay.emit)
+            if settings.overlay_hotkey:
+                keyboard.remove_hotkey(settings.overlay_hotkey)
+            settings.overlay_hotkey = new_hotkey
+            logger.info(f"Setting new hotkey to: {new_hotkey}")
+        except Exception:
+            logger.exception(f"Failed to set hotkey: {new_hotkey}")
+            self.message("Failed to use this hotkey", color='red')
+            self.key_showhide.setKeySequence(
+                QtGui.QKeySequence.fromString(old_hotkey))

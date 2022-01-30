@@ -265,6 +265,7 @@ class BoTab(QtWidgets.QWidget):
     def show_hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
+        old_hotkey = settings.bo_overlay_hotkey_show
         new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
@@ -274,15 +275,21 @@ class BoTab(QtWidgets.QWidget):
         elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_show:
             return
 
-        if settings.bo_overlay_hotkey_show:
-            keyboard.remove_hotkey(settings.bo_overlay_hotkey_show)
-        logger.info(f"Setting new buildorder show hotkey to: {new_hotkey}")
-        settings.bo_overlay_hotkey_show = new_hotkey
-        keyboard.add_hotkey(new_hotkey, self.show_hide_overlay.emit)
+        try:
+            keyboard.add_hotkey(new_hotkey, self.show_hide_overlay.emit)
+            if settings.bo_overlay_hotkey_show:
+                keyboard.remove_hotkey(settings.bo_overlay_hotkey_show)
+            settings.bo_overlay_hotkey_show = new_hotkey
+            logger.info(f"Setting new buildorder show hotkey to: {new_hotkey}")
+        except Exception:
+            logger.exception(f"Failed to set hotkey: {new_hotkey}")
+            self.key_showhide.setKeySequence(
+                QtGui.QKeySequence.fromString(old_hotkey))
 
     def cycle_hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
         Updates keyboard threads"""
+        old_hotkey = settings.bo_overlay_hotkey_cycle
         new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
 
         if new_hotkey == "Del":
@@ -292,11 +299,17 @@ class BoTab(QtWidgets.QWidget):
         elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_cycle:
             return
 
-        if settings.bo_overlay_hotkey_cycle:
-            keyboard.remove_hotkey(settings.bo_overlay_hotkey_cycle)
-        logger.info(f"Setting new buildorder cycle hotkey to: {new_hotkey}")
-        settings.bo_overlay_hotkey_cycle = new_hotkey
-        keyboard.add_hotkey(new_hotkey, self.cycle_buildorder.emit)
+        try:
+            keyboard.add_hotkey(new_hotkey, self.cycle_buildorder.emit)
+            if settings.bo_overlay_hotkey_cycle:
+                keyboard.remove_hotkey(settings.bo_overlay_hotkey_cycle)
+            settings.bo_overlay_hotkey_cycle = new_hotkey
+            logger.info(
+                f"Setting new buildorder cycle hotkey to: {new_hotkey}")
+        except Exception:
+            logger.exception(f"Failed to set hotkey: {new_hotkey}")
+            self.key_cycle.setKeySequence(
+                QtGui.QKeySequence.fromString(old_hotkey))
 
     def update_overlay(self):
         """Send new data to the overlay"""
