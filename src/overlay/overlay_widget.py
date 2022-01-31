@@ -3,7 +3,7 @@ from typing import Any, Dict
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.custom_widgets import OverlayWidget, VerticalLabel
-from overlay.helper_func import file_path
+from overlay.helper_func import file_path, zeroed
 from overlay.settings import settings
 
 PIXMAP_CACHE = {}
@@ -92,7 +92,7 @@ class PlayerWidget:
         self.update_flag()
 
         # Indicate team with background color
-        self.team = player_data['team']
+        self.team = zeroed(player_data['team'])
         self.update_name_color()
 
         # Fill the rest

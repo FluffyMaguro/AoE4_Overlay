@@ -129,7 +129,7 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         data = {
             'civ': civ_data.get(player['civ'], "Unknown civ"),
             'name': player['name'],
-            'team': player['team'],
+            'team': zeroed(player['team']),
             'rating': str(player.get('rating', '')),
             'rank': f"#{player.get('rank', '')}",
             'wins': str(wins) if wins else '',

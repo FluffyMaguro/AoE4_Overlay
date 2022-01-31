@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.aoe4_data import civ_data
-from overlay.helper_func import file_path
+from overlay.helper_func import file_path, zeroed
 from overlay.logging_func import get_logger
 from overlay.overlay_widget import AoEOverlay, PlayerWidget
 from overlay.settings import settings
@@ -58,7 +58,7 @@ class InnerPlayer(PlayerWidget):
         self.team_cb.show() if show else self.team_cb.hide()
 
     def update_team(self, index: int):
-        self.team = index
+        self.team = zeroed(index)
         self.update_name_color()
         self.callable()
 
