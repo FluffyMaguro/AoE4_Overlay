@@ -9,8 +9,8 @@ from typing import Type
 from overlay.settings import settings
 
 port = 465  # Required for SMTP_SLL
-password = ""
-sender_email = "maguro.overlay.debug@gmail.com"
+password = ""  # You can set these for your logging
+sender_email = ""
 receiver_email = sender_email
 context = ssl.create_default_context()
 
@@ -44,5 +44,6 @@ def send_email_log(version: str, exc_type: Type[BaseException],
     # Send
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email,
-                        f"Subject: {subject}\n\n{message}")
+        server.sendmail(
+            sender_email, receiver_email,
+            f"Subject: {subject}\n\n{message}".encode(encoding='utf-8'))
