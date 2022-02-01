@@ -26,11 +26,11 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
                      exc_info=(exc_type, exc_value, exc_tback))
 
     # If compiled, send email log
-    if is_compiled() and settings.send_email_logs:
-        try:
+    try:
+        if is_compiled() and settings.send_email_logs:
             send_email_log(VERSION, exc_type, exc_value, exc_tback)
-        except Exception:
-            logger.exception("Failed to send a log through email")
+    except Exception:
+        logger.exception("Failed to send a log through email")
 
     # Try to save settings
     try:
