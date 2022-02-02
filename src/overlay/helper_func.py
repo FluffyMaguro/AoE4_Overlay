@@ -59,11 +59,14 @@ def version_check(version: str) -> str:
 
 def create_custom_files():
     """ Creates custom.css and custom.js files if they don't exist"""
-    for file_name in ("custom.css", "custom.js"):
-        path = file_path(f"html/{file_name}")
-        if not os.path.isfile(path):
-            with open(path, "w") as f:
-                f.write("")
+    try:
+        for file_name in ("custom.css", "custom.js"):
+            path = file_path(f"html/{file_name}")
+            if not os.path.isfile(path):
+                with open(path, "w") as f:
+                    f.write("")
+    except Exception:
+        logger.exception("Failed to create custom.css/js")
 
 
 def match_mode(match: Dict[str, Any], convert_customs: bool = True) -> int:
