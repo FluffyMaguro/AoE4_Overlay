@@ -106,17 +106,30 @@ class BoTab(QtWidgets.QWidget):
 
     def init_hotkeys(self):
         if settings.bo_overlay_hotkey_show:
-            self.key_showhide.setKeySequence(
-                QtGui.QKeySequence.fromString(settings.bo_overlay_hotkey_show))
-            keyboard.add_hotkey(settings.bo_overlay_hotkey_show,
-                                self.show_hide_overlay.emit)
+            try:
+                self.key_showhide.setKeySequence(
+                    QtGui.QKeySequence.fromString(
+                        settings.bo_overlay_hotkey_show))
+                keyboard.add_hotkey(settings.bo_overlay_hotkey_show,
+                                    self.show_hide_overlay.emit)
+            except Exception:
+                logger.exception("Failed to set hotkey")
+                settings.bo_overlay_hotkey_show = ""
+                self.key_showhide.setKeySequence(
+                    QtGui.QKeySequence.fromString(""))
 
         if settings.bo_overlay_hotkey_cycle:
-            self.key_cycle.setKeySequence(
-                QtGui.QKeySequence.fromString(
-                    settings.bo_overlay_hotkey_cycle))
-            keyboard.add_hotkey(settings.bo_overlay_hotkey_cycle,
-                                self.cycle_buildorder.emit)
+            try:
+                self.key_cycle.setKeySequence(
+                    QtGui.QKeySequence.fromString(
+                        settings.bo_overlay_hotkey_cycle))
+                keyboard.add_hotkey(settings.bo_overlay_hotkey_cycle,
+                                    self.cycle_buildorder.emit)
+            except Exception:
+                logger.exception("Failed to set hotkey")
+                settings.bo_overlay_hotkey_cycle = ""
+                self.key_cycle.setKeySequence(
+                    QtGui.QKeySequence.fromString(""))
 
     def initUI(self):
         hlayout = QtWidgets.QHBoxLayout()
