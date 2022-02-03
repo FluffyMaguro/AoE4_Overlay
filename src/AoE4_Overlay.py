@@ -15,7 +15,7 @@ from overlay.tab_main import TabWidget
 
 logger = get_logger(__name__)
 
-VERSION = "1.2.2"
+VERSION = "1.2.3"
 
 
 def excepthook(exc_type: Type[BaseException], exc_value: Exception,
