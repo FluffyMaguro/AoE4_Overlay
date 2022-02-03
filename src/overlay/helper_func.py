@@ -108,6 +108,8 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     if team is not None:
 
         def sortingf(player: Dict[str, Any]) -> int:
+            if player['team'] is None:
+                return 99
             if player['team'] == team:
                 return -1
             return player['team']
