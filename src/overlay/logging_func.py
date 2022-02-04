@@ -22,7 +22,7 @@ def get_logger(name: str):
 
     format = logging.Formatter(
         '%(asctime)s|%(levelname)-7s|%(name)-21s: %(message)s [%(funcName)s|%(thread)d]',
-        datefmt='%Y-%M-%d %H:%M:%S')
+        datefmt='%Y-%m-%d %H:%M:%S')
     c_handler.setFormatter(format)
     f_handler.setFormatter(format)
 
