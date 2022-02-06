@@ -233,6 +233,8 @@ class AoEOverlay(OverlayWidget):
 
         show_civ_stats = False
         for i, player in enumerate(game_data['players']):
+            if i >= len(self.players):
+                break
             self.players[i].update_player(player)
             if player['civ_games']:
                 show_civ_stats = True
