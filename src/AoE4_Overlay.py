@@ -102,6 +102,14 @@ class MainApp(QtWidgets.QMainWindow):
             settings, "send_email_logs", not settings.send_email_logs))
         settings_menu.addAction(email_action)
 
+        # Log matches
+        mach_log_action = QtWidgets.QAction('Log match data', self)
+        mach_log_action.setCheckable(True)
+        mach_log_action.setChecked(settings.log_matches)
+        mach_log_action.triggered.connect(
+            lambda: setattr(settings, "log_matches", not settings.log_matches))
+        settings_menu.addAction(mach_log_action)
+
         # Github
         icon = QtGui.QIcon(file_path("img/github.png"))
         githubAction = QtWidgets.QAction(icon, 'App on Github', self)

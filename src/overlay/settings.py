@@ -12,6 +12,7 @@ class _Settings:
     def __init__(self):
         self.websocket_port: int = 7307
         self.send_email_logs: bool = True
+        self.log_matches: bool = False
         self.interval: int = 15
         self.app_width: int = 900
         self.app_height: int = 600

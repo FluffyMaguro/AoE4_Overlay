@@ -10,7 +10,7 @@ from PyQt5 import QtWidgets
 
 import overlay.helper_func as hf
 from overlay.api_checking import Api_checker, get_full_match_history
-from overlay.logging_func import get_logger
+from overlay.logging_func import get_logger, log_match
 from overlay.settings import settings
 from overlay.tab_buildorders import BoTab
 from overlay.tab_games import MatchHistoryTab
@@ -113,6 +113,8 @@ class TabWidget(QtWidgets.QTabWidget):
                 'Failed to get recent matches! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
                 color='red')
         else:
+            if settings.log_matches:
+                log_match(game_data)
             processed = hf.process_game(game_data)
             start = time.strftime("%Y-%m-%d %H:%M:%S",
                                   time.localtime(processed['started']))
