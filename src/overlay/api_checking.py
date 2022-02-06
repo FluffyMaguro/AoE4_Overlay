@@ -225,6 +225,7 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
 
 
 class Api_checker:
+
     def __init__(self):
         self.force_stop = False
         self.last_match_timestamp = -1
@@ -287,6 +288,9 @@ class Api_checker:
         # Show the last game
         if match['started'] > self.last_match_timestamp:
             self.last_match_timestamp = match['started']
+
+            # Remove duplicated players
+            match['players'] = self.get_unique_players(match['players'])
             # Gets additional player data from leaderboards stats (in-place)
             for player in match['players']:
                 try:
@@ -309,6 +313,23 @@ class Api_checker:
 
             self.last_rating_timestamp = rating['timestamp']
             return {"new_rating": True, 'timestamp': rating['timestamp']}
+
+    @staticmethod
+    def get_unique_players(
+            players: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """ Create a new list of players that has only unique players
+
+        AoEIV.net sometimes returns players multiple times in player list """
+        ids = set()
+        filtered = list()
+
+        for p in players:
+            playerid = p["profile_id"]
+            if playerid in ids:
+                continue
+            ids.add(playerid)
+            filtered.append(p)
+        return filtered
 
     @staticmethod
     def get_player_data(leaderboard_id: int, player_dict: Dict[str, Any]):
@@ -336,7 +357,8 @@ class Api_checker:
                             'game_length']['wins_median']
                         return
                 logger.warning(
-                    f"Didn't find civ: {civ_name} in aoe4world.com player civ list")
+                    f"Didn't find civ: {civ_name} in aoe4world.com player civ list"
+                )
                 return
             except Exception:
                 logger.exception(
