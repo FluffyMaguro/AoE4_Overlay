@@ -16,7 +16,7 @@ if not os.path.isdir(CONFIG_FOLDER):
 def get_logger(name: str):
     logger = logging.getLogger(name)
     c_handler = logging.StreamHandler()
-    f_handler = logging.FileHandler(LOG_FILE)
+    f_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
     logger.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
 
