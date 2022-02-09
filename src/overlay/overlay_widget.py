@@ -105,7 +105,7 @@ class PlayerWidget:
         self.civ_games.setText(player_data['civ_games'])
         self.civ_winrate.setText(player_data['civ_winrate'])
         self.civ_median_wins.setText(player_data['civ_win_length_median'])
-        self.show() if player_data['name'] else self.show(False)
+        self.show(show=bool(player_data['name']))
 
         # Hide civ specific data when there are none
         if not player_data['civ_games'] and self.hiding_civ_stats:

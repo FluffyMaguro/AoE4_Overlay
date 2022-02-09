@@ -34,8 +34,9 @@ class _Settings:
             "The best build order": "> Make units\n> Attack\n> Profit"
         }
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
-        self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35), (255, 0,
-                                                                      0, 0.35))
+        self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
+                            (255, 0, 0, 0.35), (255, 0, 255, 0.35), (255, 255,
+                                                                     0, 0.35))
 
     def load(self):
         """ Loads configuration from app data"""
