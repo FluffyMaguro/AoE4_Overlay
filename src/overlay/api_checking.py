@@ -179,6 +179,9 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
     except Exception:
         return None
 
+    # Make sure data is sorted by date
+    data = sorted(data, key=lambda x: x['started'], reverse=True)
+
     logger.info(
         f"Asked for {amount} games | obtained {len(data)} from get_match_history"
     )
