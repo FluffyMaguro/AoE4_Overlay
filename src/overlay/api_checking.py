@@ -220,6 +220,9 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
         if rating_diff is None:
             match['result'] = "?"
             match['my_rating_diff'] = "?"
+        elif rating_diff == 0:
+            match['result'] = "?"
+            match['my_rating_diff'] = 0
         else:
             match['result'] = "Win" if rating_diff > 0 else "Loss"
             match['my_rating_diff'] = rating_diff
