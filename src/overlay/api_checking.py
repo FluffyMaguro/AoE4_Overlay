@@ -221,7 +221,7 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
             match['result'] = "?"
             match['my_rating_diff'] = "?"
         else:
-            match['result'] = "Win" if rating_diff > 0 else "Loss"
+            match['result'] = "Win" if rating_diff >= 0 else "Loss"
             match['my_rating_diff'] = rating_diff
 
     return data
