@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 import webbrowser
@@ -17,10 +18,18 @@ logger = get_logger(__name__)
 
 VERSION = "1.2.5"
 
+# Might or might not help
+os.environ["PYTHONIOENCODING"] = "utf-8"
+
 
 def excepthook(exc_type: Type[BaseException], exc_value: Exception,
                exc_tback: TracebackType):
     """ Provides the top-most exception handling. Logs unhandled exceptions and cleanly shuts down the app."""
+
+    if isinstance(exc_value, UnicodeEncodeError):
+        logger.exception("")
+        return
+
     # Log the exception
     logger.exception("Unhandled exception!",
                      exc_info=(exc_type, exc_value, exc_tback))
@@ -178,14 +187,17 @@ class MainApp(QtWidgets.QMainWindow):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION}) – {name}")
 
     def finish(self):
-        """ Give it some time to stop everything correctly"""
-        settings.app_width = self.width()
-        settings.app_height = self.height()
-        for i, action in enumerate(self.show_graph_actions):
-            settings.show_graph[str(i + 1)] = action.isChecked()
-        settings.save()
-        self.centralWidget().stop_checking_api()
-        pyqt_wait(1000)
+        try:
+            """ Give it some time to stop everything correctly"""
+            settings.app_width = self.width()
+            settings.app_height = self.height()
+            for i, action in enumerate(self.show_graph_actions):
+                settings.show_graph[str(i + 1)] = action.isChecked()
+            settings.save()
+            self.centralWidget().stop_checking_api()
+            pyqt_wait(1000)
+        except Exception:
+            logger.exception("")
 
 
 if __name__ == '__main__':
