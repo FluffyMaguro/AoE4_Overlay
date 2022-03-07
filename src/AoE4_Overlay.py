@@ -16,7 +16,7 @@ from overlay.tab_main import TabWidget
 
 logger = get_logger(__name__)
 
-VERSION = "1.2.5"
+VERSION = "1.2.6"
 
 # Might or might not help
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -27,7 +27,7 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
     """ Provides the top-most exception handling. Logs unhandled exceptions and cleanly shuts down the app."""
 
     if isinstance(exc_value, UnicodeEncodeError):
-        logger.exception("")
+        logger.warning("Unicode error")
         return
 
     # Log the exception
@@ -58,6 +58,7 @@ sys.excepthook = excepthook
 
 
 class MainApp(QtWidgets.QMainWindow):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.initUI()

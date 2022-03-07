@@ -28,6 +28,19 @@ logger = get_logger(__name__)
 session = requests.session()
 
 
+def get_player_name(profile_id: int) -> str:
+    """ Gets player name by asking AoE4World"""
+    try:
+        resp = session.get(
+            f"https://aoe4world.com/api/v0/players/{profile_id}")
+        data = json.loads(resp.text)
+        return data['name']
+
+    except Exception:
+        logger.exception("Failed to get player name")
+        return "–"
+
+
 def validate_id(id: Optional[int],
                 idtype: str = "steam",
                 update_name: bool = False) -> bool:
@@ -126,10 +139,12 @@ def get_match_history(amount: int = 1,
         url = f"https://aoeiv.net/api/player/matches?game=aoe4&profile_id={settings.profile_id}&count={amount}"
     else:
         return []
+
+    resp = session.get(url).text
     try:
-        return json.loads(session.get(url).text)
+        return json.loads(resp)
     except Exception:
-        logger.exception("Failed to parse match history")
+        logger.warning(f"Failed to parse match history\n{resp}")
         if raise_exception:
             raise Exception
         return []
@@ -146,9 +161,9 @@ def get_rating_history(leaderboard_id: int, amount: int = 1) -> List[Any]:
 
     resp = session.get(url).text
     try:
-        return json.loads(session.get(url).text)
+        return json.loads(resp)
     except:
-        logger.exception(f"Failed to parse rating history: {resp}")
+        logger.warning(f"Failed to parse rating history: {resp}")
         return []
 
 
@@ -165,9 +180,9 @@ def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
 
     resp = session.get(url).text
     try:
-        return json.loads(session.get(url).text)
+        return json.loads(resp)
     except:
-        logger.exception(f"Failed to parse leaderboard data: {resp}")
+        logger.warning(f"Failed to parse leaderboard data: {resp}")
         return {}
 
 
@@ -288,6 +303,10 @@ class Api_checker:
         match = match_history[0]
         leaderboard_id = match_mode(match)
 
+        # No players in the game
+        if not match['players']:
+            return
+
         if self.force_stop:
             return
 
@@ -346,6 +365,8 @@ class Api_checker:
             try:
                 url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
                 data = json.loads(session.get(url).text)
+                player_dict['name'] = data['name']
+
                 data = data['modes']['qm_1v1']
                 player_dict['rank'] = zeroed(data["rank"])
                 player_dict['rating'] = zeroed(data["rating"])
@@ -368,17 +389,23 @@ class Api_checker:
                 return
             except Exception:
                 logger.exception(
-                    f"AoE4wWorld.com failed for player {player_dict['profile_id']}"
+                    f"AoE4wWorld.com failed for player {player_dict.get('profile_id')}"
                 )
 
         # If AoE4World.com fails, default to aoeiv.net
         url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
         data = json.loads(session.get(url).text)
         if not data['leaderboard']:
-            return  # not yet ranked player
+            return  # Not yet ranked player
         data = data["leaderboard"][0]
         player_dict['rank'] = data["rank"]
         player_dict['rating'] = data["rating"]
         player_dict['wins'] = data["wins"]
         player_dict['losses'] = data["losses"]
         player_dict['streak'] = data["streak"]
+
+        # Sometimes AoEIV.net returns no name for the player
+        if player_dict['name'] is None and data['name'] is not None:
+            player_dict['name'] = data['name']
+        elif player_dict['name'] is None:
+            player_dict['name'] = get_player_name(data['profile_id'])
