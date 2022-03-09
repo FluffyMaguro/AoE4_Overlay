@@ -318,10 +318,7 @@ class Api_checker:
             match['players'] = self.get_unique_players(match['players'])
             # Gets additional player data from leaderboards stats (in-place)
             for player in match['players']:
-                try:
-                    self.get_player_data(leaderboard_id, player)
-                except Exception:
-                    logger.exception("")
+                self.get_player_data(leaderboard_id, player)
             return match
 
         # Rating history
@@ -360,21 +357,21 @@ class Api_checker:
     def get_player_data(leaderboard_id: int, player_dict: Dict[str, Any]):
         """ Updates player data inplace"""
 
-        # AoE4World.com currently works only for 1v1
-        if leaderboard_id == 17:
-            try:
-                url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
-                data = json.loads(session.get(url).text)
-                player_dict['name'] = data['name']
+        try:
+            url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
+            data = json.loads(session.get(url).text)
+            player_dict['name'] = data['name']
 
-                data = data['modes']['qm_1v1']
-                player_dict['rank'] = zeroed(data["rank"])
-                player_dict['rating'] = zeroed(data["rating"])
-                player_dict['wins'] = zeroed(data["wins_count"])
-                player_dict['losses'] = zeroed(data["games_count"]) - zeroed(
-                    data["wins_count"])
-                player_dict['streak'] = zeroed(data["streak"])
+            data = data['modes'][f'qm_{mode_data[leaderboard_id]}']
+            player_dict['rank'] = zeroed(data["rank"])
+            player_dict['rating'] = zeroed(data["rating"])
+            player_dict['wins'] = zeroed(data["wins_count"])
+            player_dict['losses'] = zeroed(data["games_count"]) - zeroed(
+                data["wins_count"])
+            player_dict['streak'] = zeroed(data["streak"])
 
+            # AoE4World.com civ stats currently work only for 1v1
+            if mode_data[leaderboard_id] == "1v1":
                 civ_name = net_to_world.get(player_dict['civ'])
                 for civ in data['civilizations']:
                     if civ['civilization'] == civ_name:
@@ -386,26 +383,34 @@ class Api_checker:
                 logger.warning(
                     f"Didn't find civ: {civ_name} in aoe4world.com player civ list"
                 )
-                return
-            except Exception:
-                logger.exception(
-                    f"AoE4wWorld.com failed for player {player_dict.get('profile_id')}"
-                )
+            return
+        except Exception:
+            logger.exception(
+                f"AoE4wWorld.com failed for player {player_dict.get('profile_id')}"
+            )
 
         # If AoE4World.com fails, default to aoeiv.net
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
-        data = json.loads(session.get(url).text)
-        if not data['leaderboard']:
-            return  # Not yet ranked player
-        data = data["leaderboard"][0]
-        player_dict['rank'] = data["rank"]
-        player_dict['rating'] = data["rating"]
-        player_dict['wins'] = data["wins"]
-        player_dict['losses'] = data["losses"]
-        player_dict['streak'] = data["streak"]
+        try:
+            url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
+            data = json.loads(session.get(url).text)
 
-        # Sometimes AoEIV.net returns no name for the player
-        if player_dict['name'] is None and data['name'] is not None:
-            player_dict['name'] = data['name']
-        elif player_dict['name'] is None:
-            player_dict['name'] = get_player_name(data['profile_id'])
+            if data['leaderboard']:
+                data = data["leaderboard"][0]
+                player_dict['rank'] = data["rank"]
+                player_dict['rating'] = data["rating"]
+                player_dict['wins'] = data["wins"]
+                player_dict['losses'] = data["losses"]
+                player_dict['streak'] = data["streak"]
+
+                # Sometimes AoEIV.net returns no name for the player
+                if player_dict['name'] is None:
+                    player_dict['name'] = data['name']
+            else:
+                player_dict['rating'] = "–"
+
+        except Exception:
+            logger.exception("Failed to get player data from aoeiv.net")
+
+        # Last check on AoE4World for player name
+        if player_dict['name'] is None:
+            player_dict['name'] = get_player_name(player_dict['profile_id'])
