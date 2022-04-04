@@ -15,6 +15,7 @@ rating_type_id in match history seem to be offset:
 
 import json
 import time
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
@@ -249,13 +250,13 @@ class Api_checker:
 
     def __init__(self):
         self.force_stop = False
-        self.last_match_timestamp = -1
-        self.last_rating_timestamp = -1
+        self.last_match_timestamp = datetime(1900, 1, 1, 0, 0, 0)
+        self.last_rating_timestamp = datetime(1900, 1, 1, 0, 0, 0)
 
     def reset(self):
         """ Resets last timestamps"""
-        self.last_match_timestamp = -1
-        self.last_rating_timestamp = -1
+        self.last_match_timestamp = datetime(1900, 1, 1, 0, 0, 0)
+        self.last_rating_timestamp = datetime(1900, 1, 1, 0, 0, 0)
 
     def sleep(self, seconds: int) -> bool:
         """ Sleeps while checking for force_stop
@@ -284,133 +285,56 @@ class Api_checker:
                 return
 
     def get_data(self) -> Optional[Dict[str, Any]]:
-        """ Returns match data if there is a new game"""
         if self.force_stop:
             return
 
-        # Match history
+        # Get last match from aoe4world.com
         try:
-            match_history = get_match_history(amount=1, raise_exception=True)
-        except json.decoder.JSONDecodeError:
-            # AoEIV.net down
-            return {'server_down': True}
+            url = f"https://aoe4world.com/api/v0/players/{settings.profile_id}/games/last"
+            resp = session.get(url)
+            data = json.loads(resp.text)
         except Exception:
-            return
-
-        if not match_history:
-            return
-
-        match = match_history[0]
-        leaderboard_id = match_mode(match)
-
-        # No players in the game
-        if not match['players']:
+            logger.exception("")
             return
 
         if self.force_stop:
             return
+        if "error" in data:
+            return
+
+        # Calc old leaderboard id
+        data['leaderboard_id'] = 0
+        try:
+            data['leaderboard_id'] = int(data['kind'][-1]) + 16
+        except Exception:
+            logger.exception("")
+
+        # Calc started time
+        started = datetime.strptime(data['started_at'],
+                                    "%Y-%m-%dT%H:%M:%S.000Z")
+        data['started_sec'] = started.timestamp()
 
         # Show the last game
-        if match['started'] > self.last_match_timestamp:
-            self.last_match_timestamp = match['started']
+        if started > self.last_match_timestamp:  # and data['ongoing']:
+            self.last_match_timestamp = started
+            return data
 
-            # Remove duplicated players
-            match['players'] = self.get_unique_players(match['players'])
-            # Gets additional player data from leaderboards stats (in-place)
-            for player in match['players']:
-                self.get_player_data(leaderboard_id, player)
-            return match
-
-        # Rating history
-        if not quickmatch_game(match):
+        if not "qm_" in data['kind']:
             return
-        rating_history = get_rating_history(leaderboard_id, amount=1)
-        if not rating_history:
-            return
-        rating = rating_history[0]
 
-        # Check for new rating data
-        if self.last_match_timestamp != -1 and \
-            rating['timestamp'] > self.last_rating_timestamp:
+        # When a game finished
+        if started > self.last_rating_timestamp and not data['ongoing']:
 
-            self.last_rating_timestamp = rating['timestamp']
+            # Check for new ratings
+            if not data['leaderboard_id']:
+                return
+
+            rating_history = get_rating_history(data['leaderboard_id'],
+                                                amount=1)
+
+            if not rating_history:
+                return
+
+            self.last_rating_timestamp = started
+            rating = rating_history[0]
             return {"new_rating": True, 'timestamp': rating['timestamp']}
-
-    @staticmethod
-    def get_unique_players(
-            players: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """ Create a new list of players that has only unique players
-
-        AoEIV.net sometimes returns players multiple times in player list """
-        ids = set()
-        filtered = list()
-
-        for p in players:
-            playerid = p["profile_id"]
-            if playerid in ids:
-                continue
-            ids.add(playerid)
-            filtered.append(p)
-        return filtered
-
-    @staticmethod
-    def get_player_data(leaderboard_id: int, player_dict: Dict[str, Any]):
-        """ Updates player data inplace"""
-
-        try:
-            url = f"https://aoe4world.com/api/v0/players/{player_dict['profile_id']}"
-            data = json.loads(session.get(url).text)
-            player_dict['name'] = data['name']
-
-            data = data['modes'][f'qm_{mode_data[leaderboard_id]}']
-            player_dict['rank'] = zeroed(data["rank"])
-            player_dict['rating'] = zeroed(data["rating"])
-            player_dict['wins'] = zeroed(data["wins_count"])
-            player_dict['losses'] = zeroed(data["games_count"]) - zeroed(
-                data["wins_count"])
-            player_dict['streak'] = zeroed(data["streak"])
-
-            # AoE4World.com civ stats currently work only for 1v1
-            if mode_data[leaderboard_id] == "1v1":
-                civ_name = net_to_world.get(player_dict['civ'])
-                for civ in data['civilizations']:
-                    if civ['civilization'] == civ_name:
-                        player_dict['civ_games'] = civ['games_count']
-                        player_dict['civ_winrate'] = civ['win_rate']
-                        player_dict['civ_win_length_median'] = civ[
-                            'game_length']['wins_median']
-                        return
-                logger.warning(
-                    f"Didn't find civ: {civ_name} in aoe4world.com player civ list"
-                )
-            return
-        except Exception:
-            logger.exception(
-                f"AoE4wWorld.com failed for player {player_dict.get('profile_id')}"
-            )
-
-        # If AoE4World.com fails, default to aoeiv.net
-        try:
-            url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={player_dict['profile_id']}&count=1"
-            data = json.loads(session.get(url).text)
-
-            if data['leaderboard']:
-                data = data["leaderboard"][0]
-                player_dict['rank'] = data["rank"]
-                player_dict['rating'] = data["rating"]
-                player_dict['wins'] = data["wins"]
-                player_dict['losses'] = data["losses"]
-                player_dict['streak'] = data["streak"]
-
-                # Sometimes AoEIV.net returns no name for the player
-                if player_dict['name'] is None:
-                    player_dict['name'] = data['name']
-            else:
-                player_dict['rating'] = "–"
-
-        except Exception:
-            logger.exception("Failed to get player data from aoeiv.net")
-
-        # Last check on AoE4World for player name
-        if player_dict['name'] is None:
-            player_dict['name'] = get_player_name(player_dict['profile_id'])

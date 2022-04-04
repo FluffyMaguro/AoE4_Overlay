@@ -91,55 +91,64 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     Sorts players to main is at the top. Calculates winrates. 
     Gets text for civs and maps. Apart from `team`, all player data returned as string."""
     result = {}
-    result['map'] = map_data.get(game_data["map_type"], "Unknown map")
-    result['mode'] = match_mode(game_data)
-    result['started'] = game_data['started']
-    result['ranked'] = game_data['ranked']
+    result['map'] = game_data['map']
+    result['mode'] = game_data['leaderboard_id']
+    result['started'] = game_data['started_at']
+    result['ranked'] = 'qm_' in game_data['kind']
     result['server'] = game_data['server']
-    result['version'] = game_data['version']
-    result['match_id'] = game_data['match_id']
+    result['match_id'] = game_data['game_id']
+    mode = game_data['kind']
 
     # Sort players so the main player team is first
-    team = None
-    for player in game_data['players']:
-        if player['profile_id'] == settings.profile_id:
-            team = player['team']
-            break
+    players = []
+    main_team = None
+    for idx, team in enumerate(game_data['teams']):
+        for player in team:
+            player['team'] = idx
+            players.append(player)
+            if player['profile_id'] == settings.profile_id:
+                main_team = idx
 
     def sortingf(player: Dict[str, Any]) -> int:
         if player['team'] is None:
             return 99
-        if player['team'] == team:
+        if player['team'] == main_team:
             return -1
         return player['team']
 
-    game_data['players'] = sorted(game_data['players'], key=sortingf)
+    players = sorted(players, key=sortingf)
 
     # Add player data
     result['players'] = []
-    for player in game_data['players']:
-        wins = zeroed(player.get('wins'))
-        losses = zeroed(player.get('losses'))
-        games = wins + losses
-        winrate = wins / games if games else 0
-        civ_win_median = ''
-        if 'civ_win_length_median' in player:
-            civ_win_median = time.strftime(
-                "%M:%S", time.gmtime(player['civ_win_length_median']))
-        civ_winrate = ''
-        if 'civ_winrate' in player:
-            civ_winrate = f"{player['civ_winrate']/100:.1%}"
+    for player in players:
+        current_civ = player['civilization']
+        name = player['name'] if player['name'] is not None else "?"
+
+        civ_games = ""
+        civ_winrate = ""
+        civ_win_median = ""
+        try:
+            for civ in player['modes'][mode]['civilizations']:
+                if civ['civilization'] == current_civ:
+                    civ_games = str(civ['games_count'])
+                    civ_winrate = f"{civ['win_rate']/100:.1%}"
+                    med = civ['game_length']['wins_median']
+                    civ_win_median = time.strftime("%M:%S", time.gmtime(med))
+        except Exception:
+            ...
+
+        mode_data = player.get('modes', {}).get(mode, {})
 
         data = {
-            'civ': civ_data.get(player['civ'], "Unknown civ"),
-            'name': player['name'],
-            'team': zeroed(player['team']),
-            'rating': str(player.get('rating', '')),
-            'rank': f"#{player.get('rank', '')}",
-            'wins': str(wins) if wins else '',
-            'losses': str(losses) if losses else '',
-            'winrate': f"{winrate:.1%}",
-            'civ_games': str(player.get('civ_games', '')),
+            'civ': current_civ.replace("_", " ").title(),
+            'name': name,
+            'team': zeroed(player['team'] + 1),
+            'rating': str(mode_data.get('rating', 0)),
+            'rank': f"#{mode_data.get('rank',0)}",
+            'wins': str(mode_data.get('wins_count', 0)),
+            'losses': str(mode_data.get('losses_count', 0)),
+            'winrate': f"{mode_data.get('winrate',0)}%",
+            'civ_games': civ_games,
             'civ_winrate': civ_winrate,
             'civ_win_length_median': civ_win_median
         }

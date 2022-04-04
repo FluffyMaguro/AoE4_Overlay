@@ -116,10 +116,8 @@ class TabWidget(QtWidgets.QTabWidget):
             if settings.log_matches:
                 log_match(game_data)
             processed = hf.process_game(game_data)
-            start = time.strftime("%Y-%m-%d %H:%M:%S",
-                                  time.localtime(processed['started']))
             logger.info(
-                f"New live game (match_id: {processed['match_id']} | mode: {processed['mode']-16} | started: {start})"
+                f"New live game (game_id: {game_data['game_id']} | mode: {game_data['kind']} | started: {game_data['started_at']})"
             )
             self.override_tab.update_data(processed)
             if not self.prevent_overlay_update:
