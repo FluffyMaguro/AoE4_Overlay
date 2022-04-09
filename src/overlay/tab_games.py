@@ -6,13 +6,14 @@ from PyQt5 import QtCore, QtWidgets
 
 from overlay.aoe4_data import map_data
 from overlay.helper_func import quickmatch_game
-from overlay.logging_func import get_logger
+from overlay.logging_func import catch_exceptions, get_logger
 from overlay.settings import settings
 
 logger = get_logger(__name__)
 
 
 class Line(QtWidgets.QFrame):
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("background-color: #bbb")
@@ -21,6 +22,7 @@ class Line(QtWidgets.QFrame):
 
 
 class MatchEntry:
+
     def __init__(self, layout: QtWidgets.QGridLayout, match_data: Dict[str,
                                                                        Any]):
         self.main_layout: QtWidgets.QGridLayout = layout
@@ -47,8 +49,7 @@ class MatchEntry:
             team_widgets.append(QtWidgets.QLabel(team_string))
 
         # Map
-        map_name = QtWidgets.QLabel(
-            map_data.get(match_data["map_type"], "Unknown map"))
+        map_name = QtWidgets.QLabel(map_data[match_data.get("map_type", -1)])
 
         # Date
         date = QtWidgets.QLabel(
@@ -100,6 +101,7 @@ class MatchEntry:
 
 
 class MatchHistoryTab(QtWidgets.QWidget):
+
     def __init__(self, parent):
         super().__init__(parent)
         # List of added matches. New ones at the end.
@@ -153,6 +155,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.clear_scroll_layout()
         self.matches = []
 
+    @catch_exceptions(logger)
     def update_widgets(self, match_history: List[Any]):
         # Remove widgets from the layout
         self.clear_scroll_layout()

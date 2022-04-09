@@ -8,6 +8,7 @@ from overlay.helper_func import file_path
 
 
 class RandomTab(QtWidgets.QWidget):
+
     def __init__(self, parent):
         super().__init__(parent)
         self.current_map: Optional[str] = None
@@ -97,7 +98,7 @@ class RandomTab(QtWidgets.QWidget):
 
     def randomize_map(self):
         map_name = random.choice(tuple(map_data.values()))
-        if map_name == self.current_map:
+        if map_name in (self.current_map, map_data[-1]):
             self.randomize_map()
             return
         self.current_map = map_name

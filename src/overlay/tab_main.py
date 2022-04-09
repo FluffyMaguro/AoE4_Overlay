@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 
 
 class TabWidget(QtWidgets.QTabWidget):
+
     def __init__(self, parent, version: str):
         super().__init__(parent)
         self.version = version
@@ -80,9 +81,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def got_match_history(self, match_history: List[Any]):
         if match_history is None:
-            self.settigns_tab.message(
-                'Failed to get match history! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
-                color='red')
+            self.settigns_tab.aoe4net_error_msg()
             logger.warning("No match history data")
             return
         self.settigns_tab.message("")
@@ -109,9 +108,7 @@ class TabWidget(QtWidgets.QTabWidget):
             self.update_with_match_history_data(2)
 
         elif 'server_down' in game_data:
-            self.settigns_tab.message(
-                'Failed to get recent matches! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
-                color='red')
+            self.settigns_tab.aoe4net_error_msg()
         else:
             if settings.log_matches:
                 log_match(game_data)

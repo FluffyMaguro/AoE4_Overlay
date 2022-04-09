@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 from overlay.aoe4_data import civ_data, map_data, mode_data
 from overlay.api_checking import get_leaderboard_data
 from overlay.helper_func import match_mode
-from overlay.logging_func import get_logger
+from overlay.logging_func import get_logger, catch_exceptions
 from overlay.settings import settings
 from overlay.worker import scheldule
 
@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 
 
 class StatsTab(QtWidgets.QWidget):
+
     def __init__(self, parent):
         super().__init__(parent)
         self.leaderboard_data: Dict[int, Dict[str, Any]] = {}
@@ -213,6 +214,7 @@ class StatsTab(QtWidgets.QWidget):
         self.leaderboard_data = leaderboard
         self.update_leaderboard_widgets()
 
+    @catch_exceptions(logger)
     def update_leaderboard_widgets(self):
         for m, data in self.leaderboard_data.items():
             if not data.get('leaderboard', False):
@@ -233,6 +235,7 @@ class StatsTab(QtWidgets.QWidget):
             winrate = data['wins'] / games if games else 0
             self.mode_stats[m]['winrate'].setText(f"{winrate:.2%}")
 
+    @catch_exceptions(logger)
     def update_other_stats(self, match_history: List[Any]):
         # Add to our match history data
         present_match_ids = {m['match_id'] for m in self.match_data}
@@ -244,12 +247,13 @@ class StatsTab(QtWidgets.QWidget):
             f'Received {len(match_history)} | Saved {len(self.match_data)} games'
         )
 
+    @catch_exceptions(logger)
     def add_match_data(self, match: Dict[str, Any]):
         """ Saves only specific data from the match history data"""
         game = dict()  # includes: win, mode, map, civ
         if match['result'] not in {"Loss", "Win"}:
             return
-        game['map'] = match['map_type']
+        game['map'] = match.get('map_type', -1)
         game['win'] = match['result'] == "Win"
         game['mode'] = match_mode(match)
         game['match_id'] = match['match_id']
@@ -265,6 +269,7 @@ class StatsTab(QtWidgets.QWidget):
         self.match_data = []
         self.update_civ_map_stats()
 
+    @catch_exceptions(logger)
     def update_civ_map_stats(self):
         # Filter games based on the selected civilization
         fdata = self.match_data

@@ -50,6 +50,10 @@ class SettingsTab(QtWidgets.QWidget):
             QtCore.Qt.TextSelectableByMouse)
         profile_box_layout.addWidget(self.profile_info)
 
+        self.profile_link = QtWidgets.QLabel("")
+        self.profile_link.setOpenExternalLinks(True)
+        profile_box_layout.addWidget(self.profile_link, 1, 0)
+
         # Multi search
         self.multi_search = QtWidgets.QLineEdit()
         self.multi_search.setPlaceholderText("Steam ID / Profile ID / Name")
@@ -58,7 +62,7 @@ class SettingsTab(QtWidgets.QWidget):
             ' Searching by name might not find the correct player.')
         self.multi_search.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.multi_search.setMaximumWidth(220)
-        profile_box_layout.addWidget(self.multi_search, 1, 0)
+        profile_box_layout.addWidget(self.multi_search, 2, 0)
 
         # Multi search button
         self.multi_search_btn = QtWidgets.QPushButton("Search")
@@ -67,11 +71,11 @@ class SettingsTab(QtWidgets.QWidget):
         self.multi_search_btn.setToolTip(
             'Search for your account with one of these (Steam ID / Profile ID / Name).'
             ' Searching by name might not find the correct player.')
-        profile_box_layout.addWidget(self.multi_search_btn, 1, 1)
+        profile_box_layout.addWidget(self.multi_search_btn, 2, 1)
 
         # Notification
         self.notification_label = QtWidgets.QLabel()
-        profile_box_layout.addWidget(self.notification_label, 2, 0)
+        profile_box_layout.addWidget(self.notification_label, 3, 0)
 
         ### Overlay box
         overlay_box = QtWidgets.QGroupBox("Overlay")
@@ -164,6 +168,12 @@ class SettingsTab(QtWidgets.QWidget):
             self.profile_info.setText('\n'.join(s))
             self.profile_info.setStyleSheet(
                 "color: #359c20; font-weight: bold")
+            self.profile_link.setText(
+                f'<a href="https://aoe4world.com/players/{settings.profile_id}">AoE4 World profile</a>'
+            )
+        else:
+            self.profile_info.setText("No player identified")
+            self.profile_link.setText("")
 
     def notification(self, text: str, color: str = "black"):
         """ Shows a notification"""
@@ -174,6 +184,12 @@ class SettingsTab(QtWidgets.QWidget):
         """ Shows a message"""
         self.msg.setText(text)
         self.msg.setStyleSheet(f"color: {color}")
+
+    def aoe4net_error_msg(self):
+        self.message(
+            f'An issue with <a href="https://aoeiv.net/">AoEIV.net</a> servers. Data shown on the overlay are unaffected,<br> \
+             but other stats in this app might not show correctly.<br>For additional stats check your <a href="https://aoe4world.com/players/{settings.profile_id}">AoE4 World profile</a>.',
+            color='red')
 
     def find_profile(self):
         """ Attempts to find player ids based on provided text (name, either id)"""
@@ -194,9 +210,7 @@ class SettingsTab(QtWidgets.QWidget):
         """ Decoding error when finding player profile indicates an issue with AoEIV.net"""
         exctype, value, formatted = exc_data
         if exctype == json.decoder.JSONDecodeError:
-            self.message(
-                'Decoding error when finding a player! Possibly an issue with <a href="https://aoeiv.net/">AoEIV.net</a>',
-                color='red')
+            self.aoe4net_error_msg()
             logger.warning(
                 f"Decoding error when finding a player\n{formatted}")
         else:

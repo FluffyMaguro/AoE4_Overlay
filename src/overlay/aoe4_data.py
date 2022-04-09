@@ -47,6 +47,7 @@ net_to_world = {
 """aoe4.net civ index to aoe4world.com civ name"""
 
 map_data = {
+    -1: 'Unknown Map',
     0: 'Dry Arabia',
     1: 'Lipany',
     2: 'High View',

@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import time
@@ -39,3 +40,21 @@ def log_match(match: Dict[str, Any]):
             f.write(f"{now} | {match}\n")
     except Exception:
         ...
+
+
+def catch_exceptions(logger: logging.Logger):
+    """ Catches exceptions for given function and writes a log"""
+
+    # Outer function is here to provide argument for the decorator
+    def inner_function(job_func):
+
+        @functools.wraps(job_func)  # passes useful info to decorators
+        def wrapper(*args, **kwargs):
+            try:
+                return job_func(*args, **kwargs)
+            except Exception:
+                logger.exception("")
+
+        return wrapper
+
+    return inner_function

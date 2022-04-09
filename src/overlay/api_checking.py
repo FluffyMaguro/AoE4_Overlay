@@ -1,18 +1,3 @@
-""""
-Using 
-https://aoeiv.net/#api
-
-# Mode type            leaderboard_id
-# Quick Match (1v1)	    17
-# Quick Match (2v2)	    18
-# Quick Match (3v3)	    19
-# Quick Match (4v4)	    20
-
-rating_type_id in match history seem to be offset:
-    leaderboard_id = rating_type_id + 2
-
-"""
-
 import json
 import time
 from datetime import datetime
@@ -20,8 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-from overlay.aoe4_data import QM_ids, mode_data, net_to_world
-from overlay.helper_func import match_mode, quickmatch_game, zeroed
+from overlay.aoe4_data import QM_ids
+from overlay.helper_func import match_mode
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -29,104 +14,44 @@ logger = get_logger(__name__)
 session = requests.session()
 
 
-def get_player_name(profile_id: int) -> str:
-    """ Gets player name by asking AoE4World"""
-    try:
-        resp = session.get(
-            f"https://aoe4world.com/api/v0/players/{profile_id}")
-        data = json.loads(resp.text)
-        return data['name']
-
-    except Exception:
-        logger.exception("Failed to get player name")
-        return "–"
-
-
-def validate_id(id: Optional[int],
-                idtype: str = "steam",
-                update_name: bool = False) -> bool:
-    """ Validates whether given ID corresponds to some player.
-    Assumes that a player has played some matches"""
-    if id is None:
-        return False
-    url = f"https://aoeiv.net/api/player/matches?game=aoe4&{idtype}_id={id}&count=1"
-
-    # When looking for profile we might want to find player name also
-    text = session.get(url).text
-    if update_name and text != "[]" and "<body>" not in text and idtype == "profile":
-        data = json.loads(text)
-        for player in data[0]['players']:
-            if player["profile_id"] == id:
-                settings.player_name = player["name"]
-                return True
-
-    return text != "[]" and "<body>" not in text
-
-
-def find_player_by_name(name: str) -> bool:
-    """ Looks for a player by name. If found return `True`.
-    Updates settings automatically"""
-    for id in mode_data:
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&search={name}&count=1"
-        data = json.loads(session.get(url).text)
-        if data['leaderboard'] and name == data['leaderboard'][0]['name']:
-            settings.player_name = data['leaderboard'][0]['name']
-            settings.profile_id = data['leaderboard'][0]['profile_id']
-            try:
-                settings.steam_id = int(data['leaderboard'][0]['steam_id'])
-            except Exception:
-                pass
-            return True
-    return False
-
-
-def attempt_to_find_profile_id() -> bool:
-    """ Attempts to find player profile ID based on steam_id.
-    Only works if the player is ranked any team mode.
-    
-    Returns `True` if successful"""
-    if not settings.steam_id:
-        return False
-
-    for id in mode_data:
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={id}&steam_id={settings.steam_id}&count=1"
-        data = json.loads(session.get(url).text)
-        if data['leaderboard']:
-            settings.profile_id = data['leaderboard'][0]['profile_id']
-            settings.player_name = data['leaderboard'][0]['name']
-            logger.info("Found player profile_id based on steam_id")
-            return True
-    return False
-
-
 def find_player(text: str) -> bool:
     """ Tries to find a player based on a text containing either name, steam_id or profile_id
     Returns `True` if the player was found. Settings are automatically updated."""
-    id = None
-    # Save & reset current player settings
+
+    # Save the current player settings
     old = (settings.player_name, settings.profile_id, settings.steam_id)
-    settings.player_name, settings.profile_id, settings.steam_id = None, None, None
 
+    # First try if it's a profile id
     try:
-        id = int(text)
+        url = f"https://aoe4world.com/api/v0/players/{text}"
+        resp = json.loads(session.get(url).text)
+        if 'name' in resp:
+            settings.profile_id = resp['profile_id']
+            settings.player_name = resp['name']
+            settings.steam_id = resp.get('steam_id')
+            logger.info(
+                f"Found player by profile_id: {settings.player_name} ({settings.profile_id})"
+            )
+            return True
     except Exception:
-        # Probably a name
-        if find_player_by_name(text):
-            logger.info("Found player by name")
-            return True
+        logger.exception("")
 
-    if id is not None:
-        if validate_id(id, idtype="steam"):
-            settings.steam_id = id
-            logger.info("Found player by steam_id: {id}")
-            if attempt_to_find_profile_id():
-                return True
-        if validate_id(id, idtype="profile", update_name=True):
-            settings.profile_id = id
-            logger.info("Found player by profile_id: {id}")
+    # Then try query
+    try:
+        url = f"https://aoe4world.com/api/v0/players/search?query={text}"
+        resp = json.loads(session.get(url).text)
+        if resp['players']:
+            settings.profile_id = resp['players'][0]['profile_id']
+            settings.player_name = resp['players'][0]['name']
+            settings.steam_id = resp['players'][0].get('steam_id')
+            logger.info(
+                f"Found player by query: {settings.player_name} ({settings.profile_id})"
+            )
             return True
+    except Exception:
+        logger.exception("")
+
     logger.info(f"Failed to find a player with: {text}")
-    # Restore player settings
     settings.player_name, settings.profile_id, settings.steam_id = old
     return False
 
