@@ -147,7 +147,7 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
             'rank': f"#{mode_data.get('rank',0)}",
             'wins': str(mode_data.get('wins_count', 0)),
             'losses': str(mode_data.get('losses_count', 0)),
-            'winrate': f"{mode_data.get('winrate',0)}%",
+            'winrate': f"{mode_data.get('win_rate', 0)}%",
             'civ_games': civ_games,
             'civ_winrate': civ_winrate,
             'civ_win_length_median': civ_win_median
