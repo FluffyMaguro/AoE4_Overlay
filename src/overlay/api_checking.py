@@ -244,7 +244,7 @@ class Api_checker:
             self.last_match_timestamp = started
             return data
 
-        if not "qm_" in data['kind']:
+        if not ("qm_" in data['kind'] or 'rm_' in data['kind']):
             return
 
         # When a game finished

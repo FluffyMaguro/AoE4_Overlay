@@ -3,12 +3,13 @@ import os
 import pathlib
 import sys
 import time
+import traceback
 from typing import Any, Dict, Optional, Union
 
 import requests
 from PyQt5 import QtCore
 
-from overlay.aoe4_data import QM_ids, civ_data, map_data
+from overlay.aoe4_data import QM_ids
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -94,7 +95,7 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     result['map'] = game_data['map']
     result['mode'] = game_data['leaderboard_id']
     result['started'] = game_data['started_at']
-    result['ranked'] = 'qm_' in game_data['kind']
+    result['ranked'] = 'qm_' in game_data['kind'] or 'rm_' in game_data['kind']
     result['server'] = game_data['server']
     result['match_id'] = game_data['game_id']
     mode = game_data['kind']
@@ -128,23 +129,31 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         civ_winrate = ""
         civ_win_median = ""
         try:
+            if not mode in player['modes']:
+                if 'rm_' in mode:
+                    mode = mode.replace('rm_','qm_')
+                elif 'qm_' in mode:
+                    mode = mode.replace('qm_','rm_')
+
             for civ in player['modes'][mode]['civilizations']:
                 if civ['civilization'] == current_civ:
                     civ_games = str(civ['games_count'])
                     civ_winrate = f"{civ['win_rate']/100:.1%}"
                     med = civ['game_length']['wins_median']
-                    civ_win_median = time.strftime("%M:%S", time.gmtime(med))
+                    civ_win_median = time.strftime("%M:%S",
+                                                    time.gmtime(med))
         except Exception:
-            ...
+            print(traceback.format_exc())
 
         mode_data = player.get('modes', {}).get(mode, {})
+        mode_str = mode.split('_')[0].upper()
 
         data = {
             'civ': current_civ.replace("_", " ").title(),
             'name': name,
             'team': zeroed(player['team'] + 1),
             'rating': str(mode_data.get('rating', 0)),
-            'rank': f"#{mode_data.get('rank',0)}",
+            'rank': f"{mode_str}#{mode_data.get('rank',0)}",
             'wins': str(mode_data.get('wins_count', 0)),
             'losses': str(mode_data.get('losses_count', 0)),
             'winrate': f"{mode_data.get('win_rate', 0)}%",
