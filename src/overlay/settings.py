@@ -9,6 +9,7 @@ CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
 
 
 class _Settings:
+
     def __init__(self):
         self.websocket_port: int = 7307
         self.send_email_logs: bool = True
@@ -22,6 +23,7 @@ class _Settings:
         self.overlay_hotkey: str = ""
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
+        self.max_games_history: int = 100
         self.civ_stats_color: str = "#BC8AEA"
         self.bo_bg_opacity: float = 0.5
         self.bo_showtitle: bool = True

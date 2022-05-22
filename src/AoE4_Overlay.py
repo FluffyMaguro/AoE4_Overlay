@@ -46,11 +46,13 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
         settings.save()
     except Exception:
         logger.exception("Failed to save settings")
+
     # Shut down other threads
     try:
         Main.centralWidget().stop_checking_api()
     except Exception:
         pass
+
     sys.exit()
 
 

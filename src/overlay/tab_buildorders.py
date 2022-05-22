@@ -2,7 +2,7 @@ import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from overlay.custom_widgets import CustomKeySequenceEdit, OverlayWidget
-from overlay.logging_func import get_logger
+from overlay.logging_func import catch_exceptions, get_logger
 from overlay.settings import settings
 
 logger = get_logger(__name__)
@@ -10,6 +10,7 @@ logger = get_logger(__name__)
 
 class Buildorder_overlay(OverlayWidget):
     """Overlay widget showing buildorders """
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_overlay()
@@ -265,6 +266,7 @@ class BoTab(QtWidgets.QWidget):
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
 
+    @catch_exceptions(logger)
     def remove_buildorder(self):
         if self.bo_list.count() == 1:
             return

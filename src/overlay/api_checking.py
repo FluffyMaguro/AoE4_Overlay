@@ -174,7 +174,8 @@ def get_full_match_history(amount: int) -> Optional[List[Any]]:
 class Api_checker:
 
     def __init__(self):
-        self.force_stop = False
+        self.force_stop = False # To stop the thread
+        self.force_check = False # This can force a check of new data
         self.last_match_timestamp = datetime(1900, 1, 1, 0, 0, 0)
         self.last_rating_timestamp = datetime(1900, 1, 1, 0, 0, 0)
 
@@ -182,6 +183,7 @@ class Api_checker:
         """ Resets last timestamps"""
         self.last_match_timestamp = datetime(1900, 1, 1, 0, 0, 0)
         self.last_rating_timestamp = datetime(1900, 1, 1, 0, 0, 0)
+        self.force_check = True
 
     def sleep(self, seconds: int) -> bool:
         """ Sleeps while checking for force_stop
@@ -189,6 +191,11 @@ class Api_checker:
         for _ in range(seconds * 2):
             if self.force_stop:
                 return True
+
+            if self.force_check:
+                self.force_check = False
+                return False
+
             time.sleep(0.5)
         return False
 

@@ -2,7 +2,7 @@ import functools
 import logging
 import os
 import time
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 import appdirs
 
@@ -14,7 +14,7 @@ if not os.path.isdir(CONFIG_FOLDER):
     os.mkdir(CONFIG_FOLDER)
 
 
-def get_logger(name: str):
+def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
     c_handler = logging.StreamHandler()
     f_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
@@ -42,7 +42,7 @@ def log_match(match: Dict[str, Any]):
         ...
 
 
-def catch_exceptions(logger: logging.Logger):
+def catch_exceptions(logger: logging.Logger) -> Callable:
     """ Catches exceptions for given function and writes a log"""
 
     # Outer function is here to provide argument for the decorator

@@ -174,5 +174,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         for match_entry in reversed(self.matches):
             if match_entry.in_layout:
                 continue
+            if added_rows > settings.max_games_history * 2:
+                continue
             match_entry.add_to_layout(added_rows)
             added_rows += 2
