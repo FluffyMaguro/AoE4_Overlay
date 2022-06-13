@@ -60,7 +60,9 @@ class Buildorder_overlay(OverlayWidget):
 
     def update_data(self, title: str, text: str):
         self.title.setText(title)
-        self.text.setText(text)
+        rows = len(text.split("\n"))
+        padding = '\n' * int(1 + rows / 4)
+        self.text.setText(f"{text}{padding}")
 
     def update_style(self, font_size: int):
         self.setStyleSheet(
@@ -172,7 +174,14 @@ class BoTab(QtWidgets.QWidget):
         remove_bo_btn.clicked.connect(self.remove_buildorder)
         clayout.addWidget(remove_bo_btn)
 
-        clayout.addSpacing(40)
+        clayout.addSpacing(30)
+        age4builder = QtWidgets.QLabel(
+            'Find & copy buildorders from <a href="https://age4builder.com/">age4builder.com</a>'
+        )
+        age4builder.setOpenExternalLinks(True)
+        clayout.addWidget(age4builder)
+
+        clayout.addSpacing(10)
 
         ### Overlay controls
         overlay_box = QtWidgets.QGroupBox("Overlay")

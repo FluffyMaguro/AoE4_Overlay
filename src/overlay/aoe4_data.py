@@ -64,6 +64,7 @@ map_data = {
     13: 'Warring Islands',
     14: 'Archipelago',
     15: 'Nagari',
-    16: 'Boulder Bay'
+    16: 'Boulder Bay',
+    17: 'Mega Random'
 }
 """aoe4.net map index to map name"""

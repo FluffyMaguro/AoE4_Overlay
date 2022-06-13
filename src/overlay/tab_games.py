@@ -49,7 +49,8 @@ class MatchEntry:
             team_widgets.append(QtWidgets.QLabel(team_string))
 
         # Map
-        map_name = QtWidgets.QLabel(map_data[match_data.get("map_type", -1)])
+        map_name = QtWidgets.QLabel(
+            map_data.get(match_data.get("map_type", -1), "Unknown map"))
 
         # Date
         date = QtWidgets.QLabel(
