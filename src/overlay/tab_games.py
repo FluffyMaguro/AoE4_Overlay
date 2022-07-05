@@ -82,6 +82,7 @@ class MatchEntry:
 
         self.widgets = (*team_widgets, map_name, date, mode, result, elo_change, apm)
 
+
         for item in self.widgets:
             item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
             item.setAlignment(QtCore.Qt.AlignCenter)
