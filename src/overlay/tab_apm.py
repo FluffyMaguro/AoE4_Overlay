@@ -127,5 +127,5 @@ class Keys(QThread):
         self.write_to_file()
         self.action_count = 0
         self.keys = []
-        self.terminate()
+        self.terminate() # TODO this does no actually stop the threads ...
  
