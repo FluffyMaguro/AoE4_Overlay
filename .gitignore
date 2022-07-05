@@ -1,0 +1,13 @@
+venv/*
+__pycache__/*
+.vscode/*
+AoE4_Overlay.build/*
+AoE4_Overlay.dist/*
+_compile.bat
+_venv.bat
+_vsc.bat
+*.pyc
+file.log
+test.py
+custom.css
+custom.js
