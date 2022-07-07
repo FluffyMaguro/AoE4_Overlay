@@ -39,7 +39,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab = GraphTab(self)
         self.random_tab = RandomTab(self)
         self.stats_tab = StatsTab(self)
-        self.buildorder_tab = BoTab(self)
+        self.build_order_tab = BoTab(self)
         self.override_tab = OverrideTab(self)
         self.override_tab.data_override.connect(self.override_event)
         self.override_tab.update_override.connect(self.override_update_event)
@@ -51,7 +51,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.graph_tab, "Rating")
         self.addTab(self.stats_tab, "Stats")
         self.addTab(self.override_tab, "Override")
-        self.addTab(self.buildorder_tab, "Build orders")
+        self.addTab(self.build_order_tab, "Build orders")
         self.addTab(self.random_tab, "Randomize")
 
     def start(self):
@@ -196,6 +196,6 @@ class TabWidget(QtWidgets.QTabWidget):
             keyboard.unhook_all()
             keyboard = importlib.reload(keyboard)
             self.settigns_tab.init_hotkeys()
-            self.buildorder_tab.init_hotkeys()
+            self.build_order_tab.init_hotkeys()
         except Exception:
             logger.exception(f"Failed to reset keyboard")

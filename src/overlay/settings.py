@@ -26,13 +26,15 @@ class _Settings:
         self.max_games_history: int = 100
         self.civ_stats_color: str = "#BC8AEA"
         self.bo_bg_opacity: float = 0.5
-        self.bo_showtitle: bool = True
+        self.bo_showtitle: bool = False
         self.bo_font_size: int = 12
         self.bo_title_color: str = "orange"
         self.bo_overlay_hotkey_show: str = ""
         self.bo_overlay_hotkey_cycle: str = ""
+        self.bo_overlay_hotkey_previous_step: str = ""
+        self.bo_overlay_hotkey_next_step: str = ""
         self.bo_overlay_geometry: Optional[List[int]] = None
-        self.buildorders: Dict[str, str] = {
+        self.build_orders: Dict[str, str] = {
             "The best build order": "> Make units\n> Attack\n> Profit"
         }
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
