@@ -1,6 +1,6 @@
 # AoE4 Overlay
  
-* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.3.1/AoE4_Overlay.zip)** (Windows)
+* **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.4.0/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
@@ -8,7 +8,7 @@
 # What does the app do?
 * Shows information about players you are in match with
 * Provides additional player statistics in-app
-* Shows an overlay widget for buildorders
+* Shows an overlay widget for build orders
 * Supports a highly customizable streaming overlay (with CSS/JS).
 
 API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](https://aoe4world.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
