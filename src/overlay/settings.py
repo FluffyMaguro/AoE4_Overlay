@@ -34,13 +34,15 @@ class _Settings:
         self.bo_overlay_hotkey_previous_step: str = ""
         self.bo_overlay_hotkey_next_step: str = ""
         self.bo_overlay_geometry: Optional[List[int]] = None
+        self.bo_color_background: list = [30, 30, 30]  # background RGB color
+        self.bo_opacity: float = 0.75  # opacity of the window
         self.build_orders: Dict[str, str] = {
             "The best build order": "> Make units\n> Attack\n> Profit"
         }
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
         self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
-                            (255, 0, 0, 0.35), (255, 0, 255, 0.35), (255, 255,
-                                                                     0, 0.35))
+                            (255, 0, 0, 0.35), (255, 0, 255, 0.35),
+                            (255, 255, 0, 0.35))
 
     def load(self):
         """ Loads configuration from app data"""
