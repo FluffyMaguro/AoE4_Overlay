@@ -25,30 +25,26 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         parent    parent of the widget
         """
         super().__init__(parent)
-        self.show()
 
         file_path = str(pathlib.Path(__file__).parent.resolve())
         self.directory_game_pictures = os.path.join(file_path, '..', 'img', 'build_order')  # game pictures
+
+        # window is transparent to mouse events, except for the configuration when not hidden
+        self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+
+        # remove the window title and stay always on top
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+
+        # build order display
+        self.build_order_notes = MultiQLabelDisplay(
+            font_police='Arial', font_size=settings.bo_font_size, image_height=30, border_size=15, vertical_spacing=10,
+            color_default=[255, 255, 255], game_pictures_folder=self.directory_game_pictures)
 
         # color and opacity
         self.setStyleSheet(
             f'background-color: rgb({settings.bo_color_background[0]}, {settings.bo_color_background[1]},'
             f'{settings.bo_color_background[2]})')
         self.setWindowOpacity(settings.bo_opacity)
-
-        # window is transparent and stays on top
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint
-                            | QtCore.Qt.WindowTransparentForInput
-                            | QtCore.Qt.WindowStaysOnTopHint
-                            | QtCore.Qt.CoverWindow
-                            | QtCore.Qt.NoDropShadowWindowHint
-                            | QtCore.Qt.WindowDoesNotAcceptFocus)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-
-        # build order display
-        self.build_order_notes = MultiQLabelDisplay(
-            font_police='Arial', font_size=settings.bo_font_size, image_height=30, border_size=15, vertical_spacing=10,
-            color_default=[255, 255, 255], game_pictures_folder=self.directory_game_pictures)
 
         self.show()
 
@@ -67,6 +63,7 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
 
     def show_hide(self):
         self.hide() if self.isVisible() else self.show()
+
 
 
 class BoTab(QtWidgets.QWidget):
