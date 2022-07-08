@@ -186,6 +186,10 @@ class MainApp(QtWidgets.QMainWindow):
         graphs_menu.addAction(lastday)
         self.show()
 
+    def closeEvent(self, _):
+        """Function called when closing the widget."""
+        self.centralWidget().close()
+
     def update_title(self, name: str):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION}) – {name}")
 

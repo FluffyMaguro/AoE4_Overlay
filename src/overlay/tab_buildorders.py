@@ -46,8 +46,6 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             f'{settings.bo_color_background[2]})')
         self.setWindowOpacity(settings.bo_opacity)
 
-        self.show()
-
     def update_build_order_display(self, data: dict):
         self.build_order_notes.clear()
         if 'notes' in data:
@@ -63,7 +61,6 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
 
     def show_hide(self):
         self.hide() if self.isVisible() else self.show()
-
 
 
 class BoTab(QtWidgets.QWidget):
@@ -89,6 +86,10 @@ class BoTab(QtWidgets.QWidget):
         self.next_step_build_order.connect(self.select_next_build_order_step)
 
         self.update_overlay()
+
+    def closeEvent(self, _):
+        """Function called when closing the widget."""
+        self.overlay.close()
 
     def init_hotkeys(self):
         if settings.bo_overlay_hotkey_show:
@@ -458,4 +459,3 @@ class BoTab(QtWidgets.QWidget):
         count = self.bo_list.count()
         # This also automatically update overlay
         self.bo_list.setCurrentRow((self.bo_list.currentRow() + 1) % count)
-        self.overlay.show()

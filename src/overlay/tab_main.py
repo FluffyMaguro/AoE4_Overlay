@@ -66,6 +66,10 @@ class TabWidget(QtWidgets.QTabWidget):
         self.send_ws_colors()
         self.check_waking()
 
+    def closeEvent(self, _):
+        """Function called when closing the widget."""
+        self.build_order_tab.close()
+
     def new_profile_found(self):
         self.api_checker.reset()
         self.graph_tab.run_update()
