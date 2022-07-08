@@ -1,4 +1,6 @@
+import os
 import json
+import pathlib
 
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -25,6 +27,9 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         super().__init__(parent)
         self.show()
 
+        file_path = str(pathlib.Path(__file__).parent.resolve())
+        self.directory_game_pictures = os.path.join(file_path, '..', 'img', 'build_order')  # game pictures
+
         # color and opacity
         self.setStyleSheet(
             f'background-color: rgb({settings.bo_color_background[0]}, {settings.bo_color_background[1]},'
@@ -43,7 +48,7 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         # build order display
         self.build_order_notes = MultiQLabelDisplay(
             font_police='Arial', font_size=settings.bo_font_size, image_height=30, border_size=15, vertical_spacing=10,
-            color_default=[255, 255, 255], game_pictures_folder='.')
+            color_default=[255, 255, 255], game_pictures_folder=self.directory_game_pictures)
 
         self.show()
 
