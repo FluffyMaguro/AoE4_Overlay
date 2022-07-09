@@ -46,6 +46,9 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             f'{settings.bo_color_background[2]})')
         self.setWindowOpacity(settings.bo_opacity)
 
+        self.fixed = True
+        self.update_position()
+
     def update_build_order_display(self, data: dict):
         self.build_order_notes.clear()
         if 'notes' in data:
@@ -58,9 +61,32 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         self.resize(self.build_order_notes.row_max_width + 30, self.build_order_notes.row_total_height + 30)
 
         self.build_order_notes.show()
+        self.update_position()
 
     def show_hide(self):
+        self.update_position()
         self.hide() if self.isVisible() else self.show()
+
+    def change_state(self):
+        if self.fixed:
+            self.fixed = False
+            self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
+            self.setWindowFlags(QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint)
+            self.update_position()
+        else:
+            self.fixed = True
+            self.save_upper_right_position(offset_x=8, offset_y=31)
+            self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+            self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.show()
+
+    def save_upper_right_position(self, offset_x: int = 0, offset_y: int = 0):
+        """Save of the upper right corner position"""
+        settings.bo_upper_right_position = [self.x() + self.width() + offset_x, self.y() + offset_y]
+
+    def update_position(self):
+        """Update the position to stick to the saved upper right corner"""
+        self.move(settings.bo_upper_right_position[0] - self.width(), settings.bo_upper_right_position[1])
 
 
 class BoTab(QtWidgets.QWidget):
@@ -257,7 +283,7 @@ class BoTab(QtWidgets.QWidget):
         self.btn_change_position.setToolTip(
             "Click to change overlay position. Click again to fix its position."
         )
-        # self.btn_change_position.clicked.connect(self.overlay.change_state)
+        self.btn_change_position.clicked.connect(self.overlay.change_state)
         overlay_layout.addWidget(self.btn_change_position, 5, 0, 1, 2)
 
     def save_current_bo(self):

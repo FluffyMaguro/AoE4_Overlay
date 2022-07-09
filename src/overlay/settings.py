@@ -36,6 +36,7 @@ class _Settings:
         self.bo_overlay_geometry: Optional[List[int]] = None
         self.bo_color_background: list = [30, 30, 30]  # background RGB color
         self.bo_opacity: float = 0.75  # opacity of the window
+        self.bo_upper_right_position: list = [1870, 70]
         self.build_orders: Dict[str, str] = {
             "The best build order": "> Make units\n> Attack\n> Profit"
         }
