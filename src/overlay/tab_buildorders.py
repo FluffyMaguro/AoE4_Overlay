@@ -5,8 +5,8 @@ import pathlib
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from overlay.custom_widgets import CustomKeySequenceEdit, OverlayWidget
-from overlay.logging_func import catch_exceptions, get_logger
+from overlay.custom_widgets import CustomKeySequenceEdit
+from overlay.logging_func import get_logger
 from overlay.settings import settings
 
 from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay
@@ -26,8 +26,16 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         """
         super().__init__(parent)
 
-        file_path = str(pathlib.Path(__file__).parent.resolve())
-        self.directory_game_pictures = os.path.join(file_path, '..', 'img', 'build_order')  # game pictures
+        file_path = str(pathlib.Path(__file__).parent.resolve())  # path of the folder containing this file
+        self.directory_game_pictures = os.path.join(file_path, '..', 'img', 'build_order')  # build order pictures
+
+        # build order display
+        self.build_order_notes = MultiQLabelDisplay(
+            font_police=settings.bo_font_police, font_size=settings.bo_font_size, image_height=settings.bo_image_height,
+            border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
+            color_default=settings.bo_text_color, game_pictures_folder=self.directory_game_pictures)
+
+        self.fixed = True  # True if overlay position is fixed
 
         # window is transparent to mouse events, except for the configuration when not hidden
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
@@ -35,53 +43,78 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         # remove the window title and stay always on top
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
 
-        # build order display
-        self.build_order_notes = MultiQLabelDisplay(
-            font_police='Arial', font_size=settings.bo_font_size, image_height=30, border_size=15, vertical_spacing=10,
-            color_default=[255, 255, 255], game_pictures_folder=self.directory_game_pictures)
-
         # color and opacity
+        color_background = settings.bo_color_background
         self.setStyleSheet(
-            f'background-color: rgb({settings.bo_color_background[0]}, {settings.bo_color_background[1]},'
-            f'{settings.bo_color_background[2]})')
+            f'background-color: rgb({color_background[0]}, {color_background[1]}, {color_background[2]})')
         self.setWindowOpacity(settings.bo_opacity)
 
-        self.fixed = True
-        self.update_position()
+        # check that the upper right corner is inside the screen
+        screen_size = QtWidgets.QDesktopWidget().screenGeometry(-1)
+
+        if settings.bo_upper_right_position[0] >= screen_size.width():
+            print(f'Upper right corner X position set to {(screen_size.width() - 20)} (to stay inside screen).')
+            settings.bo_upper_right_position[0] = screen_size.width() - 20
+
+        if settings.bo_upper_right_position[1] >= screen_size.height():
+            print(f'Upper right corner Y position set to {(screen_size.height() - 40)} (to stay inside screen).')
+            settings.bo_upper_right_position[1] = screen_size.height() - 40
+
+        self.update_position()  # update the position
 
     def update_build_order_display(self, data: dict):
-        self.build_order_notes.clear()
-        if 'notes' in data:
+        """Update the display of the build order
+
+        Parameters
+        ----------
+        data    data from the build order in dictionary form
+        """
+        self.build_order_notes.clear()  # clear previous build order display
+
+        if 'notes' in data:  # build order with pictures
             notes = data['notes']
             for note in notes:
                 self.build_order_notes.add_row_from_picture_line(parent=self, line=note)
+        elif 'txt' in data:  # simple TXT file for build order:
+            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']))
 
-        self.build_order_notes.update_size_position()
+        self.build_order_notes.update_size_position()  # update the size and position of the build order
 
-        self.resize(self.build_order_notes.row_max_width + 30, self.build_order_notes.row_total_height + 30)
+        # resize the window to the size of the build order
+        self.resize(self.build_order_notes.row_max_width + 2 * settings.bo_border_size,
+                    self.build_order_notes.row_total_height + 2 * settings.bo_border_size)
 
-        self.build_order_notes.show()
-        self.update_position()
+        self.build_order_notes.show()  # show the new notes
+        self.update_position()  # update the position to keep the correct upper right corner position
 
     def show_hide(self):
-        self.update_position()
+        """Switch from hidden to shown (and opposite)"""
         self.hide() if self.isVisible() else self.show()
+        if self.isVisible():
+            self.update_position()
 
-    def change_state(self):
-        if self.fixed:
+    def change_position_state(self):
+        """Change the state from fixed position to window with moving position (and opposite)"""
+        if self.fixed:  # fixed to moving
             self.fixed = False
             self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
             self.setWindowFlags(QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint)
-            self.update_position()
-        else:
+        else:  # moving to fixed
             self.fixed = True
+            # offset added to take into account the difference of the window size with titlebar
             self.save_upper_right_position(offset_x=8, offset_y=31)
             self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
             self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
         self.show()
 
     def save_upper_right_position(self, offset_x: int = 0, offset_y: int = 0):
-        """Save of the upper right corner position"""
+        """Save of the upper right corner position
+
+        Parameters
+        ----------
+        offset_x    pixels offset to add on the X axis
+        offset_y    pixels offset to add on the Y axis
+        """
         settings.bo_upper_right_position = [self.x() + self.width() + offset_x, self.y() + offset_y]
 
     def update_position(self):
@@ -283,7 +316,7 @@ class BoTab(QtWidgets.QWidget):
         self.btn_change_position.setToolTip(
             "Click to change overlay position. Click again to fix its position."
         )
-        self.btn_change_position.clicked.connect(self.overlay.change_state)
+        self.btn_change_position.clicked.connect(self.overlay.change_position_state)
         overlay_layout.addWidget(self.btn_change_position, 5, 0, 1, 2)
 
     def save_current_bo(self):

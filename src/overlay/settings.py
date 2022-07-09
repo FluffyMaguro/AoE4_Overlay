@@ -25,6 +25,7 @@ class _Settings:
         self.font_size: int = 12
         self.max_games_history: int = 100
         self.civ_stats_color: str = "#BC8AEA"
+        # build order related parameters
         self.bo_bg_opacity: float = 0.5
         self.bo_showtitle: bool = False
         self.bo_font_size: int = 12
@@ -34,9 +35,14 @@ class _Settings:
         self.bo_overlay_hotkey_previous_step: str = ""
         self.bo_overlay_hotkey_next_step: str = ""
         self.bo_overlay_geometry: Optional[List[int]] = None
+        self.bo_text_color: list = [255, 255, 255]  # text RGB color
         self.bo_color_background: list = [30, 30, 30]  # background RGB color
+        self.bo_font_police: str = 'Arial'  # police font
         self.bo_opacity: float = 0.75  # opacity of the window
-        self.bo_upper_right_position: list = [1870, 70]
+        self.bo_upper_right_position: list = [1870, 70]  # position for the upper right corner
+        self.bo_image_height: int = 30  # height of the images
+        self.bo_border_size: int = 15  # size of the borders
+        self.bo_vertical_spacing: int = 10  # vertical space between the build order lines
         self.build_orders: Dict[str, str] = {
             "The best build order": "> Make units\n> Attack\n> Profit"
         }
