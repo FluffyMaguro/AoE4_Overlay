@@ -9,7 +9,7 @@ from overlay.custom_widgets import CustomKeySequenceEdit
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
-from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay
+from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay, QLabelSettings
 
 logger = get_logger(__name__)
 
@@ -69,14 +69,20 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
             color_default=settings.bo_text_color, image_height=settings.bo_image_height)
 
-    def update_build_order_display(self, data: dict):
+    def update_build_order_display(self, title: str, data: dict):
         """Update the display of the build order
 
         Parameters
         ----------
-        data    data from the build order in dictionary form
+        title    title of this build order step
+        data     data from the build order in dictionary form
         """
         self.build_order_notes.clear()  # clear previous build order display
+
+        if (settings.bo_show_title) and (title != ''):
+            self.build_order_notes.add_row_from_picture_line(
+                parent=self, line=title,
+                labels_settings=[QLabelSettings(text_color=settings.bo_title_color, text_bold=True)])
 
         if 'notes' in data:  # build order with pictures
             notes = data['notes']
@@ -508,6 +514,8 @@ class BoTab(QtWidgets.QWidget):
     def cycle_overlay(self):
         """ Cycles through build orders and sends data to the overlay"""
         self.bo_list.setCurrentRow((self.bo_list.currentRow() + 1) % self.bo_list.count())
+        self.build_order_step = -1
+        self.update_overlay()
 
     def update_overlay(self):
         """Send new data to the overlay"""
@@ -520,8 +528,10 @@ class BoTab(QtWidgets.QWidget):
                 data = json.loads(bo_text)
                 self.build_order_step_count = len(data['build_order'])
                 self.limit_build_order_step()
-                self.overlay.update_build_order_display(data['build_order'][self.build_order_step])
+                self.overlay.update_build_order_display(
+                    title=f'{bo_name} - {self.build_order_step + 1}/{self.build_order_step_count}',
+                    data=data['build_order'][self.build_order_step])
             else:
                 self.build_order_step = -1
                 self.build_order_step_count = -1
-                self.overlay.update_build_order_display({'txt': bo_text})
+                self.overlay.update_build_order_display(title=bo_name, data={'txt': bo_text})
