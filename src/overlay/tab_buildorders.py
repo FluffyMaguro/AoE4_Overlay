@@ -62,6 +62,13 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
 
         self.update_position()  # update the position
 
+    def update_settings(self):
+        """Update the overlay settings"""
+        self.build_order_notes.update_settings(
+            font_police=settings.bo_font_police, font_size=settings.bo_font_size,
+            border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
+            color_default=settings.bo_text_color, image_height=settings.bo_image_height)
+
     def update_build_order_display(self, data: dict):
         """Update the display of the build order
 
@@ -146,6 +153,41 @@ def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit, hotkey_sign
     return hotkey_str
 
 
+def hotkey_changed(new_hotkey: str, hotkey_str: str,
+                   hotkey_edit: CustomKeySequenceEdit, hotkey_signal: QtCore.pyqtSignal):
+    """Update hotkey when changed
+
+    Parameters
+    ----------
+    new_hotkey       new hotkey value
+    hotkey_str       string containing the hotkey sequence
+    hotkey_edit      field to edit the hotkey
+    hotkey_signal    signal linked to this hotkey
+
+    Returns
+    -------
+    updated 'hotkey_str'
+    """
+    new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey)
+
+    if new_hotkey == "Del":
+        hotkey_edit.setKeySequence(QtGui.QKeySequence.fromString(""))
+        return ""
+    elif not new_hotkey or (new_hotkey == hotkey_str):
+        return hotkey_str
+
+    try:
+        keyboard.add_hotkey(new_hotkey, hotkey_signal.emit)
+        if hotkey_str:
+            keyboard.remove_hotkey(hotkey_str)
+        logger.info(f"Setting new build order hotkey to: {new_hotkey}")
+        return new_hotkey
+    except Exception:
+        logger.exception(f"Failed to set hotkey: {new_hotkey}")
+        hotkey_edit.setKeySequence(QtGui.QKeySequence.fromString(hotkey_str))
+        return hotkey_str
+
+
 class BoTab(QtWidgets.QWidget):
     """Tab used to configure the build order (BO) overlay"""
     show_hide_overlay = QtCore.pyqtSignal()  # show/hide the BO
@@ -167,15 +209,28 @@ class BoTab(QtWidgets.QWidget):
 
         self.overlay = BuildOrderOverlay()  # overlay to display the build order
 
-        # initialization
-        self.init_ui()
-        self.init_hotkeys()
+        # user interface
+        self.bo_edit = QtWidgets.QTextEdit()  # text/json edit field
+        self.naming_widget = QtWidgets.QLineEdit()  # BO name edition
+        self.bo_list = QtWidgets.QListWidget()  # list of build orders
+        self.font_size_combo = QtWidgets.QComboBox()  # overlay font
+        self.button_change_position = QtWidgets.QPushButton("Change overlay position")  # change overlay position
+
+        # hotkeys
+        self.key_show_hide = CustomKeySequenceEdit(self)
+        self.key_cycle = CustomKeySequenceEdit(self)
+        self.key_previous_step = CustomKeySequenceEdit(self)
+        self.key_next_step = CustomKeySequenceEdit(self)
 
         # connect signals
         self.show_hide_overlay.connect(self.overlay.show_hide)
         self.cycle_build_order.connect(self.cycle_overlay)
         self.previous_step_build_order.connect(self.select_previous_build_order_step)
         self.next_step_build_order.connect(self.select_next_build_order_step)
+
+        # initialization
+        self.init_ui()
+        self.init_hotkeys()
 
         self.update_overlay()  # update the BO overlay
 
@@ -187,7 +242,7 @@ class BoTab(QtWidgets.QWidget):
         """Initialize all the hotkeys"""
         settings.bo_overlay_hotkey_show = init_hotkey(
             hotkey_str=settings.bo_overlay_hotkey_show,
-            hotkey_edit=self.key_showhide,
+            hotkey_edit=self.key_show_hide,
             hotkey_signal=self.show_hide_overlay)
 
         settings.bo_overlay_hotkey_cycle = init_hotkey(
@@ -206,151 +261,146 @@ class BoTab(QtWidgets.QWidget):
             hotkey_signal=self.next_step_build_order)
 
     def init_ui(self):
-        hlayout = QtWidgets.QHBoxLayout()
-        self.setLayout(hlayout)
+        """Initialize the user interface for the BO configuration"""
+        horizontal_layout = QtWidgets.QHBoxLayout()
+        self.setLayout(horizontal_layout)
 
-        # Text edit field
-        self.edit = QtWidgets.QTextEdit()
-        hlayout.addWidget(self.edit)
+        # text/json edit field
+        horizontal_layout.addWidget(self.bo_edit)
 
-        ### Build order controls
-        controls = QtWidgets.QFrame()
-        controls.setMaximumWidth(350)
-        clayout = QtWidgets.QVBoxLayout()
-        clayout.setContentsMargins(0, 0, 0, 0)
-        controls.setLayout(clayout)
-        hlayout.addWidget(controls)
+        # BO control frame
+        control_frame = QtWidgets.QFrame()
+        control_frame.setMaximumWidth(350)
+        vertical_layout = QtWidgets.QVBoxLayout()
+        vertical_layout.setContentsMargins(0, 0, 0, 0)
+        control_frame.setLayout(vertical_layout)
+        horizontal_layout.addWidget(control_frame)
 
-        # Renaming build orders
-        self.rename_widget = QtWidgets.QLineEdit()
-        self.rename_widget.setToolTip("Rename build order here")
-        self.rename_widget.setTextMargins(3, 0, 0, 0)
-        clayout.addWidget(self.rename_widget)
+        # renaming build orders
+        self.naming_widget.setToolTip("Adapt the build order name here")
+        self.naming_widget.setTextMargins(3, 0, 0, 0)
+        vertical_layout.addWidget(self.naming_widget)
 
-        # Build order list
-        self.bo_list = QtWidgets.QListWidget()
-        clayout.addWidget(self.bo_list)
+        # list of build orders
+        vertical_layout.addWidget(self.bo_list)
         for name in settings.build_orders:
             self.bo_list.addItem(name)
         self.bo_list.currentItemChanged.connect(self.bo_selected)
         self.bo_list.setCurrentRow(0)
 
-        # Add build orders
-        add_bo_btn = QtWidgets.QPushButton("Add build order")
-        add_bo_btn.clicked.connect(self.add_build_order)
-        clayout.addWidget(add_bo_btn)
+        # add build order
+        add_bo_button = QtWidgets.QPushButton("Add build order")
+        add_bo_button.clicked.connect(self.add_build_order)
+        vertical_layout.addWidget(add_bo_button)
 
-        # Remove build order
+        # remove build order
         remove_bo_btn = QtWidgets.QPushButton("Remove build order")
         remove_bo_btn.clicked.connect(self.remove_build_order)
-        clayout.addWidget(remove_bo_btn)
+        vertical_layout.addWidget(remove_bo_btn)
 
-        clayout.addSpacing(30)
+        vertical_layout.addSpacing(30)
         age4builder = QtWidgets.QLabel(
             'Find & copy build orders from <a href="https://age4builder.com/">age4builder.com</a>'
         )
         age4builder.setOpenExternalLinks(True)
-        clayout.addWidget(age4builder)
+        vertical_layout.addWidget(age4builder)
 
-        clayout.addSpacing(10)
-
-        ### Overlay controls
+        # overlay control (hotkeys...)
+        vertical_layout.addSpacing(10)
         overlay_box = QtWidgets.QGroupBox("Overlay")
         overlay_layout = QtWidgets.QGridLayout()
         overlay_box.setLayout(overlay_layout)
-        clayout.addWidget(overlay_box)
+        vertical_layout.addWidget(overlay_box)
 
-        # Show/hide hotkey
+        # show/hide hotkey
         key_label = QtWidgets.QLabel("Hotkey for showing and hiding overlay:")
         overlay_layout.addWidget(key_label, 0, 0)
+        self.key_show_hide.setMaximumWidth(100)
+        self.key_show_hide.setToolTip("Hotkey for showing and hiding overlay.")
+        overlay_layout.addWidget(self.key_show_hide, 0, 1)
+        self.key_show_hide.key_changed.connect(self.show_hotkey_changed)
 
-        self.key_showhide = CustomKeySequenceEdit(self)
-        self.key_showhide.setMaximumWidth(100)
-        self.key_showhide.setToolTip("Hotkey for showing and hiding overlay")
-        overlay_layout.addWidget(self.key_showhide, 0, 1)
-        self.key_showhide.key_changed.connect(self.show_hotkey_changed)
-
-        # Cycle hotkey
+        # cycle hotkey
         key_label = QtWidgets.QLabel("Hotkey for cycling build orders:")
         overlay_layout.addWidget(key_label, 1, 0)
-
-        self.key_cycle = CustomKeySequenceEdit(self)
         self.key_cycle.setMaximumWidth(100)
-        self.key_cycle.setToolTip("Hotkey for cycling build orders")
+        self.key_cycle.setToolTip("Hotkey for cycling build orders.")
         overlay_layout.addWidget(self.key_cycle, 1, 1)
         self.key_cycle.key_changed.connect(self.cycle_hotkey_changed)
 
-        # Previous build order step hotkey
+        # previous build order step hotkey
         key_label = QtWidgets.QLabel("Hotkey to go to previous step:")
         overlay_layout.addWidget(key_label, 2, 0)
-
-        self.key_previous_step = CustomKeySequenceEdit(self)
         self.key_previous_step.setMaximumWidth(100)
         self.key_previous_step.setToolTip("Hotkey to go to the previous step of the build order.")
         overlay_layout.addWidget(self.key_previous_step, 2, 1)
         self.key_previous_step.key_changed.connect(self.previous_step_hotkey_changed)
 
-        # Next build order step hotkey
+        # next build order step hotkey
         key_label = QtWidgets.QLabel("Hotkey to go to next step:")
         overlay_layout.addWidget(key_label, 3, 0)
-
-        self.key_next_step = CustomKeySequenceEdit(self)
         self.key_next_step.setMaximumWidth(100)
         self.key_next_step.setToolTip("Hotkey to go to the next step of the build order.")
         overlay_layout.addWidget(self.key_next_step, 3, 1)
         self.key_next_step.key_changed.connect(self.next_step_hotkey_changed)
 
-        # Overlay font
+        # overlay font
         font_label = QtWidgets.QLabel("Overlay font size:")
         overlay_layout.addWidget(font_label, 4, 0)
-
-        self.font_size_combo = QtWidgets.QComboBox()
         for i in range(1, 50):
             self.font_size_combo.addItem(f"{i} pt")
         self.font_size_combo.setCurrentIndex(settings.bo_font_size - 1)
-        self.font_size_combo.currentIndexChanged.connect(
-            self.font_size_changed)
+        self.font_size_combo.currentIndexChanged.connect(self.font_size_changed)
         overlay_layout.addWidget(self.font_size_combo, 4, 1)
 
         # Position change button
-        self.btn_change_position = QtWidgets.QPushButton(
-            "Change/fix overlay position")
-        self.btn_change_position.setToolTip(
-            "Click to change overlay position. Click again to fix its position."
-        )
-        self.btn_change_position.clicked.connect(self.overlay.change_position_state)
-        overlay_layout.addWidget(self.btn_change_position, 5, 0, 1, 2)
+        self.button_change_position.setToolTip("Click to change overlay position. Click again to fix its position.")
+        self.button_change_position.clicked.connect(self.overlay.change_position_state)
+        overlay_layout.addWidget(self.button_change_position, 5, 0, 1, 2)
 
     def save_current_bo(self):
+        """Save the current build order"""
         bo_name = self.bo_list.currentItem().text()
-        bo_text = self.edit.toPlainText()
+        bo_text = self.bo_edit.toPlainText()
         settings.build_orders[bo_name] = bo_text
         self.update_overlay()
 
     def bo_selected(self, item: QtWidgets.QListWidgetItem):
-        # Try disconnecting signals (throws an error when nothing connected)
-        try:
-            self.edit.disconnect()
+        """Actions related to selected BO
+
+        Parameters
+        ----------
+        item    holds the BO content
+        """
+
+        try:  # try disconnecting signals (throws an error when nothing connected)
+            self.bo_edit.disconnect()
         except TypeError:
             pass
         try:
-            self.rename_widget.disconnect()
+            self.naming_widget.disconnect()
         except TypeError:
             pass
 
-        # Change values
-        self.rename_widget.setText(item.text())
-        self.edit.setText(settings.build_orders.get(item.text(), ""))
+        # change values
+        self.naming_widget.setText(item.text())
+        self.bo_edit.setText(settings.build_orders.get(item.text(), ""))
         self.update_overlay()
 
-        # Reconnect signals
-        self.edit.textChanged.connect(self.save_current_bo)
-        self.rename_widget.textChanged.connect(self.name_changed)
+        # reconnect signals
+        self.bo_edit.textChanged.connect(self.save_current_bo)
+        self.naming_widget.textChanged.connect(self.name_changed)
 
     def name_changed(self, text: str):
+        """Change the name of the BO
+
+        Parameters
+        ----------
+        text    new name for the BO
+        """
         self.bo_list.currentItem().setText(text)
 
-        # Remove the old build order
+        # remove the old build order
         rows = self.bo_list.count()
         bo_names = {self.bo_list.item(i).text() for i in range(rows)}
         for name in settings.build_orders:
@@ -358,125 +408,80 @@ class BoTab(QtWidgets.QWidget):
                 del settings.build_orders[name]
                 break
 
-        # Add the new build order
+        # add the new build order
         self.save_current_bo()
 
     def add_build_order(self):
+        """Add a new build order"""
         self.bo_list.addItem(f"Build order {self.bo_list.count() + 1}")
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
 
     def remove_build_order(self):
+        """Remove the currently selected build order"""
         if self.bo_list.count() == 1:
             return
         del settings.build_orders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
 
     def font_size_changed(self, font_index: int):
+        """Adapt the overlay for a font size change
+
+        Parameters
+        ----------
+        font_index
+        """
         settings.bo_font_size = font_index + 1
-        self.overlay.update_style(font_index + 1)
+        self.overlay.update_settings()
+        self.update_overlay()
 
     def show_hotkey_changed(self, new_hotkey: str):
-        """ Checks whether the hotkey is actually new and valid.
-        Updates keyboard threads"""
-        old_hotkey = settings.bo_overlay_hotkey_show
-        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey.lower())
+        """Update the show/hide hotkey when changed
 
-        if new_hotkey == "Del":
-            self.key_showhide.setKeySequence(QtGui.QKeySequence.fromString(""))
-            settings.bo_overlay_hotkey_show = ""
-            return
-        elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_show:
-            return
-
-        try:
-            keyboard.add_hotkey(new_hotkey, self.show_hide_overlay.emit)
-            if settings.bo_overlay_hotkey_show:
-                keyboard.remove_hotkey(settings.bo_overlay_hotkey_show)
-            settings.bo_overlay_hotkey_show = new_hotkey
-            logger.info(f"Setting new build order show hotkey to: {new_hotkey}")
-        except Exception:
-            logger.exception(f"Failed to set hotkey: {new_hotkey}")
-            self.key_showhide.setKeySequence(
-                QtGui.QKeySequence.fromString(old_hotkey))
+        Parameters
+        ----------
+        new_hotkey    string containing the new hotkey sequence
+        """
+        settings.bo_overlay_hotkey_show = hotkey_changed(
+            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_show,
+            hotkey_edit=self.key_show_hide, hotkey_signal=self.show_hide_overlay)
 
     def cycle_hotkey_changed(self, new_hotkey: str):
-        """ Checks whether the hotkey is actually new and valid.
-        Updates keyboard threads"""
-        old_hotkey = settings.bo_overlay_hotkey_cycle
-        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey.lower())
+        """Update the cycle BO hotkey when changed
 
-        if new_hotkey == "Del":
-            self.key_cycle.setKeySequence(QtGui.QKeySequence.fromString(""))
-            settings.bo_overlay_hotkey_cycle = ""
-            return
-        elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_cycle:
-            return
-
-        try:
-            keyboard.add_hotkey(new_hotkey, self.cycle_build_order.emit)
-            if settings.bo_overlay_hotkey_cycle:
-                keyboard.remove_hotkey(settings.bo_overlay_hotkey_cycle)
-            settings.bo_overlay_hotkey_cycle = new_hotkey
-            logger.info(
-                f"Setting new build order cycle hotkey to: {new_hotkey}")
-        except Exception:
-            logger.exception(f"Failed to set hotkey: {new_hotkey}")
-            self.key_cycle.setKeySequence(
-                QtGui.QKeySequence.fromString(old_hotkey))
+        Parameters
+        ----------
+        new_hotkey    string containing the new hotkey sequence
+        """
+        settings.bo_overlay_hotkey_cycle = hotkey_changed(
+            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_cycle,
+            hotkey_edit=self.key_cycle, hotkey_signal=self.cycle_build_order)
 
     def previous_step_hotkey_changed(self, new_hotkey: str):
-        """ Checks whether the hotkey is actually new and valid.
-        Updates keyboard threads"""
-        old_hotkey = settings.bo_overlay_hotkey_previous_step
-        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey.lower())
+        """Update the previous step hotkey when changed
 
-        if new_hotkey == "Del":
-            self.key_previous_step.setKeySequence(QtGui.QKeySequence.fromString(""))
-            settings.bo_overlay_hotkey_previous_step = ""
-            return
-        elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_previous_step:
-            return
-
-        try:
-            keyboard.add_hotkey(new_hotkey, self.previous_step_build_order.emit)
-            if settings.bo_overlay_hotkey_previous_step:
-                keyboard.remove_hotkey(settings.bo_overlay_hotkey_previous_step)
-            settings.bo_overlay_hotkey_previous_step = new_hotkey
-            logger.info(
-                f"Setting new build order cycle hotkey to: {new_hotkey}")
-        except Exception:
-            logger.exception(f"Failed to set hotkey: {new_hotkey}")
-            self.key_previous_step.setKeySequence(
-                QtGui.QKeySequence.fromString(old_hotkey))
+        Parameters
+        ----------
+        new_hotkey    string containing the new hotkey sequence
+        """
+        settings.bo_overlay_hotkey_previous_step = hotkey_changed(
+            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_previous_step,
+            hotkey_edit=self.key_previous_step, hotkey_signal=self.previous_step_build_order)
 
     def next_step_hotkey_changed(self, new_hotkey: str):
-        """ Checks whether the hotkey is actually new and valid.
-        Updates keyboard threads"""
-        old_hotkey = settings.bo_overlay_hotkey_next_step
-        new_hotkey = CustomKeySequenceEdit.convert_hotkey(new_hotkey.lower())
+        """Update the next step hotkey when changed
 
-        if new_hotkey == "Del":
-            self.key_next_step.setKeySequence(QtGui.QKeySequence.fromString(""))
-            settings.bo_overlay_hotkey_next_step = ""
-            return
-        elif not new_hotkey or new_hotkey == settings.bo_overlay_hotkey_next_step:
-            return
-
-        try:
-            keyboard.add_hotkey(new_hotkey, self.next_step_build_order.emit)
-            if settings.bo_overlay_hotkey_next_step:
-                keyboard.remove_hotkey(settings.bo_overlay_hotkey_next_step)
-            settings.bo_overlay_hotkey_next_step = new_hotkey
-            logger.info(
-                f"Setting new build order cycle hotkey to: {new_hotkey}")
-        except Exception:
-            logger.exception(f"Failed to set hotkey: {new_hotkey}")
-            self.key_next_step.setKeySequence(
-                QtGui.QKeySequence.fromString(old_hotkey))
+        Parameters
+        ----------
+        new_hotkey    string containing the new hotkey sequence
+        """
+        settings.bo_overlay_hotkey_next_step = hotkey_changed(
+            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_next_step,
+            hotkey_edit=self.key_next_step, hotkey_signal=self.next_step_build_order)
 
     def limit_build_order_step(self):
-        if self.build_order_step_count < 1:
+        """Limit the step of the build order"""
+        if self.build_order_step_count < 1:  # invalid build order for step selection
             self.build_order_step = -1
             self.build_order_step_count = -1
         elif self.build_order_step < 0:
@@ -485,6 +490,7 @@ class BoTab(QtWidgets.QWidget):
             self.build_order_step = self.build_order_step_count - 1
 
     def select_previous_build_order_step(self):
+        """Select the previous build order step"""
         init_build_order_step = self.build_order_step
         self.build_order_step -= 1
         self.limit_build_order_step()
@@ -492,19 +498,25 @@ class BoTab(QtWidgets.QWidget):
             self.update_overlay()
 
     def select_next_build_order_step(self):
+        """Select the next build order"""
         init_build_order_step = self.build_order_step
         self.build_order_step += 1
         self.limit_build_order_step()
         if (init_build_order_step != self.build_order_step) and (self.build_order_step >= 0):
             self.update_overlay()
 
+    def cycle_overlay(self):
+        """ Cycles through build orders and sends data to the overlay"""
+        self.bo_list.setCurrentRow((self.bo_list.currentRow() + 1) % self.bo_list.count())
+
     def update_overlay(self):
         """Send new data to the overlay"""
         if self.bo_list.count():
+            # get data from the selected build order
             bo_name = self.bo_list.currentItem().text()
-            bo_text = self.edit.toPlainText()
-            valid_check = check_valid_aoe4_build_order_from_string(bo_text)
-            if valid_check:
+            bo_text = self.bo_edit.toPlainText()
+            # check if valid JSON format for CraftySalamander overlay
+            if check_valid_aoe4_build_order_from_string(bo_text):
                 data = json.loads(bo_text)
                 self.build_order_step_count = len(data['build_order'])
                 self.limit_build_order_step()
@@ -513,10 +525,3 @@ class BoTab(QtWidgets.QWidget):
                 self.build_order_step = -1
                 self.build_order_step_count = -1
                 self.overlay.update_build_order_display({'txt': bo_text})
-
-    def cycle_overlay(self):
-        """ Cycles through build orders and sends data to the overlay"""
-        # Update widget (move to higher row)
-        count = self.bo_list.count()
-        # This also automatically update overlay
-        self.bo_list.setCurrentRow((self.bo_list.currentRow() + 1) % count)
