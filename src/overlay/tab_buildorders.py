@@ -122,88 +122,90 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         self.move(settings.bo_upper_right_position[0] - self.width(), settings.bo_upper_right_position[1])
 
 
+def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit, hotkey_signal: QtCore.pyqtSignal):
+    """Initialize one hotkey
+
+    Parameters
+    ----------
+    hotkey_str       string containing the hotkey sequence
+    hotkey_edit      field to edit the hotkey
+    hotkey_signal    signal linked to this hotkey
+
+    Returns
+    -------
+    updated 'hotkey_str'
+    """
+    if hotkey_str:
+        try:
+            hotkey_edit.setKeySequence(QtGui.QKeySequence.fromString(hotkey_str))
+            keyboard.add_hotkey(hotkey_str, hotkey_signal.emit)
+        except Exception:
+            logger.exception("Failed to set hotkey.")
+            hotkey_str = ""
+            hotkey_edit.setKeySequence(QtGui.QKeySequence.fromString(""))
+    return hotkey_str
+
+
 class BoTab(QtWidgets.QWidget):
-    show_hide_overlay = QtCore.pyqtSignal()
-    cycle_build_order = QtCore.pyqtSignal()
-    previous_step_build_order = QtCore.pyqtSignal()
-    next_step_build_order = QtCore.pyqtSignal()
+    """Tab used to configure the build order (BO) overlay"""
+    show_hide_overlay = QtCore.pyqtSignal()  # show/hide the BO
+    cycle_build_order = QtCore.pyqtSignal()  # cycle between the different BO available
+    previous_step_build_order = QtCore.pyqtSignal()  # go to the previous step of the build order
+    next_step_build_order = QtCore.pyqtSignal()  # go to the next step of the build order
 
     def __init__(self, parent):
+        """Constructor
+
+        Parameters
+        ----------
+        parent    parent of the widget
+        """
         super().__init__(parent)
 
         self.build_order_step = -1  # step of the build order, negative if not valid
         self.build_order_step_count = -1  # number of steps in the build order, negative if not valid
 
-        self.overlay = BuildOrderOverlay()
-        self.initUI()
+        self.overlay = BuildOrderOverlay()  # overlay to display the build order
+
+        # initialization
+        self.init_ui()
         self.init_hotkeys()
 
-        # Connect signals
+        # connect signals
         self.show_hide_overlay.connect(self.overlay.show_hide)
         self.cycle_build_order.connect(self.cycle_overlay)
         self.previous_step_build_order.connect(self.select_previous_build_order_step)
         self.next_step_build_order.connect(self.select_next_build_order_step)
 
-        self.update_overlay()
+        self.update_overlay()  # update the BO overlay
 
     def closeEvent(self, _):
         """Function called when closing the widget."""
         self.overlay.close()
 
     def init_hotkeys(self):
-        if settings.bo_overlay_hotkey_show:
-            try:
-                self.key_showhide.setKeySequence(
-                    QtGui.QKeySequence.fromString(
-                        settings.bo_overlay_hotkey_show))
-                keyboard.add_hotkey(settings.bo_overlay_hotkey_show,
-                                    self.show_hide_overlay.emit)
-            except Exception:
-                logger.exception("Failed to set hotkey")
-                settings.bo_overlay_hotkey_show = ""
-                self.key_showhide.setKeySequence(
-                    QtGui.QKeySequence.fromString(""))
+        """Initialize all the hotkeys"""
+        settings.bo_overlay_hotkey_show = init_hotkey(
+            hotkey_str=settings.bo_overlay_hotkey_show,
+            hotkey_edit=self.key_showhide,
+            hotkey_signal=self.show_hide_overlay)
 
-        if settings.bo_overlay_hotkey_cycle:
-            try:
-                self.key_cycle.setKeySequence(
-                    QtGui.QKeySequence.fromString(
-                        settings.bo_overlay_hotkey_cycle))
-                keyboard.add_hotkey(settings.bo_overlay_hotkey_cycle,
-                                    self.cycle_build_order.emit)
-            except Exception:
-                logger.exception("Failed to set hotkey")
-                settings.bo_overlay_hotkey_cycle = ""
-                self.key_cycle.setKeySequence(
-                    QtGui.QKeySequence.fromString(""))
+        settings.bo_overlay_hotkey_cycle = init_hotkey(
+            hotkey_str=settings.bo_overlay_hotkey_cycle,
+            hotkey_edit=self.key_cycle,
+            hotkey_signal=self.cycle_build_order)
 
-        if settings.bo_overlay_hotkey_previous_step:
-            try:
-                self.key_previous_step.setKeySequence(
-                    QtGui.QKeySequence.fromString(
-                        settings.bo_overlay_hotkey_previous_step))
-                keyboard.add_hotkey(settings.bo_overlay_hotkey_previous_step,
-                                    self.previous_step_build_order.emit)
-            except Exception:
-                logger.exception("Failed to set hotkey")
-                settings.bo_overlay_hotkey_previous_step = ""
-                self.key_previous_step.setKeySequence(
-                    QtGui.QKeySequence.fromString(""))
+        settings.bo_overlay_hotkey_previous_step = init_hotkey(
+            hotkey_str=settings.bo_overlay_hotkey_previous_step,
+            hotkey_edit=self.key_previous_step,
+            hotkey_signal=self.previous_step_build_order)
 
-        if settings.bo_overlay_hotkey_next_step:
-            try:
-                self.key_next_step.setKeySequence(
-                    QtGui.QKeySequence.fromString(
-                        settings.bo_overlay_hotkey_next_step))
-                keyboard.add_hotkey(settings.bo_overlay_hotkey_next_step,
-                                    self.next_step_build_order.emit)
-            except Exception:
-                logger.exception("Failed to set hotkey")
-                settings.bo_overlay_hotkey_next_step = ""
-                self.key_next_step.setKeySequence(
-                    QtGui.QKeySequence.fromString(""))
+        settings.bo_overlay_hotkey_next_step = init_hotkey(
+            hotkey_str=settings.bo_overlay_hotkey_next_step,
+            hotkey_edit=self.key_next_step,
+            hotkey_signal=self.next_step_build_order)
 
-    def initUI(self):
+    def init_ui(self):
         hlayout = QtWidgets.QHBoxLayout()
         self.setLayout(hlayout)
 

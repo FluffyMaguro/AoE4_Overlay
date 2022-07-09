@@ -25,16 +25,18 @@ class _Settings:
         self.font_size: int = 12
         self.max_games_history: int = 100
         self.civ_stats_color: str = "#BC8AEA"
-        # build order related parameters
-        self.bo_bg_opacity: float = 0.5
+        self.show_graph = {"1": True, "2": True, "3": True, "4": True}
+        self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
+                            (255, 0, 0, 0.35), (255, 0, 255, 0.35),
+                            (255, 255, 0, 0.35))
+        # build order (BO) related parameters
         self.bo_showtitle: bool = False
-        self.bo_font_size: int = 12
         self.bo_title_color: str = "orange"
-        self.bo_overlay_hotkey_show: str = ""
-        self.bo_overlay_hotkey_cycle: str = ""
-        self.bo_overlay_hotkey_previous_step: str = ""
-        self.bo_overlay_hotkey_next_step: str = ""
-        self.bo_overlay_geometry: Optional[List[int]] = None
+        self.bo_overlay_hotkey_show: str = ""  # hotkey to show/hide the BO
+        self.bo_overlay_hotkey_cycle: str = ""  # hotkey to cycle between the different BO available
+        self.bo_overlay_hotkey_previous_step: str = ""  # hotkey to go to the previous step of the build order
+        self.bo_overlay_hotkey_next_step: str = ""  # hotkey to go to the next step of the build order
+        self.bo_font_size: int = 12  # font size
         self.bo_text_color: list = [255, 255, 255]  # text RGB color
         self.bo_color_background: list = [30, 30, 30]  # background RGB color
         self.bo_font_police: str = 'Arial'  # police font
@@ -43,13 +45,14 @@ class _Settings:
         self.bo_image_height: int = 30  # height of the images
         self.bo_border_size: int = 15  # size of the borders
         self.bo_vertical_spacing: int = 10  # vertical space between the build order lines
+        # store build orders
         self.build_orders: Dict[str, str] = {
-            "The best build order": "> Make units\n> Attack\n> Profit"
+            "Instructions": "Write your own build order.\n"
+                            "You can also copy one from the https://age4builder.com website.\n\n"
+                            "Two formats are accepted (both available on https://age4builder.com):\n"
+                            "* Simple TXT format.\n"
+                            "* JSON format compatible with CraftySalamander overlay."
         }
-        self.show_graph = {"1": True, "2": True, "3": True, "4": True}
-        self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
-                            (255, 0, 0, 0.35), (255, 0, 255, 0.35),
-                            (255, 255, 0, 0.35))
 
     def load(self):
         """ Loads configuration from app data"""
