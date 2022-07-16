@@ -30,7 +30,7 @@ class _Settings:
                             (255, 0, 0, 0.35), (255, 0, 255, 0.35),
                             (255, 255, 0, 0.35))
         # build order (BO) related parameters
-        self.bo_show_title: bool = False  # True to show the title
+        self.bo_show_title: bool = True  # True to show the title
         self.bo_title_color: list = [230, 159, 0]  # color for the title
         self.bo_overlay_hotkey_show: str = ""  # hotkey to show/hide the BO
         self.bo_overlay_hotkey_cycle: str = ""  # hotkey to cycle between the different BO available

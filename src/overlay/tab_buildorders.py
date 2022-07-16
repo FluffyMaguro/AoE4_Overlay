@@ -76,11 +76,11 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         screen_size = QtWidgets.QDesktopWidget().screenGeometry(-1)
 
         if settings.bo_upper_right_position[0] >= screen_size.width():
-            print(f'Upper right corner X position set to {(screen_size.width() - 20)} (to stay inside screen).')
+            logger.info(f'Upper right corner X position set to {(screen_size.width() - 20)} (to stay inside screen).')
             settings.bo_upper_right_position[0] = screen_size.width() - 20
 
         if settings.bo_upper_right_position[1] >= screen_size.height():
-            print(f'Upper right corner Y position set to {(screen_size.height() - 40)} (to stay inside screen).')
+            logger.info(f'Upper right corner Y position set to {(screen_size.height() - 40)} (to stay inside screen).')
             settings.bo_upper_right_position[1] = screen_size.height() - 40
 
         self.update_position()  # update the position
@@ -144,7 +144,7 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         elif 'txt' in data:  # simple TXT file for build order:
             self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']))
         else:
-            print('Invalid data for build order.')
+            logger.info('Invalid data for build order.')
 
         self.build_order_notes.update_size_position()  # update the size and position of the build order
 
@@ -275,7 +275,8 @@ class BoTab(QtWidgets.QWidget):
         self.naming_widget = QtWidgets.QLineEdit()  # BO name edition
         self.bo_list = QtWidgets.QListWidget()  # list of build orders
         self.font_size_combo = QtWidgets.QComboBox()  # overlay font
-        self.button_change_position = QtWidgets.QPushButton("Change overlay position")  # change overlay position
+        self.image_height_combo = QtWidgets.QComboBox()  # images height
+        self.button_change_position = QtWidgets.QPushButton("Change BO overlay position")  # change overlay position
 
         # hotkeys
         self.key_show_hide = CustomKeySequenceEdit(self)
@@ -408,16 +409,25 @@ class BoTab(QtWidgets.QWidget):
         # overlay font
         font_label = QtWidgets.QLabel("Overlay font size:")
         overlay_layout.addWidget(font_label, 4, 0)
-        for i in range(1, 50):
+        for i in range(1, 51):
             self.font_size_combo.addItem(f"{i} pt")
         self.font_size_combo.setCurrentIndex(settings.bo_font_size - 1)
         self.font_size_combo.currentIndexChanged.connect(self.font_size_changed)
         overlay_layout.addWidget(self.font_size_combo, 4, 1)
 
+        # images height
+        image_height_label = QtWidgets.QLabel("Overlay images height:")
+        overlay_layout.addWidget(image_height_label, 5, 0)
+        for i in range(1, 101):
+            self.image_height_combo.addItem(f"{i} px")
+        self.image_height_combo.setCurrentIndex(settings.bo_image_height - 1)
+        self.image_height_combo.currentIndexChanged.connect(self.image_height_changed)
+        overlay_layout.addWidget(self.image_height_combo, 5, 1)
+
         # Position change button
-        self.button_change_position.setToolTip("Click to change overlay position. Click again to fix its position.")
+        self.button_change_position.setToolTip("Click to change BO overlay position. Click again to fix its position.")
         self.button_change_position.clicked.connect(self.overlay.change_position_state)
-        overlay_layout.addWidget(self.button_change_position, 5, 0, 1, 2)
+        overlay_layout.addWidget(self.button_change_position, 6, 0, 1, 2)
 
     def save_current_bo(self):
         """Save the current build order"""
@@ -490,9 +500,20 @@ class BoTab(QtWidgets.QWidget):
 
         Parameters
         ----------
-        font_index
+        font_index    index of the font to use
         """
         settings.bo_font_size = font_index + 1
+        self.overlay.update_settings()
+        self.update_overlay()
+
+    def image_height_changed(self, height_index: int):
+        """Adapt the overlay for the BO images height change
+
+        Parameters
+        ----------
+        height_index    index of the height to use
+        """
+        settings.bo_image_height = height_index + 1
         self.overlay.update_settings()
         self.update_overlay()
 
