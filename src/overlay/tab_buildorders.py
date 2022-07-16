@@ -14,6 +14,29 @@ from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, 
 logger = get_logger(__name__)
 
 
+def get_age_image(age_id: int):
+    """Get the image for a requested age
+
+    Parameters
+    ----------
+    age_id    ID of the age
+
+    Returns
+    -------
+    age image with path
+    """
+    if age_id == 1:
+        return settings.image_age_1
+    elif age_id == 2:
+        return settings.image_age_2
+    elif age_id == 3:
+        return settings.image_age_3
+    elif age_id == 4:
+        return settings.image_age_4
+    else:
+        return settings.image_age_unknown
+
+
 class BuildOrderOverlay(QtWidgets.QMainWindow):
     """Overlay widget showing the selected build order"""
 
@@ -79,17 +102,49 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         """
         self.build_order_notes.clear()  # clear previous build order display
 
-        if (settings.bo_show_title) and (title != ''):
+        if settings.bo_show_title and (title != ''):
             self.build_order_notes.add_row_from_picture_line(
                 parent=self, line=title,
                 labels_settings=[QLabelSettings(text_color=settings.bo_title_color, text_bold=True)])
 
-        if 'notes' in data:  # build order with pictures
+        # build order with pictures
+        if {'population_count', 'villager_count', 'age', 'resources', 'notes'} <= data.keys():
+
+            target_resources = data['resources']
+            target_food = target_resources['food']
+            target_wood = target_resources['wood']
+            target_gold = target_resources['gold']
+            target_stone = target_resources['stone']
+            target_villager = data['villager_count']
+            target_population = data['population_count']
+            target_age = data['age']
             notes = data['notes']
+            spacing = '  '
+
+            # line to display the target resources
+            resources_line = settings.image_food + '@ ' + (str(target_food) if (target_food >= 0) else ' ')
+            resources_line += spacing + '@' + settings.image_wood + '@ ' + (
+                str(target_wood) if (target_wood >= 0) else ' ')
+            resources_line += spacing + '@' + settings.image_gold + '@ ' + (
+                str(target_gold) if (target_gold >= 0) else ' ')
+            resources_line += spacing + '@' + settings.image_stone + '@ ' + (
+                str(target_stone) if (target_stone >= 0) else ' ')
+            resources_line += spacing + '@' + settings.image_villager + '@ ' + (
+                str(target_villager) if (target_villager >= 0) else ' ')
+            resources_line += spacing + '@' + settings.image_population + '@ ' + (
+                str(target_population) if (target_population >= 0) else ' ')
+            resources_line += spacing + '@' + get_age_image(target_age)
+            if 'time' in data:  # add time if indicated
+                resources_line += '@' + spacing + '@' + settings.image_time + '@' + data['time']
+
+            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(resources_line))
+
             for note in notes:
                 self.build_order_notes.add_row_from_picture_line(parent=self, line=note)
         elif 'txt' in data:  # simple TXT file for build order:
             self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']))
+        else:
+            print('Invalid data for build order.')
 
         self.build_order_notes.update_size_position()  # update the size and position of the build order
 
