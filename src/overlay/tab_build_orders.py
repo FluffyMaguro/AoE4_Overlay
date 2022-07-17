@@ -369,6 +369,16 @@ class BoTab(QtWidgets.QWidget):
         remove_bo_btn.clicked.connect(self.remove_build_order)
         vertical_layout.addWidget(remove_bo_btn)
 
+        # move build order up
+        move_up_bo_btn = QtWidgets.QPushButton("Move build order up")
+        move_up_bo_btn.clicked.connect(self.move_build_order_up)
+        vertical_layout.addWidget(move_up_bo_btn)
+
+        # move build order down
+        move_down_bo_btn = QtWidgets.QPushButton("Move build order down")
+        move_down_bo_btn.clicked.connect(self.move_build_order_down)
+        vertical_layout.addWidget(move_down_bo_btn)
+
         vertical_layout.addSpacing(30)
         age4builder = QtWidgets.QLabel(
             'Find & copy build orders from <a href="https://age4builder.com/">age4builder.com</a>'
@@ -491,6 +501,17 @@ class BoTab(QtWidgets.QWidget):
         # add the new build order
         self.save_current_bo()
 
+    def update_order(self):
+        """Update the order of the BOs"""
+        old_build_orders = settings.build_orders.copy()
+        settings.build_orders.clear()
+
+        rows = self.bo_list.count()
+        for i in range(rows):
+            name = self.bo_list.item(i).text()
+            if (name in old_build_orders) and (name not in settings.build_orders):
+                settings.build_orders[name] = old_build_orders[name]
+
     def add_build_order(self):
         """Add a new build order"""
         self.bo_list.addItem(f"Build order {self.bo_list.count() + 1}")
@@ -503,6 +524,36 @@ class BoTab(QtWidgets.QWidget):
             return
         del settings.build_orders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
+
+    def move_build_order_up(self):
+        """Move the currently selected build order up in the list"""
+        if self.bo_list.count() <= 1:
+            return
+
+        current_index = self.bo_list.currentRow()
+        if current_index < 1:
+            return
+
+        bo_item = self.bo_list.takeItem(current_index)
+        self.bo_list.insertItem(current_index - 1, bo_item)
+        self.bo_list.setCurrentRow(current_index - 1)
+
+        self.update_order()
+
+    def move_build_order_down(self):
+        """Move the currently selected build order down in the list"""
+        if self.bo_list.count() <= 1:
+            return
+
+        current_index = self.bo_list.currentRow()
+        if current_index > self.bo_list.count() - 2:
+            return
+
+        bo_item = self.bo_list.takeItem(current_index)
+        self.bo_list.insertItem(current_index + 1, bo_item)
+        self.bo_list.setCurrentRow(current_index + 1)
+
+        self.update_order()
 
     def font_size_changed(self, font_index: int):
         """Adapt the overlay for a font size change
