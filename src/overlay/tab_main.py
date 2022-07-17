@@ -12,7 +12,7 @@ import overlay.helper_func as hf
 from overlay.api_checking import Api_checker, get_full_match_history
 from overlay.logging_func import get_logger, log_match
 from overlay.settings import settings
-from overlay.tab_buildorders import BoTab
+from overlay.tab_build_orders import BoTab
 from overlay.tab_games import MatchHistoryTab
 from overlay.tab_graphs import GraphTab
 from overlay.tab_override import OverrideTab
