@@ -5,7 +5,17 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
 
-from overlay.aoe4_data import civ_data
+# flags of the different civilizations
+civilization_flags = {
+    'Abbasid Dynasty': 'civilization_flag/CivIcon-AbbasidAoE4_spacing.png',
+    'Chinese': 'civilization_flag/CivIcon-ChineseAoE4_spacing.png',
+    'Delhi Sultanate': 'civilization_flag/CivIcon-DelhiAoE4_spacing.png',
+    'English': 'civilization_flag/CivIcon-EnglishAoE4_spacing.png',
+    'French': 'civilization_flag/CivIcon-FrenchAoE4_spacing.png',
+    'Holy Roman Empire': 'civilization_flag/CivIcon-HREAoE4_spacing.png',
+    'Mongols': 'civilization_flag/CivIcon-MongolsAoE4_spacing.png',
+    'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.png'
+}
 
 
 def list_directory_files(directory: str, extension: str = None, recursive: bool = True) -> list:
@@ -104,10 +114,10 @@ def check_valid_aoe4_build_order(data: dict) -> bool:
             return False
 
         for civilization in civilization_data:
-            if civilization not in civ_data.values():
+            if civilization not in civilization_flags.keys():
                 print(f'Unknown civilization \'{civilization}\' (check spelling) for build order \'{name}\'.')
                 return False
-    elif civilization_data not in civ_data.values():  # single civilization provided
+    elif civilization_data not in civilization_flags.keys():  # single civilization provided
         print(f'Unknown civilization \'{civilization_data}\' (check spelling) for build order \'{name}\'.')
         return False
 

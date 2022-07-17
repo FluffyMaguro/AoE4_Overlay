@@ -9,7 +9,8 @@ from overlay.custom_widgets import CustomKeySequenceEdit
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
-from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay, QLabelSettings
+from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay, QLabelSettings, \
+    civilization_flags
 
 logger = get_logger(__name__)
 
@@ -92,20 +93,29 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
             color_default=settings.bo_text_color, image_height=settings.bo_image_height)
 
-    def update_build_order_display(self, title: str, data: dict):
+    def update_build_order_display(self, title: str, data: dict, flag_picture: str = None):
         """Update the display of the build order
 
         Parameters
         ----------
-        title    title of this build order step
-        data     data from the build order in dictionary form
+        title           title of this build order step
+        data            data from the build order in dictionary form
+        flag_picture    picture to use for the flag, None if not applicable
         """
         self.build_order_notes.clear()  # clear previous build order display
+        spacing = '  '  # horizontal space between elements
 
-        if settings.bo_show_title and (title != ''):
+        if settings.bo_show_title and (title != ''):  # title
+            title_line = ''
+            labels_settings = []
+            if flag_picture is not None:
+                title_line += flag_picture + '@' + spacing
+                labels_settings.append(QLabelSettings())
+            title_line += title
+            labels_settings.append(QLabelSettings(text_color=settings.bo_title_color, text_bold=True))
+
             self.build_order_notes.add_row_from_picture_line(
-                parent=self, line=title,
-                labels_settings=[QLabelSettings(text_color=settings.bo_title_color, text_bold=True)])
+                parent=self, line=title_line, labels_settings=labels_settings)
 
         # build order with pictures
         if {'population_count', 'villager_count', 'age', 'resources', 'notes'} <= data.keys():
@@ -119,7 +129,6 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             target_population = data['population_count']
             target_age = data['age']
             notes = data['notes']
-            spacing = '  '
 
             # line to display the target resources
             resources_line = settings.image_food + '@ ' + (str(target_food) if (target_food >= 0) else ' ')
@@ -604,9 +613,12 @@ class BoTab(QtWidgets.QWidget):
                 data = json.loads(bo_text)
                 self.build_order_step_count = len(data['build_order'])
                 self.limit_build_order_step()
+                flag_picture = None
+                if ('civilization' in data) and (data['civilization'] in civilization_flags):
+                    flag_picture = civilization_flags[data['civilization']]
                 self.overlay.update_build_order_display(
                     title=f'{bo_name} - {self.build_order_step + 1}/{self.build_order_step_count}',
-                    data=data['build_order'][self.build_order_step])
+                    data=data['build_order'][self.build_order_step], flag_picture=flag_picture)
             else:
                 self.build_order_step = -1
                 self.build_order_step_count = -1
