@@ -68,7 +68,7 @@ class MainApp(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
-        self.setWindowIcon(QtGui.QIcon(file_path('img/icon.ico')))
+        self.setWindowIcon(QtGui.QIcon(file_path('img/aoe4_sword_shield.ico')))
         self.setGeometry(0, 0, settings.app_width, settings.app_height)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
                   QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
