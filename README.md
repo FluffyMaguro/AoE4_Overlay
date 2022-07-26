@@ -113,35 +113,35 @@ Or change values to something completely different
 
 2. **Build order** (BO) font, images size, position and hotkeys can be changed in the app. Other attributes can also be customized in `config.json` (to find the file click `File/config & logs` in the app). You have to close the app before making changes to the config file. What can be changed:
 
-    `"bo_show_title": true ` : true to show the BO title, false otherwise
+    `"bo_show_title": true` : true to show the BO title, false otherwise
 
-    `"bo_title_color": [230, 159, 0] ` : color for the BO title
+    `"bo_title_color": [230, 159, 0]` : color for the BO title
 
-    `"bo_overlay_hotkey_show": "" ` : hotkey to show/hide the BO
+    `"bo_overlay_hotkey_show": ""` : hotkey to show/hide the BO
 
-    `"bo_overlay_hotkey_cycle": "" ` : hotkey to cycle between the different BO available
+    `"bo_overlay_hotkey_cycle": ""` : hotkey to cycle between the different BO available
 
-    `"bo_overlay_hotkey_previous_step": "" ` : hotkey to go to the previous step of the BO
+    `"bo_overlay_hotkey_previous_step": ""` : hotkey to go to the previous step of the BO
 
-    `"bo_overlay_hotkey_next_step": "" ` : hotkey to go to the next step of the BO
+    `"bo_overlay_hotkey_next_step": ""` : hotkey to go to the next step of the BO
 
-    `"bo_font_size": 12 ` : font size
+    `"bo_font_size": 12` : font size
 
-    `"bo_text_color": [255, 255, 255] ` : text RGB color
+    `"bo_text_color": [255, 255, 255]` : text RGB color
 
-    `"bo_color_background": [30, 30, 30] ` : background RGB color
+    `"bo_color_background": [30, 30, 30]` : background RGB color
 
-    `"bo_font_police": 'Arial' ` : police font
+    `"bo_font_police": 'Arial'` : police font
 
-    `"bo_opacity": 0.75 ` : opacity of the window
+    `"bo_opacity": 0.75` : opacity of the window
 
-    `"bo_upper_right_position": [1870, 70] ` : position for the upper right corner
+    `"bo_upper_right_position": [1870, 70]` : position for the upper right corner
 
-    `"bo_image_height": 30 ` : height of the images
+    `"bo_image_height": 30` : height of the images
 
-    `"bo_border_size": 15 ` : size of the borders
+    `"bo_border_size": 15` : size of the borders
 
-    `"bo_vertical_spacing": 10 ` : vertical space between the BO lines
+    `"bo_vertical_spacing": 10` : vertical space between the BO lines
 
     The images used in the build order overlay can also be defined in the same configuration file (path relative to `src/img/build_order`).
 
