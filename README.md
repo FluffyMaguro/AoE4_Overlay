@@ -10,7 +10,7 @@
 * Provides additional player statistics in-app.
 * Shows an overlay widget for build orders (BO) in two formats:
   * Simple TXT format.
-  * Interactive (selecting the BO step) with resources distribution and game pictures.
+  * Illustrated with resources distribution and game pictures (+ BO step selection).
 * Supports a highly customizable streaming overlay (with CSS/JS).
 
 API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](https://aoe4world.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
@@ -24,16 +24,18 @@ API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](h
 * Set up the hotkey for showing/hiding overlay.
   * Overlay will be automatically shown when a new game starts (or app starts).
 * Build orders:
-  * Two build orders types are available: *Simple TXT* and/or *Interactive (selecting the BO step) with resources distribution and game pictures*.
+  * Two build orders types are available:
+    * *Simple TXT*.
+    * *Illustrated* with resources distribution and game pictures (+ BO step selection).
   * Add or remove build orders with **Add/Remove build order** (write the content on the left panel, and the title on the top of the right panel).
     * Write anything for the *Simple TXT format*.
-    * For the *Interactive format*, you need to have a JSON format compatible with the [RTS_Overlay](https://github.com/CraftySalamander/RTS_Overlay) from CraftySalamander (see examples [here](https://github.com/CraftySalamander/RTS_Overlay/tree/master/build_orders/aoe4)).
+    * For the *Illustrated format*, you need to have a JSON format compatible with the [RTS_Overlay](https://github.com/CraftySalamander/RTS_Overlay) from CraftySalamander (see examples [here](https://github.com/CraftySalamander/RTS_Overlay/tree/master/build_orders/aoe4)).
     * Many build orders can be downloaded from https://age4builder.com (currently only for *Simple TXT format*, but soon available for both formats).
-  * Change their order using with **Move build order up/down**.
-  * Set up hotkeys (with **Hotkey for/to...**) for showing/hiding overlay, cycling between build orders and selecting the previous/next step of a build order (only available for the *Interactive build orders with images*).
+  * Change their order using **Move build order up/down**.
+  * Set up hotkeys (with **Hotkey for/to...**) for showing/hiding overlay, cycling between build orders and selecting the previous/next step of a build order (only available for the *Illustrated format*).
     * Use the corresponding hotkeys to show/hide/cycle build orders and steps.
   * Change the overlay font size with **Overlay font size**.
-  * Change the height of the build order images (irrelevant for the *Simple TXT* version) with **Overlay images height**.
+  * Change the height of the build order images (only for the *Illustrated format*) with **Overlay images height**.
   * Change the position of the build order overlay with **Change BO overlay position**. Once fixed, the upper right corner will never move, but the size of the overlay will be automatically adapted to its content.
 
 *To update the app delete the app folder and extract the new archive elsewhere.*
@@ -46,7 +48,7 @@ API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](h
 
 # Screenshots
 
-Build order widget:
+Build order widget (*Illustrated format*):
 
 ![Screenshot](https://i.imgur.com/ET6KY5W.png)
 
@@ -76,7 +78,7 @@ Various stats:
 
 ![Screenshot](https://i.imgur.com/aGXRnT2.png)
 
-Build order tab:
+Build order configuration tab:
 
 ![Screenshot](https://i.imgur.com/xPKpaEz.png)
 
@@ -141,7 +143,7 @@ Or change values to something completely different
 
     `"bo_vertical_spacing": 10 ` : vertical space between the BO lines
 
-    The images used in the build order overlay can also be defined in the same file (path relative to `src/img/build_order`).
+    The images used in the build order overlay can also be defined in the same configuration file (path relative to `src/img/build_order`).
 
 
 
