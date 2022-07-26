@@ -34,8 +34,8 @@ class _Settings:
         self.bo_title_color: list = [230, 159, 0]  # color for the title
         self.bo_overlay_hotkey_show: str = ""  # hotkey to show/hide the BO
         self.bo_overlay_hotkey_cycle: str = ""  # hotkey to cycle between the different BO available
-        self.bo_overlay_hotkey_previous_step: str = ""  # hotkey to go to the previous step of the build order
-        self.bo_overlay_hotkey_next_step: str = ""  # hotkey to go to the next step of the build order
+        self.bo_overlay_hotkey_previous_step: str = ""  # hotkey to go to the previous step of the BO
+        self.bo_overlay_hotkey_next_step: str = ""  # hotkey to go to the next step of the BO
         self.bo_font_size: int = 12  # font size
         self.bo_text_color: list = [255, 255, 255]  # text RGB color
         self.bo_color_background: list = [30, 30, 30]  # background RGB color
@@ -44,7 +44,7 @@ class _Settings:
         self.bo_upper_right_position: list = [1870, 70]  # position for the upper right corner
         self.bo_image_height: int = 30  # height of the images
         self.bo_border_size: int = 15  # size of the borders
-        self.bo_vertical_spacing: int = 10  # vertical space between the build order lines
+        self.bo_vertical_spacing: int = 10  # vertical space between the BO lines
         # store build orders
         self.build_orders: Dict[str, str] = {
             "Instructions": "Write your own build order.\n"
@@ -72,7 +72,7 @@ class _Settings:
         if not os.path.isfile(CONFIG_FILE):
             return
         try:
-            with open(CONFIG_FILE, 'r') as f:
+            with open(CONFIG_FILE, 'rb') as f:
                 data = json.loads(f.read())
         except Exception:
             logger.warning("Failed to parse config file")

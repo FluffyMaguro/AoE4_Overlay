@@ -517,6 +517,7 @@ class BoTab(QtWidgets.QWidget):
         self.bo_list.addItem(f"Build order {self.bo_list.count() + 1}")
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
+        self.update_order()
 
     def remove_build_order(self):
         """Remove the currently selected build order"""
@@ -524,6 +525,7 @@ class BoTab(QtWidgets.QWidget):
             return
         del settings.build_orders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
+        self.update_order()
 
     def move_build_order_up(self):
         """Move the currently selected build order up in the list"""
