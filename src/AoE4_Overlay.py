@@ -16,7 +16,7 @@ from overlay.tab_main import TabWidget
 
 logger = get_logger(__name__)
 
-VERSION = "1.3.1"
+VERSION = "1.4.0"
 
 # Might or might not help
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -68,7 +68,7 @@ class MainApp(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
-        self.setWindowIcon(QtGui.QIcon(file_path('img/icon.ico')))
+        self.setWindowIcon(QtGui.QIcon(file_path('img/aoe4_sword_shield.ico')))
         self.setGeometry(0, 0, settings.app_width, settings.app_height)
         self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
                   QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
@@ -185,6 +185,10 @@ class MainApp(QtWidgets.QMainWindow):
             partial(self.centralWidget().graph_tab.limit_to_day, lastday))
         graphs_menu.addAction(lastday)
         self.show()
+
+    def closeEvent(self, _):
+        """Function called when closing the widget."""
+        self.centralWidget().close()
 
     def update_title(self, name: str):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION}) – {name}")

@@ -12,7 +12,7 @@ os.system('cmd /c "python -m nuitka'
           ' --plugin-enable=pyqt5'
           ' --standalone'
           ' --windows-disable-console'
-          ' --windows-icon-from-ico=src/img/icon.ico'
+          ' --windows-icon-from-ico=src/img/aoe4_sword_shield.ico'
           ' --include-data-dir=src/img=img'
           ' --include-data-dir=src/html=html'
           ' src/AoE4_Overlay.py')
