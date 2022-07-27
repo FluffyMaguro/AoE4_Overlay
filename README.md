@@ -13,7 +13,7 @@
   * Illustrated with resources distribution and game pictures (+ BO step selection).
 * Supports a highly customizable streaming overlay (with CSS/JS).
 
-API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](https://aoe4world.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
+API calls are done through [AoE4World.com](https://aoe4world.com/). For build orders check [age4builder.com](https://age4builder.com/). For questions and issues visit my [discord server](https://discord.gg/FtGdhqD).
 
 
 # How to use
@@ -23,9 +23,12 @@ API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](h
 * Find your profile by entering your profile ID, Steam ID or player name.
 * Set up the hotkey for showing/hiding overlay.
   * Overlay will be automatically shown when a new game starts (or app starts).
-* Build orders:
+
+*To update the app delete the app folder and extract the new archive elsewhere.*
+  
+# Build orders
   * Two build orders types are available:
-    * *Simple TXT*.
+    * *Simple TXT*
     * *Illustrated* with resources distribution and game pictures (+ BO step selection).
   * Add or remove build orders with **Add/Remove build order** (write the content on the left panel, and the title on the top of the right panel).
     * Write anything for the *Simple TXT format*.
@@ -38,12 +41,12 @@ API calls are done through [AoEIV.net](https://aoeiv.net/) and [AoE4World.com](h
   * Change the height of the build order images (only for the *Illustrated format*) with **Overlay images height**.
   * Change the position of the build order overlay with **Change BO overlay position**. Once fixed, the upper right corner will never move, but the size of the overlay will be automatically adapted to its content.
 
-*To update the app delete the app folder and extract the new archive elsewhere.*
+
 
 
 # Authors
 * FluffyMaguro
-* CraftySalamander (build order overlay)
+* [CraftySalamander](https://github.com/CraftySalamander) (build order overlay)
 
 
 # Screenshots
@@ -62,21 +65,21 @@ Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
 
-Game history:
+<!-- Game history:
 
-![Screenshot](https://i.imgur.com/L1V1wp2.png)
+![Screenshot](https://i.imgur.com/L1V1wp2.png) -->
 
 Rating history:
 
 ![Screenshot](https://i.imgur.com/QqojOJI.png)
 
-Last 24 hours:
+<!-- Last 24 hours:
 
-![Screenshot](https://i.imgur.com/8ODqTrw.png)
+![Screenshot](https://i.imgur.com/8ODqTrw.png) -->
 
-Various stats:
+<!-- Various stats:
 
-![Screenshot](https://i.imgur.com/aGXRnT2.png)
+![Screenshot](https://i.imgur.com/aGXRnT2.png) -->
 
 Build order configuration tab:
 
@@ -172,6 +175,4 @@ Or change values to something completely different
 
 # Releases & Changelog
 
-The Releases can be downloaded [here](https://github.com/FluffyMaguro/AoE4_Overlay/releases).
-
-The Changelog is available [here](https://github.com/CraftySalamander/AoE4_Overlay/blob/main/Changelog.md).
+[All here](https://github.com/FluffyMaguro/AoE4_Overlay/releases)

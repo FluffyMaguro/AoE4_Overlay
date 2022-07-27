@@ -1,9 +1,9 @@
-import os
 import json
+import os
 
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QLabel
 
 # flags of the different civilizations
 civilization_flags = {
