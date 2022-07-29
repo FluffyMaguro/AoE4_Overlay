@@ -35,7 +35,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.force_stop: bool = False
         self.prevent_overlay_update: bool = False
 
-        # self.games_tab = MatchHistoryTab(self)
+        self.games_tab = MatchHistoryTab(self)
         self.graph_tab = GraphTab(self)
         self.random_tab = RandomTab(self)
         # self.stats_tab = StatsTab(self)
@@ -47,7 +47,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.settigns_tab.new_profile.connect(self.new_profile_found)
 
         self.addTab(self.settigns_tab, "Settings")
-        # self.addTab(self.games_tab, "Games")
+        self.addTab(self.games_tab, "Games")
         self.addTab(self.graph_tab, "Rating")
         # self.addTab(self.stats_tab, "Stats")
         self.addTab(self.override_tab, "Override")
@@ -75,8 +75,8 @@ class TabWidget(QtWidgets.QTabWidget):
         self.graph_tab.run_update()
         # self.stats_tab.run_mode_update()
         # self.stats_tab.clear_match_data()
-        # self.games_tab.clear_games()
-        # self.update_with_match_history_data(10000)
+        self.games_tab.clear_games()
+        self.update_with_match_history_data(10000)
         self.parent().update_title(settings.player_name)
 
     def update_with_match_history_data(self, amount: int):
@@ -90,7 +90,7 @@ class TabWidget(QtWidgets.QTabWidget):
             return
         self.settigns_tab.message("")
         # self.stats_tab.update_other_stats(match_history)
-        # self.games_tab.update_widgets(match_history)
+        self.games_tab.update_widgets(match_history)
 
     def run_new_game_check(self, delayed_seconds: int = 0):
         """ Creates a new thread for a new api check"""
@@ -109,7 +109,7 @@ class TabWidget(QtWidgets.QTabWidget):
                 f"Game finished (rating_timestamp: {game_data['timestamp']})")
             self.graph_tab.run_update()
             # self.stats_tab.run_mode_update()
-            # self.update_with_match_history_data(2)
+            self.update_with_match_history_data(2)
 
         elif 'server_down' in game_data:
             self.settigns_tab.aoe4net_error_msg()

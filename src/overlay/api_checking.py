@@ -1,12 +1,10 @@
 import json
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import requests
 
-from overlay.aoe4_data import QM_ids
-from overlay.helper_func import match_mode
 from overlay.logging_func import get_logger
 from overlay.settings import settings
 
@@ -114,68 +112,22 @@ def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
 
 def get_full_match_history(amount: int) -> Optional[List[Any]]:
     """ Gets match history and adds some data its missing"""
-    # Get player match history
+
+    url = f"https://aoe4world.com/api/v0/players/{settings.profile_id}/games?limit={amount}"
     try:
-        data = get_match_history(amount=amount, raise_exception=True)
+        resp = session.get(url).text
+        data = json.loads(resp)
+        return data['games']
     except Exception:
+        logger.exception("")
         return None
-
-    # Make sure data is sorted by date
-    data = sorted(data, key=lambda x: x['started'], reverse=True)
-
-    logger.info(
-        f"Asked for {amount} games | obtained {len(data)} from get_match_history"
-    )
-    # What type of games are there
-    leaderboard_ids = {match_mode(i, convert_customs=False) for i in data}
-    leaderboard_ids = {i for i in leaderboard_ids if i in QM_ids}
-
-    # Get rating histories for those modes
-    rating_hist = {
-        i: get_rating_history(i, amount + 1)
-        for i in leaderboard_ids
-    }
-
-    def find_rating_change(leaderboard_id: int,
-                           timestamp: int) -> Tuple[Optional[int], int]:
-        """ Finds a rating change for given match"""
-        # If not quick match
-        if leaderboard_id not in QM_ids:
-            return None, -1
-
-        # Go through rating histories, the first that's newer than our game has new rating
-        reversed = rating_hist[leaderboard_id][::-1]
-        for i, entry in enumerate(reversed):
-            if entry['timestamp'] > timestamp:
-                if i == 0:
-                    return None, entry['rating']
-                # Calculate rating difference compared to the previous game
-                diff = entry['rating'] - reversed[i - 1]['rating']
-                return diff, entry['rating']
-        return None, -1
-
-    for match in data:
-        rating_diff, rating = find_rating_change(
-            match_mode(match, convert_customs=False), match['started'])
-        match["my_rating"] = rating
-        if rating_diff is None:
-            match['result'] = "?"
-            match['my_rating_diff'] = "?"
-        elif rating_diff == 0:
-            match['result'] = "?"
-            match['my_rating_diff'] = 0
-        else:
-            match['result'] = "Win" if rating_diff > 0 else "Loss"
-            match['my_rating_diff'] = rating_diff
-
-    return data
 
 
 class Api_checker:
 
     def __init__(self):
-        self.force_stop = False # To stop the thread
-        self.force_check = False # This can force a check of new data
+        self.force_stop = False  # To stop the thread
+        self.force_check = False  # This can force a check of new data
         self.last_match_timestamp = datetime(1900, 1, 1, 0, 0, 0)
         self.last_rating_timestamp = datetime(1900, 1, 1, 0, 0, 0)
 

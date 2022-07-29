@@ -1,11 +1,9 @@
-import time
 from collections import defaultdict
+from datetime import datetime
 from typing import Any, Dict, List
 
 from PyQt5 import QtCore, QtWidgets
 
-from overlay.aoe4_data import map_data
-from overlay.helper_func import quickmatch_game
 from overlay.logging_func import catch_exceptions, get_logger
 from overlay.settings import settings
 
@@ -27,61 +25,62 @@ class MatchEntry:
                                                                        Any]):
         self.main_layout: QtWidgets.QGridLayout = layout
         self.in_layout: bool = False
-        self.match_id = match_data['match_id']
+        self.game_id = match_data['game_id']
 
         # Try to find the main player team first
-        main_team = 1
-        for player in match_data["players"]:
-            if player['profile_id'] == settings.profile_id:
-                main_team = player['team']
-                break
+        main_player_data = None
+        main_team = 0
+        for team_idx, team in enumerate(match_data['teams']):
+            for player in team:
+                if player['player']['profile_id'] == settings.profile_id:
+                    main_team = team_idx
+                    main_player_data = player['player']
+                    break
 
         # Teams
         teams = defaultdict(list)
-        for player in match_data["players"]:
-            team = player["team"]
-            teams[team].append(f"{player['name']}")
+        for team_idx, team in enumerate(match_data['teams']):
+            for player in team:
+                civ = player['player']['civilization'].replace(
+                    "_", " ").capitalize()
+                teams[team_idx].append(
+                    f"{player['player']['name']} ({civ})   ")
 
-        other_team = 1 if main_team == 2 else 2
+        other_team = 1 if main_team == 0 else 0
         team_widgets = []
         for team in (main_team, other_team):
             team_string = "\n".join(teams[team])
             team_widgets.append(QtWidgets.QLabel(team_string))
 
         # Map
-        map_name = QtWidgets.QLabel(
-            map_data.get(match_data.get("map_type", -1), "Unknown map"))
+        map_name = QtWidgets.QLabel(match_data.get('map', "Unknown map"))
 
         # Date
-        date = QtWidgets.QLabel(
-            time.strftime("%b %d, %H:%M:%S",
-                          time.localtime(match_data['started'])))
+        started = datetime.strptime(match_data['started_at'],
+                                    "%Y-%m-%dT%H:%M:%S.000Z")
+
+        date = QtWidgets.QLabel(started.strftime("%b %d, %H:%M:%S"))
 
         # Mode
-        mode = QtWidgets.QLabel()
-        if len(teams) == 2:
-            player_number = [len(teams[i]) for i in teams]
-            mode.setText(f"{player_number[0]}v{player_number[1]}")
+        mode = QtWidgets.QLabel(match_data['kind'])
 
         # Result
-        result = QtWidgets.QLabel(match_data["result"])
+        result = QtWidgets.QLabel(main_player_data['result'].capitalize(
+        ) if main_player_data and main_player_data['result'] else "?")
 
         # ELO change
-        if quickmatch_game(match_data):
-            plus = not isinstance(match_data['my_rating_diff'],
-                                  str) and match_data['my_rating_diff'] > 0
-            rating_string = f"{'+' if plus else ''}{match_data['my_rating_diff']} → {match_data['my_rating']}"
-        else:
-            rating_string = "Custom game"
-
-        elo_change = QtWidgets.QLabel(rating_string)
+        diff = main_player_data[
+            'rating_diff'] if main_player_data and main_player_data[
+                'rating_diff'] else "?"
+        elo_change = QtWidgets.QLabel(str(diff))
 
         self.widgets = (*team_widgets, map_name, date, mode, result,
                         elo_change)
 
         for item in self.widgets:
             item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-            item.setAlignment(QtCore.Qt.AlignCenter)
+            if item not in team_widgets:
+                item.setAlignment(QtCore.Qt.AlignCenter)
 
         # Line
         self.line = Line()
@@ -135,7 +134,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.scroll_layout.addWidget(QtWidgets.QLabel("Started"), 0, 3)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Mode"), 0, 4)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
-        self.scroll_layout.addWidget(QtWidgets.QLabel("Rating"), 0, 6)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("Rating diff"), 0, 6)
 
         self.header_widgets = set()
         for i in range(self.scroll_layout.count()):
@@ -162,11 +161,11 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.clear_scroll_layout()
 
         # Add new matches to our list
-        present_match_ids = {i.match_id for i in self.matches}
+        present_game_ids = {i.game_id for i in self.matches}
         for match in reversed(match_history):
-            if match['my_rating'] == -1 and quickmatch_game(match):
-                continue
-            if match['match_id'] in present_match_ids:
+            # if match['my_rating'] == -1 and quickmatch_game(match):
+            #     continue
+            if match['game_id'] in present_game_ids:
                 continue
             self.matches.append(MatchEntry(self.scroll_layout, match))
 
