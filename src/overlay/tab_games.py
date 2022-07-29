@@ -162,9 +162,10 @@ class MatchHistoryTab(QtWidgets.QWidget):
 
         # Add new matches to our list
         present_game_ids = {i.game_id for i in self.matches}
+
         for match in reversed(match_history):
-            # if match['my_rating'] == -1 and quickmatch_game(match):
-            #     continue
+            if match['ongoing']:
+                continue
             if match['game_id'] in present_game_ids:
                 continue
             self.matches.append(MatchEntry(self.scroll_layout, match))

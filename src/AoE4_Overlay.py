@@ -79,7 +79,7 @@ class MainApp(QtWidgets.QMainWindow):
         ### Create menu bar items
         menubar = self.menuBar()
         file_menu = menubar.addMenu('File')
-        graphs_menu = menubar.addMenu('Graphs')
+        # graphs_menu = menubar.addMenu('Graphs')
         settings_menu = menubar.addMenu('Settings')
         link_menu = menubar.addMenu('Links')
 
@@ -167,23 +167,23 @@ class MainApp(QtWidgets.QMainWindow):
         link_menu.addAction(aoe4worldaction)
 
         # Which graphs to show
-        self.show_graph_actions = []
-        for i in (1, 2, 3, 4):
-            action = QtWidgets.QAction(f'Show {i}v{i}', self)
-            self.show_graph_actions.append(action)
-            action.setCheckable(True)
-            action.setChecked(True)
-            action.changed.connect(
-                partial(self.centralWidget().graph_tab.change_plot_visibility,
-                        i - 1, action))
-            action.setChecked(settings.show_graph[str(i)])
-            graphs_menu.addAction(action)
+        # self.show_graph_actions = []
+        # for i in (1, 2, 3, 4):
+        #     action = QtWidgets.QAction(f'Show {i}v{i}', self)
+        #     self.show_graph_actions.append(action)
+        #     action.setCheckable(True)
+        #     action.setChecked(True)
+        #     action.changed.connect(
+        #         partial(self.centralWidget().graph_tab.change_plot_visibility,
+        #                 i - 1, action))
+        #     action.setChecked(settings.show_graph[str(i)])
+        #     graphs_menu.addAction(action)
 
-        lastday = QtWidgets.QAction("Last 24h", self)
-        lastday.setCheckable(True)
-        lastday.changed.connect(
-            partial(self.centralWidget().graph_tab.limit_to_day, lastday))
-        graphs_menu.addAction(lastday)
+        # lastday = QtWidgets.QAction("Last 24h", self)
+        # lastday.setCheckable(True)
+        # lastday.changed.connect(
+        #     partial(self.centralWidget().graph_tab.limit_to_day, lastday))
+        # graphs_menu.addAction(lastday)
         self.show()
 
     def closeEvent(self, _):
@@ -198,8 +198,8 @@ class MainApp(QtWidgets.QMainWindow):
             """ Give it some time to stop everything correctly"""
             settings.app_width = self.width()
             settings.app_height = self.height()
-            for i, action in enumerate(self.show_graph_actions):
-                settings.show_graph[str(i + 1)] = action.isChecked()
+            # for i, action in enumerate(self.show_graph_actions):
+            #     settings.show_graph[str(i + 1)] = action.isChecked()
             settings.save()
             self.centralWidget().stop_checking_api()
             pyqt_wait(1000)

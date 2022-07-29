@@ -131,17 +131,17 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             if not mode in player['modes']:
                 if 'rm_' in mode:
-                    mode = mode.replace('rm_','qm_')
+                    mode = mode.replace('rm_', 'qm_')
                 elif 'qm_' in mode:
-                    mode = mode.replace('qm_','rm_')
-
-            for civ in player['modes'][mode]['civilizations']:
-                if civ['civilization'] == current_civ:
-                    civ_games = str(civ['games_count'])
-                    civ_winrate = f"{civ['win_rate']/100:.1%}"
-                    med = civ['game_length']['wins_median']
-                    civ_win_median = time.strftime("%M:%S",
-                                                    time.gmtime(med))
+                    mode = mode.replace('qm_', 'rm_')
+            if 'civilizations' in player['modes'][mode]:
+                for civ in player['modes'][mode]['civilizations']:
+                    if civ['civilization'] == current_civ:
+                        civ_games = str(civ['games_count'])
+                        civ_winrate = f"{civ['win_rate']/100:.1%}"
+                        med = civ['game_length']['wins_median']
+                        civ_win_median = time.strftime("%M:%S",
+                                                       time.gmtime(med))
         except Exception:
             print(traceback.format_exc())
 

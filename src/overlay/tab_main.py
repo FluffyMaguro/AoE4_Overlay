@@ -36,7 +36,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.prevent_overlay_update: bool = False
 
         self.games_tab = MatchHistoryTab(self)
-        self.graph_tab = GraphTab(self)
+        # self.graph_tab = GraphTab(self)
         self.random_tab = RandomTab(self)
         # self.stats_tab = StatsTab(self)
         self.build_order_tab = BoTab(self)
@@ -48,7 +48,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
         self.addTab(self.settigns_tab, "Settings")
         self.addTab(self.games_tab, "Games")
-        self.addTab(self.graph_tab, "Rating")
+        # self.addTab(self.graph_tab, "Rating")
         # self.addTab(self.stats_tab, "Stats")
         self.addTab(self.override_tab, "Override")
         self.addTab(self.build_order_tab, "Build orders")
@@ -72,7 +72,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def new_profile_found(self):
         self.api_checker.reset()
-        self.graph_tab.run_update()
+        # self.graph_tab.run_update()
         # self.stats_tab.run_mode_update()
         # self.stats_tab.clear_match_data()
         self.games_tab.clear_games()
@@ -107,7 +107,7 @@ class TabWidget(QtWidgets.QTabWidget):
         elif "new_rating" in game_data:
             logger.info(
                 f"Game finished (rating_timestamp: {game_data['timestamp']})")
-            self.graph_tab.run_update()
+            # self.graph_tab.run_update()
             # self.stats_tab.run_mode_update()
             self.update_with_match_history_data(2)
 
