@@ -1,16 +1,16 @@
-import os
 import json
+import os
 import pathlib
 
 import keyboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from overlay.build_order_tools import (
+    MultiQLabelDisplay, QLabelSettings,
+    check_valid_aoe4_build_order_from_string, civilization_flags)
 from overlay.custom_widgets import CustomKeySequenceEdit
 from overlay.logging_func import get_logger
 from overlay.settings import settings
-
-from overlay.build_order_tools import check_valid_aoe4_build_order_from_string, MultiQLabelDisplay, QLabelSettings, \
-    civilization_flags
 
 logger = get_logger(__name__)
 
@@ -65,7 +65,7 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 
         # remove the window title and stay always on top
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.CoverWindow)
 
         # color and opacity
         color_background = settings.bo_color_background
