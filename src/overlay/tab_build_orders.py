@@ -138,11 +138,12 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
                 str(target_gold) if (target_gold >= 0) else ' ')
             resources_line += spacing + '@' + settings.image_stone + '@ ' + (
                 str(target_stone) if (target_stone >= 0) else ' ')
-            resources_line += spacing + '@' + settings.image_villager + '@ ' + (
-                str(target_villager) if (target_villager >= 0) else ' ')
-            resources_line += spacing + '@' + settings.image_population + '@ ' + (
-                str(target_population) if (target_population >= 0) else ' ')
-            resources_line += spacing + '@' + get_age_image(target_age)
+            if target_villager >= 0:
+                resources_line += spacing + '@' + settings.image_villager + '@ ' + str(target_villager)
+            if target_population >= 0:
+                resources_line += spacing + '@' + settings.image_population + '@ ' + str(target_population)
+            if 1 <= target_age <= 4:
+                resources_line += spacing + '@' + get_age_image(target_age)
             if 'time' in data:  # add time if indicated
                 resources_line += '@' + spacing + '@' + settings.image_time + '@' + data['time']
 
