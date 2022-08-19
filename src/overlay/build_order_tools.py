@@ -420,7 +420,8 @@ class MultiQLabelDisplay:
             elif text_alignment == 'right':
                 label.setAlignment(Qt.AlignRight)
 
-    def add_row_from_picture_line(self, parent, line: str, labels_settings: list = None):
+    def add_row_from_picture_line(self, parent, line: str, labels_settings: list = None,
+                                  use_pictures: bool = True):
         """Add a row of labels based on a line mixing text and images.
 
         Parameters
@@ -429,11 +430,13 @@ class MultiQLabelDisplay:
         line               string text line with images between @ markers (e.g. 'text @image@ text')
         labels_settings    settings for the QLabel elements, must be the same size as the line after splitting,
                            see 'split_multi_label_line' function (None for default settings).
+        use_pictures       True to use pictures (if available), False to display line as it is.
         """
         if len(line) == 0:
             return
 
-        if (self.game_pictures_folder is None) and (self.common_pictures_folder is None):  # no picture
+        # no picture
+        if (not use_pictures) or ((self.game_pictures_folder is None) and (self.common_pictures_folder is None)):
             label = QLabel('', parent)
             label.setFont(QFont(self.font_police, self.font_size))
             label.setText(line)
