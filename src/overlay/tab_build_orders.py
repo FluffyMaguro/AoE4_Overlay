@@ -152,7 +152,7 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             for note in notes:
                 self.build_order_notes.add_row_from_picture_line(parent=self, line=note)
         elif 'txt' in data:  # simple TXT file for build order:
-            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']))
+            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']), use_pictures=False)
         else:
             logger.info('Invalid data for build order.')
 
