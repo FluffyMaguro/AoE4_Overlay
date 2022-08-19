@@ -50,9 +50,9 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.games_tab, "Games")
         # self.addTab(self.graph_tab, "Rating")
         # self.addTab(self.stats_tab, "Stats")
-        self.addTab(self.override_tab, "Override")
         self.addTab(self.build_order_tab, "Build orders")
         self.addTab(self.random_tab, "Randomize")
+        self.addTab(self.override_tab, "Override")
 
     def start(self):
         logger.info(
