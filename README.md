@@ -33,7 +33,9 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
   * Add or remove build orders with **Add/Remove build order** (write the content on the left panel, and the title on the top of the right panel).
     * Write anything for the *Simple TXT format*.
     * For the *Illustrated format*, you need to have a JSON format compatible with the [RTS_Overlay](https://github.com/CraftySalamander/RTS_Overlay) from CraftySalamander (see examples [here](https://github.com/CraftySalamander/RTS_Overlay/tree/master/build_orders/aoe4)).
-    * Many build orders can be downloaded from https://age4builder.com (currently only for *Simple TXT format*, but soon available for both formats).
+    * Many build orders can be downloaded from https://age4builder.com.
+      * To get the *Simple TXT format*, click on **Simple TXT Build Order to clipboard** on the top of any open build order (`M` icon).
+      * To get the *Illustrated format*, click on **Illustrated Build Order to clipboard** on the top of any open build order (**salamander** icon).
   * Change their order using **Move build order up/down**.
   * Set up hotkeys (with **Hotkey for/to...**) for showing/hiding overlay, cycling between build orders and selecting the previous/next step of a build order (only available for the *Illustrated format*).
     * Use the corresponding hotkeys to show/hide/cycle build orders and steps.
