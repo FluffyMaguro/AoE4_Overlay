@@ -50,14 +50,20 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         """
         super().__init__(parent)
 
-        file_path = str(pathlib.Path(__file__).parent.resolve())  # path of the folder containing this file
-        self.directory_game_pictures = os.path.join(file_path, '..', 'img', 'build_order')  # build order pictures
+        file_path = str(pathlib.Path(__file__).parent.resolve()
+                        )  # path of the folder containing this file
+        self.directory_game_pictures = os.path.join(
+            file_path, '..', 'img', 'build_order')  # build order pictures
 
         # build order display
         self.build_order_notes = MultiQLabelDisplay(
-            font_police=settings.bo_font_police, font_size=settings.bo_font_size, image_height=settings.bo_image_height,
-            border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
-            color_default=settings.bo_text_color, game_pictures_folder=self.directory_game_pictures)
+            font_police=settings.bo_font_police,
+            font_size=settings.bo_font_size,
+            image_height=settings.bo_image_height,
+            border_size=settings.bo_border_size,
+            vertical_spacing=settings.bo_vertical_spacing,
+            color_default=settings.bo_text_color,
+            game_pictures_folder=self.directory_game_pictures)
 
         self.fixed = True  # True if overlay position is fixed
 
@@ -65,23 +71,30 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 
         # remove the window title and stay always on top
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.CoverWindow)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint
+                            | QtCore.Qt.WindowStaysOnTopHint
+                            | QtCore.Qt.CoverWindow)
 
         # color and opacity
         color_background = settings.bo_color_background
         self.setStyleSheet(
-            f'background-color: rgb({color_background[0]}, {color_background[1]}, {color_background[2]})')
+            f'background-color: rgb({color_background[0]}, {color_background[1]}, {color_background[2]})'
+        )
         self.setWindowOpacity(settings.bo_opacity)
 
         # check that the upper right corner is inside the screen
         screen_size = QtWidgets.QDesktopWidget().screenGeometry(-1)
 
         if settings.bo_upper_right_position[0] >= screen_size.width():
-            logger.info(f'Upper right corner X position set to {(screen_size.width() - 20)} (to stay inside screen).')
+            logger.info(
+                f'Upper right corner X position set to {(screen_size.width() - 20)} (to stay inside screen).'
+            )
             settings.bo_upper_right_position[0] = screen_size.width() - 20
 
         if settings.bo_upper_right_position[1] >= screen_size.height():
-            logger.info(f'Upper right corner Y position set to {(screen_size.height() - 40)} (to stay inside screen).')
+            logger.info(
+                f'Upper right corner Y position set to {(screen_size.height() - 40)} (to stay inside screen).'
+            )
             settings.bo_upper_right_position[1] = screen_size.height() - 40
 
         self.update_position()  # update the position
@@ -89,11 +102,17 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
     def update_settings(self):
         """Update the overlay settings"""
         self.build_order_notes.update_settings(
-            font_police=settings.bo_font_police, font_size=settings.bo_font_size,
-            border_size=settings.bo_border_size, vertical_spacing=settings.bo_vertical_spacing,
-            color_default=settings.bo_text_color, image_height=settings.bo_image_height)
+            font_police=settings.bo_font_police,
+            font_size=settings.bo_font_size,
+            border_size=settings.bo_border_size,
+            vertical_spacing=settings.bo_vertical_spacing,
+            color_default=settings.bo_text_color,
+            image_height=settings.bo_image_height)
 
-    def update_build_order_display(self, title: str, data: dict, flag_picture: str = None):
+    def update_build_order_display(self,
+                                   title: str,
+                                   data: dict,
+                                   flag_picture: str = None):
         """Update the display of the build order
 
         Parameters
@@ -112,13 +131,16 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
                 title_line += flag_picture + '@' + spacing
                 labels_settings.append(QLabelSettings())
             title_line += title
-            labels_settings.append(QLabelSettings(text_color=settings.bo_title_color, text_bold=True))
+            labels_settings.append(
+                QLabelSettings(text_color=settings.bo_title_color,
+                               text_bold=True))
 
             self.build_order_notes.add_row_from_picture_line(
                 parent=self, line=title_line, labels_settings=labels_settings)
 
         # build order with pictures
-        if {'population_count', 'villager_count', 'age', 'resources', 'notes'} <= data.keys():
+        if {'population_count', 'villager_count', 'age', 'resources', 'notes'
+            } <= data.keys():
 
             target_resources = data['resources']
             target_food = target_resources['food']
@@ -131,7 +153,9 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             notes = data['notes']
 
             # line to display the target resources
-            resources_line = settings.image_food + '@ ' + (str(target_food) if (target_food >= 0) else ' ')
+            resources_line = settings.image_food + '@ ' + (str(target_food) if
+                                                           (target_food >= 0)
+                                                           else ' ')
             resources_line += spacing + '@' + settings.image_wood + '@ ' + (
                 str(target_wood) if (target_wood >= 0) else ' ')
             resources_line += spacing + '@' + settings.image_gold + '@ ' + (
@@ -139,31 +163,41 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
             resources_line += spacing + '@' + settings.image_stone + '@ ' + (
                 str(target_stone) if (target_stone >= 0) else ' ')
             if target_villager >= 0:
-                resources_line += spacing + '@' + settings.image_villager + '@ ' + str(target_villager)
+                resources_line += spacing + '@' + settings.image_villager + '@ ' + str(
+                    target_villager)
             if target_population >= 0:
-                resources_line += spacing + '@' + settings.image_population + '@ ' + str(target_population)
+                resources_line += spacing + '@' + settings.image_population + '@ ' + str(
+                    target_population)
             if 1 <= target_age <= 4:
                 resources_line += spacing + '@' + get_age_image(target_age)
             if 'time' in data:  # add time if indicated
-                resources_line += '@' + spacing + '@' + settings.image_time + '@' + data['time']
+                resources_line += '@' + spacing + '@' + settings.image_time + '@' + data[
+                    'time']
 
-            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(resources_line))
+            self.build_order_notes.add_row_from_picture_line(
+                parent=self, line=str(resources_line))
 
             for note in notes:
-                self.build_order_notes.add_row_from_picture_line(parent=self, line=note)
+                self.build_order_notes.add_row_from_picture_line(parent=self,
+                                                                 line=note)
         elif 'txt' in data:  # simple TXT file for build order:
-            self.build_order_notes.add_row_from_picture_line(parent=self, line=str(data['txt']), use_pictures=False)
+            self.build_order_notes.add_row_from_picture_line(
+                parent=self, line=str(data['txt']), use_pictures=False)
         else:
             logger.info('Invalid data for build order.')
 
-        self.build_order_notes.update_size_position()  # update the size and position of the build order
+        self.build_order_notes.update_size_position(
+        )  # update the size and position of the build order
 
         # resize the window to the size of the build order
-        self.resize(self.build_order_notes.row_max_width + 2 * settings.bo_border_size,
-                    self.build_order_notes.row_total_height + 2 * settings.bo_border_size)
+        self.resize(
+            self.build_order_notes.row_max_width + 2 * settings.bo_border_size,
+            self.build_order_notes.row_total_height +
+            2 * settings.bo_border_size)
 
         self.build_order_notes.show()  # show the new notes
-        self.update_position()  # update the position to keep the correct upper right corner position
+        self.update_position(
+        )  # update the position to keep the correct upper right corner position
 
     def show_hide(self):
         """Switch from hidden to shown (and opposite)"""
@@ -176,13 +210,15 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         if self.fixed:  # fixed to moving
             self.fixed = False
             self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
-            self.setWindowFlags(QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(QtCore.Qt.WindowTitleHint
+                                | QtCore.Qt.WindowStaysOnTopHint)
         else:  # moving to fixed
             self.fixed = True
             # offset added to take into account the difference of the window size with titlebar
             self.save_upper_right_position(offset_x=8, offset_y=31)
             self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
-            self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(QtCore.Qt.FramelessWindowHint
+                                | QtCore.Qt.WindowStaysOnTopHint)
         self.show()
 
     def save_upper_right_position(self, offset_x: int = 0, offset_y: int = 0):
@@ -193,14 +229,19 @@ class BuildOrderOverlay(QtWidgets.QMainWindow):
         offset_x    pixels offset to add on the X axis
         offset_y    pixels offset to add on the Y axis
         """
-        settings.bo_upper_right_position = [self.x() + self.width() + offset_x, self.y() + offset_y]
+        settings.bo_upper_right_position = [
+            self.x() + self.width() + offset_x,
+            self.y() + offset_y
+        ]
 
     def update_position(self):
         """Update the position to stick to the saved upper right corner"""
-        self.move(settings.bo_upper_right_position[0] - self.width(), settings.bo_upper_right_position[1])
+        self.move(settings.bo_upper_right_position[0] - self.width(),
+                  settings.bo_upper_right_position[1])
 
 
-def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit, hotkey_signal: QtCore.pyqtSignal):
+def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit,
+                hotkey_signal: QtCore.pyqtSignal):
     """Initialize one hotkey
 
     Parameters
@@ -215,7 +256,8 @@ def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit, hotkey_sign
     """
     if hotkey_str:
         try:
-            hotkey_edit.setKeySequence(QtGui.QKeySequence.fromString(hotkey_str))
+            hotkey_edit.setKeySequence(
+                QtGui.QKeySequence.fromString(hotkey_str))
             keyboard.add_hotkey(hotkey_str, hotkey_signal.emit)
         except Exception:
             logger.exception("Failed to set hotkey.")
@@ -225,7 +267,8 @@ def init_hotkey(hotkey_str: str, hotkey_edit: CustomKeySequenceEdit, hotkey_sign
 
 
 def hotkey_changed(new_hotkey: str, hotkey_str: str,
-                   hotkey_edit: CustomKeySequenceEdit, hotkey_signal: QtCore.pyqtSignal):
+                   hotkey_edit: CustomKeySequenceEdit,
+                   hotkey_signal: QtCore.pyqtSignal):
     """Update hotkey when changed
 
     Parameters
@@ -262,9 +305,12 @@ def hotkey_changed(new_hotkey: str, hotkey_str: str,
 class BoTab(QtWidgets.QWidget):
     """Tab used to configure the build order (BO) overlay"""
     show_hide_overlay = QtCore.pyqtSignal()  # show/hide the BO
-    cycle_build_order = QtCore.pyqtSignal()  # cycle between the different BO available
-    previous_step_build_order = QtCore.pyqtSignal()  # go to the previous step of the build order
-    next_step_build_order = QtCore.pyqtSignal()  # go to the next step of the build order
+    cycle_build_order = QtCore.pyqtSignal(
+    )  # cycle between the different BO available
+    previous_step_build_order = QtCore.pyqtSignal(
+    )  # go to the previous step of the build order
+    next_step_build_order = QtCore.pyqtSignal(
+    )  # go to the next step of the build order
 
     def __init__(self, parent):
         """Constructor
@@ -278,7 +324,8 @@ class BoTab(QtWidgets.QWidget):
         self.build_order_step = -1  # step of the build order, negative if not valid
         self.build_order_step_count = -1  # number of steps in the build order, negative if not valid
 
-        self.overlay = BuildOrderOverlay()  # overlay to display the build order
+        self.overlay = BuildOrderOverlay(
+        )  # overlay to display the build order
 
         # user interface
         self.bo_edit = QtWidgets.QTextEdit()  # text/json edit field
@@ -286,7 +333,8 @@ class BoTab(QtWidgets.QWidget):
         self.bo_list = QtWidgets.QListWidget()  # list of build orders
         self.font_size_combo = QtWidgets.QComboBox()  # overlay font
         self.image_height_combo = QtWidgets.QComboBox()  # images height
-        self.button_change_position = QtWidgets.QPushButton("Change BO overlay position")  # change overlay position
+        self.button_change_position = QtWidgets.QPushButton(
+            "Change BO overlay position")  # change overlay position
 
         # hotkeys
         self.key_show_hide = CustomKeySequenceEdit(self)
@@ -297,7 +345,8 @@ class BoTab(QtWidgets.QWidget):
         # connect signals
         self.show_hide_overlay.connect(self.overlay.show_hide)
         self.cycle_build_order.connect(self.cycle_overlay)
-        self.previous_step_build_order.connect(self.select_previous_build_order_step)
+        self.previous_step_build_order.connect(
+            self.select_previous_build_order_step)
         self.next_step_build_order.connect(self.select_next_build_order_step)
 
         # initialization
@@ -355,7 +404,7 @@ class BoTab(QtWidgets.QWidget):
 
         # list of build orders
         vertical_layout.addWidget(self.bo_list)
-        for name in settings.build_orders:
+        for name in settings.buildorders:
             self.bo_list.addItem(name)
         self.bo_list.currentItemChanged.connect(self.bo_selected)
         self.bo_list.setCurrentRow(0)
@@ -414,15 +463,18 @@ class BoTab(QtWidgets.QWidget):
         key_label = QtWidgets.QLabel("Hotkey to go to previous step:")
         overlay_layout.addWidget(key_label, 2, 0)
         self.key_previous_step.setMaximumWidth(100)
-        self.key_previous_step.setToolTip("Hotkey to go to the previous step of the build order.")
+        self.key_previous_step.setToolTip(
+            "Hotkey to go to the previous step of the build order.")
         overlay_layout.addWidget(self.key_previous_step, 2, 1)
-        self.key_previous_step.key_changed.connect(self.previous_step_hotkey_changed)
+        self.key_previous_step.key_changed.connect(
+            self.previous_step_hotkey_changed)
 
         # next build order step hotkey
         key_label = QtWidgets.QLabel("Hotkey to go to next step:")
         overlay_layout.addWidget(key_label, 3, 0)
         self.key_next_step.setMaximumWidth(100)
-        self.key_next_step.setToolTip("Hotkey to go to the next step of the build order.")
+        self.key_next_step.setToolTip(
+            "Hotkey to go to the next step of the build order.")
         overlay_layout.addWidget(self.key_next_step, 3, 1)
         self.key_next_step.key_changed.connect(self.next_step_hotkey_changed)
 
@@ -432,7 +484,8 @@ class BoTab(QtWidgets.QWidget):
         for i in range(1, 51):
             self.font_size_combo.addItem(f"{i} pt")
         self.font_size_combo.setCurrentIndex(settings.bo_font_size - 1)
-        self.font_size_combo.currentIndexChanged.connect(self.font_size_changed)
+        self.font_size_combo.currentIndexChanged.connect(
+            self.font_size_changed)
         overlay_layout.addWidget(self.font_size_combo, 4, 1)
 
         # images height
@@ -441,19 +494,23 @@ class BoTab(QtWidgets.QWidget):
         for i in range(1, 101):
             self.image_height_combo.addItem(f"{i} px")
         self.image_height_combo.setCurrentIndex(settings.bo_image_height - 1)
-        self.image_height_combo.currentIndexChanged.connect(self.image_height_changed)
+        self.image_height_combo.currentIndexChanged.connect(
+            self.image_height_changed)
         overlay_layout.addWidget(self.image_height_combo, 5, 1)
 
         # Position change button
-        self.button_change_position.setToolTip("Click to change BO overlay position. Click again to fix its position.")
-        self.button_change_position.clicked.connect(self.overlay.change_position_state)
+        self.button_change_position.setToolTip(
+            "Click to change BO overlay position. Click again to fix its position."
+        )
+        self.button_change_position.clicked.connect(
+            self.overlay.change_position_state)
         overlay_layout.addWidget(self.button_change_position, 6, 0, 1, 2)
 
     def save_current_bo(self):
         """Save the current build order"""
         bo_name = self.bo_list.currentItem().text()
         bo_text = self.bo_edit.toPlainText()
-        settings.build_orders[bo_name] = bo_text
+        settings.buildorders[bo_name] = bo_text
         self.update_overlay()
 
     def bo_selected(self, item: QtWidgets.QListWidgetItem):
@@ -475,7 +532,7 @@ class BoTab(QtWidgets.QWidget):
 
         # change values
         self.naming_widget.setText(item.text())
-        self.bo_edit.setText(settings.build_orders.get(item.text(), ""))
+        self.bo_edit.setText(settings.buildorders.get(item.text(), ""))
         self.update_overlay()
 
         # reconnect signals
@@ -494,9 +551,9 @@ class BoTab(QtWidgets.QWidget):
         # remove the old build order
         rows = self.bo_list.count()
         bo_names = {self.bo_list.item(i).text() for i in range(rows)}
-        for name in settings.build_orders:
+        for name in settings.buildorders:
             if name not in bo_names:
-                del settings.build_orders[name]
+                del settings.buildorders[name]
                 break
 
         # add the new build order
@@ -504,14 +561,15 @@ class BoTab(QtWidgets.QWidget):
 
     def update_order(self):
         """Update the order of the BOs"""
-        old_build_orders = settings.build_orders.copy()
-        settings.build_orders.clear()
+        old_build_orders = settings.buildorders.copy()
+        settings.buildorders.clear()
 
         rows = self.bo_list.count()
         for i in range(rows):
             name = self.bo_list.item(i).text()
-            if (name in old_build_orders) and (name not in settings.build_orders):
-                settings.build_orders[name] = old_build_orders[name]
+            if (name in old_build_orders) and (name
+                                               not in settings.buildorders):
+                settings.buildorders[name] = old_build_orders[name]
 
     def add_build_order(self):
         """Add a new build order"""
@@ -524,7 +582,7 @@ class BoTab(QtWidgets.QWidget):
         """Remove the currently selected build order"""
         if self.bo_list.count() == 1:
             return
-        del settings.build_orders[self.bo_list.currentItem().text()]
+        del settings.buildorders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
         self.update_order()
 
@@ -588,8 +646,10 @@ class BoTab(QtWidgets.QWidget):
         new_hotkey    string containing the new hotkey sequence
         """
         settings.bo_overlay_hotkey_show = hotkey_changed(
-            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_show,
-            hotkey_edit=self.key_show_hide, hotkey_signal=self.show_hide_overlay)
+            new_hotkey=new_hotkey,
+            hotkey_str=settings.bo_overlay_hotkey_show,
+            hotkey_edit=self.key_show_hide,
+            hotkey_signal=self.show_hide_overlay)
 
     def cycle_hotkey_changed(self, new_hotkey: str):
         """Update the cycle BO hotkey when changed
@@ -599,8 +659,10 @@ class BoTab(QtWidgets.QWidget):
         new_hotkey    string containing the new hotkey sequence
         """
         settings.bo_overlay_hotkey_cycle = hotkey_changed(
-            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_cycle,
-            hotkey_edit=self.key_cycle, hotkey_signal=self.cycle_build_order)
+            new_hotkey=new_hotkey,
+            hotkey_str=settings.bo_overlay_hotkey_cycle,
+            hotkey_edit=self.key_cycle,
+            hotkey_signal=self.cycle_build_order)
 
     def previous_step_hotkey_changed(self, new_hotkey: str):
         """Update the previous step hotkey when changed
@@ -610,8 +672,10 @@ class BoTab(QtWidgets.QWidget):
         new_hotkey    string containing the new hotkey sequence
         """
         settings.bo_overlay_hotkey_previous_step = hotkey_changed(
-            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_previous_step,
-            hotkey_edit=self.key_previous_step, hotkey_signal=self.previous_step_build_order)
+            new_hotkey=new_hotkey,
+            hotkey_str=settings.bo_overlay_hotkey_previous_step,
+            hotkey_edit=self.key_previous_step,
+            hotkey_signal=self.previous_step_build_order)
 
     def next_step_hotkey_changed(self, new_hotkey: str):
         """Update the next step hotkey when changed
@@ -621,8 +685,10 @@ class BoTab(QtWidgets.QWidget):
         new_hotkey    string containing the new hotkey sequence
         """
         settings.bo_overlay_hotkey_next_step = hotkey_changed(
-            new_hotkey=new_hotkey, hotkey_str=settings.bo_overlay_hotkey_next_step,
-            hotkey_edit=self.key_next_step, hotkey_signal=self.next_step_build_order)
+            new_hotkey=new_hotkey,
+            hotkey_str=settings.bo_overlay_hotkey_next_step,
+            hotkey_edit=self.key_next_step,
+            hotkey_signal=self.next_step_build_order)
 
     def limit_build_order_step(self):
         """Limit the step of the build order"""
@@ -639,7 +705,8 @@ class BoTab(QtWidgets.QWidget):
         init_build_order_step = self.build_order_step
         self.build_order_step -= 1
         self.limit_build_order_step()
-        if (init_build_order_step != self.build_order_step) and (self.build_order_step >= 0):
+        if (init_build_order_step !=
+                self.build_order_step) and (self.build_order_step >= 0):
             self.update_overlay()
 
     def select_next_build_order_step(self):
@@ -647,12 +714,14 @@ class BoTab(QtWidgets.QWidget):
         init_build_order_step = self.build_order_step
         self.build_order_step += 1
         self.limit_build_order_step()
-        if (init_build_order_step != self.build_order_step) and (self.build_order_step >= 0):
+        if (init_build_order_step !=
+                self.build_order_step) and (self.build_order_step >= 0):
             self.update_overlay()
 
     def cycle_overlay(self):
         """ Cycles through build orders and sends data to the overlay"""
-        self.bo_list.setCurrentRow((self.bo_list.currentRow() + 1) % self.bo_list.count())
+        self.bo_list.setCurrentRow(
+            (self.bo_list.currentRow() + 1) % self.bo_list.count())
         self.build_order_step = -1
         self.update_overlay()
 
@@ -668,12 +737,16 @@ class BoTab(QtWidgets.QWidget):
                 self.build_order_step_count = len(data['build_order'])
                 self.limit_build_order_step()
                 flag_picture = None
-                if ('civilization' in data) and (data['civilization'] in civilization_flags):
+                if ('civilization' in data) and (data['civilization']
+                                                 in civilization_flags):
                     flag_picture = civilization_flags[data['civilization']]
                 self.overlay.update_build_order_display(
-                    title=f'{bo_name} - {self.build_order_step + 1}/{self.build_order_step_count}',
-                    data=data['build_order'][self.build_order_step], flag_picture=flag_picture)
+                    title=
+                    f'{bo_name} - {self.build_order_step + 1}/{self.build_order_step_count}',
+                    data=data['build_order'][self.build_order_step],
+                    flag_picture=flag_picture)
             else:
                 self.build_order_step = -1
                 self.build_order_step_count = -1
-                self.overlay.update_build_order_display(title=bo_name, data={'txt': bo_text})
+                self.overlay.update_build_order_display(title=bo_name,
+                                                        data={'txt': bo_text})

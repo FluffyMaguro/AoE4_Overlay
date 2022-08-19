@@ -27,8 +27,8 @@ class _Settings:
         self.civ_stats_color: str = "#BC8AEA"
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
         self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
-                            (255, 0, 0, 0.35), (255, 0, 255, 0.35),
-                            (255, 255, 0, 0.35))
+                            (255, 0, 0, 0.35), (255, 0, 255, 0.35), (255, 255,
+                                                                     0, 0.35))
         # build order (BO) related parameters
         self.bo_show_title: bool = True  # True to show the title
         self.bo_title_color: list = [230, 159, 0]  # color for the title
@@ -41,17 +41,20 @@ class _Settings:
         self.bo_color_background: list = [30, 30, 30]  # background RGB color
         self.bo_font_police: str = 'Arial'  # police font
         self.bo_opacity: float = 0.75  # opacity of the window
-        self.bo_upper_right_position: list = [1870, 70]  # position for the upper right corner
+        self.bo_upper_right_position: list = [
+            1870, 70
+        ]  # position for the upper right corner
         self.bo_image_height: int = 30  # height of the images
         self.bo_border_size: int = 15  # size of the borders
         self.bo_vertical_spacing: int = 10  # vertical space between the BO lines
         # store build orders
-        self.build_orders: Dict[str, str] = {
-            "Instructions": "Write your own build order.\n"
-                            "You can also copy one from the https://age4builder.com website.\n\n"
-                            "Two formats are accepted (both available on https://age4builder.com):\n"
-                            "* Simple TXT format.\n"
-                            "* JSON format compatible with CraftySalamander overlay."
+        self.buildorders: Dict[str, str] = {
+            "Instructions":
+            "Write your own build order.\n"
+            "You can also copy one from the https://age4builder.com website.\n\n"
+            "Two formats are accepted (both available on https://age4builder.com):\n"
+            "* Simple TXT format.\n"
+            "* JSON format compatible with CraftySalamander overlay."
         }
         # images
         self.image_wood: str = 'resource/resource_wood.png'  # wood resource
