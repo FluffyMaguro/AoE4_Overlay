@@ -67,13 +67,13 @@ Settings:
 
 ![Screenshot](https://i.imgur.com/hhH8R72.png)
 
-<!-- Game history:
+Game history:
 
-![Screenshot](https://i.imgur.com/L1V1wp2.png) -->
-
+![Screenshot](https://i.imgur.com/L1V1wp2.png)
+<!-- 
 Rating history:
 
-![Screenshot](https://i.imgur.com/QqojOJI.png)
+![Screenshot](https://i.imgur.com/QqojOJI.png) -->
 
 <!-- Last 24 hours:
 
