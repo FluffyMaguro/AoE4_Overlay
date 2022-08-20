@@ -81,9 +81,8 @@ class _Settings:
             logger.warning("Failed to parse config file")
             return
 
-        for key in self.__dict__:
-            if key in data:
-                setattr(self, key, data[key])
+        for key in data:
+            setattr(self, key, data[key])
 
     def save(self):
         """ Saves configuration to app data"""
