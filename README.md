@@ -24,7 +24,9 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 * Set up the hotkey for showing/hiding overlay.
   * Overlay will be automatically shown when a new game starts (or app starts).
 
-*To update the app delete the app folder and extract the new archive elsewhere.*
+→ [Video tutorial](https://youtu.be/R5t9P4-tMxg) for app setup and using buildorders.
+
+→ *Note: To update the app delete the app folder and extract the new archive elsewhere.*
   
 # Build orders
   * Two build orders types are available:
