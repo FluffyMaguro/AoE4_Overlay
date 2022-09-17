@@ -81,11 +81,6 @@ def match_mode(match: Dict[str, Any], convert_customs: bool = True) -> int:
     return int(leaderboard_id)
 
 
-def quickmatch_game(match: Dict[str, Any]) -> bool:
-    """ Checks whether the game is a quickmatch"""
-    return match_mode(match, convert_customs=False) in QM_ids
-
-
 def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     """ Processes game data returned by API
     

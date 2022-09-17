@@ -31,6 +31,8 @@ def find_player(text: str) -> bool:
                 f"Found player by profile_id: {settings.player_name} ({settings.profile_id})"
             )
             return True
+    except json.decoder.JSONDecodeError:
+        ...
     except Exception:
         logger.exception("")
 
@@ -202,23 +204,3 @@ class Api_checker:
         if started > self.last_match_timestamp:  # and data['ongoing']:
             self.last_match_timestamp = started
             return data
-
-        if not ("qm_" in data['kind'] or 'rm_' in data['kind']):
-            return
-
-        # When a game finished
-        if started > self.last_rating_timestamp and not data['ongoing']:
-
-            # Check for new ratings
-            if not data['leaderboard_id']:
-                return
-
-            rating_history = get_rating_history(data['leaderboard_id'],
-                                                amount=1)
-
-            if not rating_history:
-                return
-
-            self.last_rating_timestamp = started
-            rating = rating_history[0]
-            return {"new_rating": True, 'timestamp': rating['timestamp']}

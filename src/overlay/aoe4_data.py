@@ -30,21 +30,10 @@ civ_data = {
     4: 'French',
     5: 'Holy Roman Empire',
     6: 'Mongols',
-    7: 'Rus'
+    7: 'Rus',
+    8: 'Ottomans',
+    9: 'Malians'
 }
-"""aoe4.net civ index to civ name"""
-
-net_to_world = {
-    0: 'abbasid_dynasty',
-    1: 'chinese',
-    2: 'delhi_sultanate',
-    3: 'english',
-    4: 'french',
-    5: 'holy_roman_empire',
-    6: 'mongols',
-    7: 'rus',
-}
-"""aoe4.net civ index to aoe4world.com civ name"""
 
 map_data = {
     -1: 'Unknown Map',

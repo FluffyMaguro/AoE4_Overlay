@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 from overlay.aoe4_data import civ_data, map_data, mode_data
 from overlay.api_checking import get_leaderboard_data
 from overlay.helper_func import match_mode
-from overlay.logging_func import get_logger, catch_exceptions
+from overlay.logging_func import catch_exceptions, get_logger
 from overlay.settings import settings
 from overlay.worker import scheldule
 
