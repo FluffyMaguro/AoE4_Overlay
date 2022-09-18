@@ -16,7 +16,7 @@ from overlay.tab_main import TabWidget
 
 logger = get_logger(__name__)
 
-VERSION = "1.4.0"
+VERSION = "1.4.1"
 
 # Might or might not help
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -35,11 +35,11 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
                      exc_info=(exc_type, exc_value, exc_tback))
 
     # If compiled, send email log
-    try:
-        if is_compiled() and settings.send_email_logs:
-            send_email_log(VERSION, exc_type, exc_value, exc_tback)
-    except Exception:
-        logger.exception("Failed to send a log through email")
+    # try:
+    #     if is_compiled() and settings.send_email_logs:
+    #         send_email_log(VERSION, exc_type, exc_value, exc_tback)
+    # except Exception:
+    #     logger.exception("Failed to send a log through email")
 
     # Try to save settings
     try:
@@ -107,12 +107,12 @@ class MainApp(QtWidgets.QMainWindow):
         file_menu.addAction(exitAction)
 
         # Report crashes
-        email_action = QtWidgets.QAction('Report crashes', self)
-        email_action.setCheckable(True)
-        email_action.setChecked(settings.send_email_logs)
-        email_action.triggered.connect(lambda: setattr(
-            settings, "send_email_logs", not settings.send_email_logs))
-        settings_menu.addAction(email_action)
+        # email_action = QtWidgets.QAction('Report crashes', self)
+        # email_action.setCheckable(True)
+        # email_action.setChecked(settings.send_email_logs)
+        # email_action.triggered.connect(lambda: setattr(
+        #     settings, "send_email_logs", not settings.send_email_logs))
+        # settings_menu.addAction(email_action)
 
         # Log matches
         mach_log_action = QtWidgets.QAction('Log match data', self)

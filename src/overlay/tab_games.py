@@ -74,11 +74,19 @@ class MatchEntry:
                 'rating_diff'] else "?"
         elo_change = QtWidgets.QLabel(str(diff))
 
+        # aoe4world Link
+        game_id = match_data["game_id"]
+        link = QtWidgets.QLabel(
+            f'<a href="https://aoe4world.com/players/{settings.profile_id}/games/{game_id}"> game link</a>'
+        )
+        link.setOpenExternalLinks(True)
+
         self.widgets = (*team_widgets, map_name, date, mode, result,
-                        elo_change)
+                        elo_change, link)
 
         for item in self.widgets:
-            item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+            if item != link:
+                item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
             if item not in team_widgets:
                 item.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -90,7 +98,7 @@ class MatchEntry:
         self.in_layout = True
         for column, widget in enumerate(self.widgets):
             self.main_layout.addWidget(widget, row, column)
-        self.main_layout.addWidget(self.line, row + 1, 0, 1, 7)
+        self.main_layout.addWidget(self.line, row + 1, 0, 1, len(self.widgets))
 
     def remove_from_layout(self):
         """ Removes its widgets from the layout"""
@@ -135,6 +143,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.scroll_layout.addWidget(QtWidgets.QLabel("Mode"), 0, 4)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Result"), 0, 5)
         self.scroll_layout.addWidget(QtWidgets.QLabel("Rating diff"), 0, 6)
+        self.scroll_layout.addWidget(QtWidgets.QLabel("AoE4World"), 0, 7)
 
         self.header_widgets = set()
         for i in range(self.scroll_layout.count()):
