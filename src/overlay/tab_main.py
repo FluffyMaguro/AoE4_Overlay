@@ -56,7 +56,7 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def start(self):
         logger.info(
-            f"Starting (v{self.version}) (c:{hf.is_compiled()}) [{platform.platform()}]"
+            f"Starting (v{self.version}) (compiled:{hf.is_compiled()}) [{platform.platform()}]"
         )
         self.check_for_new_version()
         hf.create_custom_files()

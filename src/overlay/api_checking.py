@@ -56,26 +56,7 @@ def find_player(text: str) -> bool:
     return False
 
 
-def get_match_history(amount: int = 1,
-                      raise_exception: bool = False) -> List[Any]:
-    """ Gets player match history"""
-    if settings.steam_id:
-        url = f"https://aoeiv.net/api/player/matches?game=aoe4&steam_id={settings.steam_id}&count={amount}"
-    elif settings.profile_id:
-        url = f"https://aoeiv.net/api/player/matches?game=aoe4&profile_id={settings.profile_id}&count={amount}"
-    else:
-        return []
-
-    resp = session.get(url).text
-    try:
-        return json.loads(resp)
-    except Exception:
-        logger.warning(f"Failed to parse match history\n{resp}")
-        if raise_exception:
-            raise Exception
-        return []
-
-
+# Not used anymore
 def get_rating_history(leaderboard_id: int, amount: int = 1) -> List[Any]:
     """ Gets player match history"""
     if settings.steam_id:
@@ -93,6 +74,7 @@ def get_rating_history(leaderboard_id: int, amount: int = 1) -> List[Any]:
         return []
 
 
+# Not used anymore
 def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
     """ Gets leaderboard data for the main player"""
     if settings.steam_id:
