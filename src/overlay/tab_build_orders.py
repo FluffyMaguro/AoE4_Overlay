@@ -576,7 +576,9 @@ class BoTab(QtWidgets.QWidget):
 
     def add_build_order(self):
         """Add a new build order"""
-        self.bo_list.addItem(f"Build order {self.bo_list.count() + 1}")
+        item = QtWidgets.QListWidgetItem(f"Build order {self.bo_list.count() + 1}")
+        item.setCheckState(QtCore.Qt.Checked)
+        self.bo_list.addItem(item)
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
         self.update_order()
