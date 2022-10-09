@@ -41,6 +41,7 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
   * Change their order using **Move build order up/down**.
   * Set up hotkeys (with **Hotkey for/to...**) for showing/hiding overlay, cycling between build orders and selecting the previous/next step of a build order (only available for the *Illustrated format*).
     * Use the corresponding hotkeys to show/hide/cycle build orders and steps.
+    * You can uncheck a build order so that it does not appear when cycling between the build orders with the dedicated hotkey.
   * Change the overlay font size with **Overlay font size**.
   * Change the height of the build order images (only for the *Illustrated format*) with **Overlay images height**.
   * Change the position of the build order overlay with **Change BO overlay position**. Once fixed, the upper right corner will never move, but the size of the overlay will be automatically adapted to its content.
