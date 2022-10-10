@@ -305,12 +305,9 @@ def hotkey_changed(new_hotkey: str, hotkey_str: str,
 class BoTab(QtWidgets.QWidget):
     """Tab used to configure the build order (BO) overlay"""
     show_hide_overlay = QtCore.pyqtSignal()  # show/hide the BO
-    cycle_build_order = QtCore.pyqtSignal(
-    )  # cycle between the different BO available
-    previous_step_build_order = QtCore.pyqtSignal(
-    )  # go to the previous step of the build order
-    next_step_build_order = QtCore.pyqtSignal(
-    )  # go to the next step of the build order
+    cycle_build_order = QtCore.pyqtSignal()  # cycle between the different BO available
+    previous_step_build_order = QtCore.pyqtSignal()  # go to the previous step of the build order
+    next_step_build_order = QtCore.pyqtSignal()  # go to the next step of the build order
 
     def __init__(self, parent):
         """Constructor
@@ -357,6 +354,7 @@ class BoTab(QtWidgets.QWidget):
 
     def closeEvent(self, _):
         """Function called when closing the widget."""
+        self.save_unchecked_state()
         self.overlay.close()
 
     def init_hotkeys(self):
@@ -405,9 +403,14 @@ class BoTab(QtWidgets.QWidget):
         # list of build orders
         vertical_layout.addWidget(self.bo_list)
         for name in settings.buildorders:
-            self.bo_list.addItem(name)
+            item = QtWidgets.QListWidgetItem(name)
+            item.setCheckState(QtCore.Qt.Unchecked if (name in settings.unchecked_buildorders) else QtCore.Qt.Checked)
+            self.bo_list.addItem(item)
         self.bo_list.currentItemChanged.connect(self.bo_selected)
-        self.bo_list.setCurrentRow(0)
+
+        self.bo_list.setCurrentRow(0)  # set first selected item
+        if self.bo_list.currentItem().checkState() == QtCore.Qt.Unchecked:
+            self.cycle_overlay()
 
         # add build order
         add_bo_button = QtWidgets.QPushButton("Add build order")
@@ -549,8 +552,8 @@ class BoTab(QtWidgets.QWidget):
         self.bo_list.currentItem().setText(text)
 
         # remove the old build order
-        rows = self.bo_list.count()
-        bo_names = {self.bo_list.item(i).text() for i in range(rows)}
+        rows_count = self.bo_list.count()
+        bo_names = {self.bo_list.item(i).text() for i in range(rows_count)}
         for name in settings.buildorders:
             if name not in bo_names:
                 del settings.buildorders[name]
@@ -564,8 +567,8 @@ class BoTab(QtWidgets.QWidget):
         old_build_orders = settings.buildorders.copy()
         settings.buildorders.clear()
 
-        rows = self.bo_list.count()
-        for i in range(rows):
+        rows_count = self.bo_list.count()
+        for i in range(rows_count):
             name = self.bo_list.item(i).text()
             if (name in old_build_orders) and (name
                                                not in settings.buildorders):
@@ -573,7 +576,9 @@ class BoTab(QtWidgets.QWidget):
 
     def add_build_order(self):
         """Add a new build order"""
-        self.bo_list.addItem(f"Build order {self.bo_list.count() + 1}")
+        item = QtWidgets.QListWidgetItem(f"Build order {self.bo_list.count() + 1}")
+        item.setCheckState(QtCore.Qt.Checked)
+        self.bo_list.addItem(item)
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
         self.update_order()
@@ -706,7 +711,7 @@ class BoTab(QtWidgets.QWidget):
         self.build_order_step -= 1
         self.limit_build_order_step()
         if (init_build_order_step !=
-                self.build_order_step) and (self.build_order_step >= 0):
+            self.build_order_step) and (self.build_order_step >= 0):
             self.update_overlay()
 
     def select_next_build_order_step(self):
@@ -715,15 +720,29 @@ class BoTab(QtWidgets.QWidget):
         self.build_order_step += 1
         self.limit_build_order_step()
         if (init_build_order_step !=
-                self.build_order_step) and (self.build_order_step >= 0):
+            self.build_order_step) and (self.build_order_step >= 0):
             self.update_overlay()
 
     def cycle_overlay(self):
-        """ Cycles through build orders and sends data to the overlay"""
-        self.bo_list.setCurrentRow(
-            (self.bo_list.currentRow() + 1) % self.bo_list.count())
-        self.build_order_step = -1
-        self.update_overlay()
+        """ Cycle through build orders and send data to the overlay"""
+        rows_count = self.bo_list.count()
+        init_id = self.bo_list.currentRow()  # initially selected build order ID
+
+        current_id = init_id + 1  # current build order ID to check
+        if current_id >= rows_count:
+            current_id = 0
+
+        while current_id != init_id:  # stop if back to the initial ID
+
+            if self.bo_list.item(current_id).checkState() == QtCore.Qt.Checked:  # valid build order found
+                self.bo_list.setCurrentRow(current_id)
+                self.build_order_step = -1
+                self.update_overlay()
+                return
+
+            current_id += 1  # go to next build order ID
+            if current_id >= rows_count:
+                current_id = 0
 
     def update_overlay(self):
         """Send new data to the overlay"""
@@ -750,3 +769,11 @@ class BoTab(QtWidgets.QWidget):
                 self.build_order_step_count = -1
                 self.overlay.update_build_order_display(title=bo_name,
                                                         data={'txt': bo_text})
+
+    def save_unchecked_state(self):
+        """Save the state of the unchecked build orders"""
+        settings.unchecked_buildorders.clear()
+        rows_count = self.bo_list.count()
+        for row_id in range(rows_count):
+            if self.bo_list.item(row_id).checkState() == QtCore.Qt.Unchecked:
+                settings.unchecked_buildorders.append(self.bo_list.item(row_id).text())
