@@ -13,7 +13,9 @@ civilization_flags = {
     'English': 'civilization_flag/CivIcon-EnglishAoE4_spacing.png',
     'French': 'civilization_flag/CivIcon-FrenchAoE4_spacing.png',
     'Holy Roman Empire': 'civilization_flag/CivIcon-HREAoE4_spacing.png',
+    'Malians': 'civilization_flag/CivIcon-MaliansAoE4_spacing.png',
     'Mongols': 'civilization_flag/CivIcon-MongolsAoE4_spacing.png',
+    'Ottomans': 'civilization_flag/CivIcon-OttomansAoE4_spacing.png',
     'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.png'
 }
 
