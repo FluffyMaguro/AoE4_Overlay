@@ -1,5 +1,6 @@
 ## [1.4.2] - in progress
 * Build orders can be unchecked, so that they do not appear when cycling between the build orders with the dedicated hotkey.
+* Malians and Ottomans added (Season 3).
 
 ## [1.4.0] - 2022.07.25
 * The order of the build orders can be adapted with 'Move build order up/down'.
