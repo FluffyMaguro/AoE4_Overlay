@@ -16,7 +16,7 @@ from overlay.tab_main import TabWidget
 
 logger = get_logger(__name__)
 
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 
 # Might or might not help
 os.environ["PYTHONIOENCODING"] = "utf-8"
