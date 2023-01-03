@@ -25,6 +25,7 @@ class _Settings:
         self.font_size: int = 12
         self.max_games_history: int = 100
         self.civ_stats_color: str = "#BC8AEA"
+        self.open_overlay_on_new_game = True
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
         self.team_colors = ((74, 255, 2, 0.35), (3, 179, 255, 0.35),
                             (255, 0, 0, 0.35), (255, 0, 255, 0.35), (255, 255,
@@ -50,14 +51,15 @@ class _Settings:
         # store build orders
         self.buildorders: Dict[str, str] = {
             "Instructions":
-                "Write your own build order.\n"
-                "You can also copy one from the https://age4builder.com website\n"
-                "    (click on the salamander icon and paste it here).\n\n"
-                "Two formats are accepted (both available on https://age4builder.com):\n"
-                "* Simple TXT format.\n"
-                "* JSON format compatible with CraftySalamander overlay."
+            "Write your own build order.\n"
+            "You can also copy one from the https://age4builder.com website\n"
+            "    (click on the salamander icon and paste it here).\n\n"
+            "Two formats are accepted (both available on https://age4builder.com):\n"
+            "* Simple TXT format.\n"
+            "* JSON format compatible with CraftySalamander overlay."
         }
-        self.unchecked_buildorders: list = []  # list of build orders which are not checked at launch
+        self.unchecked_buildorders: list = [
+        ]  # list of build orders which are not checked at launch
         # images
         self.image_wood: str = 'resource/resource_wood.png'  # wood resource
         self.image_food: str = 'resource/resource_food.png'  # food resource

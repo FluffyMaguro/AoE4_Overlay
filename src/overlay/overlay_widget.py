@@ -23,6 +23,7 @@ def set_pixmap(civ: str, widget: QtWidgets.QWidget):
 
 class PlayerWidget:
     """ Player widget shown on the overlay"""
+
     def __init__(self, row: int, toplayout: QtWidgets.QGridLayout):
         self.hiding_civ_stats: bool = True
         self.team: int = 0
@@ -131,6 +132,7 @@ class PlayerWidget:
 
 class AoEOverlay(OverlayWidget):
     """Overlay widget showing AOE4 information """
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.hiding_civ_stats: bool = True
@@ -247,7 +249,8 @@ class AoEOverlay(OverlayWidget):
             else:
                 widget.show()
 
-        self.show()
+        if settings.open_overlay_on_new_game:
+            self.show()
 
     def save_geometry(self):
         """ Saves overlay geometry into settings"""
