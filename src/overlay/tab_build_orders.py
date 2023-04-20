@@ -434,7 +434,7 @@ class BoTab(QtWidgets.QWidget):
 
         vertical_layout.addSpacing(30)
         age4builder = QtWidgets.QLabel(
-            'Find & copy build orders from <a href="https://age4builder.com/">age4builder.com</a>'
+            'Find & copy build orders from <a href="https://age4builder.com/">age4builder.com</a><br>or <a href="https://aoe4guides.com/">aoe4guides.com</a>.'
         )
         age4builder.setOpenExternalLinks(True)
         vertical_layout.addWidget(age4builder)

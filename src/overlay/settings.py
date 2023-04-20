@@ -53,8 +53,10 @@ class _Settings:
             "Instructions":
             "Write your own build order.\n"
             "You can also copy one from the https://age4builder.com website\n"
-            "    (click on the salamander icon and paste it here).\n\n"
-            "Two formats are accepted (both available on https://age4builder.com):\n"
+            "    (click on the salamander icon and paste it here)\n"
+            "    or from https://aoe4guides.com (click on the 3 dots\n"
+            "    in the upper right corner, then on \'Overlay Tool\'').\n\n"
+            "Two formats are accepted:\n"
             "* Simple TXT format.\n"
             "* JSON format compatible with CraftySalamander overlay."
         }
