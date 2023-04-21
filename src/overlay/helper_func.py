@@ -122,6 +122,8 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     # Add player data
     result['players'] = []
     for player in players:
+        # Avoid overwriting mode when falling back to QM/RM on a specific player
+        lookup_mode = mode
         current_civ = player['civilization']
         name = player['name'] if player['name'] is not None else "?"
 
@@ -129,13 +131,13 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         civ_winrate = ""
         civ_win_median = ""
         try:
-            if not mode in player['modes']:
-                if 'rm_' in mode:
-                    mode = mode.replace('rm_', 'qm_')
-                elif 'qm_' in mode:
-                    mode = mode.replace('qm_', 'rm_')
-            if 'civilizations' in player['modes'][mode]:
-                for civ in player['modes'][mode]['civilizations']:
+            if not lookup_mode in player['modes']:
+                if 'rm_' in lookup_mode:
+                    lookup_mode = lookup_mode.replace('rm_', 'qm_')
+                elif 'qm_' in lookup_mode:
+                    lookup_mode = lookup_mode.replace('qm_', 'rm_')
+            if 'civilizations' in player['modes'][lookup_mode]:
+                for civ in player['modes'][lookup_mode]['civilizations']:
                     if civ['civilization'] == current_civ:
                         civ_games = str(civ['games_count'])
                         civ_winrate = f"{civ['win_rate']/100:.1%}"
@@ -145,8 +147,8 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
         except Exception:
             print(traceback.format_exc())
 
-        mode_data = player.get('modes', {}).get(mode, {})
-        mode_str = mode.split('_')[0].upper()
+        mode_data = player.get('modes', {}).get(lookup_mode, {})
+        mode_str = lookup_mode.split('_')[0].upper()
 
         data = {
             'civ': current_civ.replace("_", " ").title(),
