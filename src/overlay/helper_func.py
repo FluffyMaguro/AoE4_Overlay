@@ -95,6 +95,11 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     result['match_id'] = game_data['game_id']
     mode = game_data['kind']
 
+    # aoe4world has a single rm_team rating that we'd like to use instead here
+    # for team games
+    if mode in ['rm_4v4', 'rm_3v3', 'rm_2v2']:
+        mode = "rm_team"
+
     # Sort players so the main player team is first
     players = []
     main_team = None
