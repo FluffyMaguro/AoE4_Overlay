@@ -32,7 +32,13 @@ civ_data = {
     6: 'Mongols',
     7: 'Rus',
     8: 'Ottomans',
-    9: 'Malians'
+    9: 'Malians',
+    10: 'Ayyubids', # Later added for randomization. Indexes not accurate.
+    11: 'Byzantines',
+    12: 'Japanese',
+    13: 'Jeanne Darc',
+    14: 'Order Of The Dragon',
+    15: 'Zhu Xis Legacy',
 }
 
 map_data = {
