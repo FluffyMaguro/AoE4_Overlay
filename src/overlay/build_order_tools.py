@@ -8,15 +8,21 @@ from PyQt5.QtWidgets import QLabel
 # flags of the different civilizations
 civilization_flags = {
     'Abbasid Dynasty': 'civilization_flag/CivIcon-AbbasidAoE4_spacing.png',
+    'Ayyubids': 'civilization_flag/CivIcon-AyyubidsAoE4_spacing.png',
+    'Byzantines': 'civilization_flag/CivIcon-ByzantinesAoE4_spacing.png',
     'Chinese': 'civilization_flag/CivIcon-ChineseAoE4_spacing.png',
     'Delhi Sultanate': 'civilization_flag/CivIcon-DelhiAoE4_spacing.png',
     'English': 'civilization_flag/CivIcon-EnglishAoE4_spacing.png',
     'French': 'civilization_flag/CivIcon-FrenchAoE4_spacing.png',
     'Holy Roman Empire': 'civilization_flag/CivIcon-HREAoE4_spacing.png',
+    'Japanese': 'civilization_flag/CivIcon-JapaneseAoE4_spacing.png',
+    'Jeanne d\'Arc': 'civilization_flag/CivIcon-JeanneDArcAoE4_spacing.png',
     'Malians': 'civilization_flag/CivIcon-MaliansAoE4_spacing.png',
     'Mongols': 'civilization_flag/CivIcon-MongolsAoE4_spacing.png',
+    'Order of the Dragon': 'civilization_flag/CivIcon-OrderOfTheDragonAoE4_spacing.png',
     'Ottomans': 'civilization_flag/CivIcon-OttomansAoE4_spacing.png',
-    'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.png'
+    'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.png',
+    'Zhu Xi\'s Legacy': 'civilization_flag/CivIcon-ZhuXiLegacyAoE4_spacing.png'
 }
 
 

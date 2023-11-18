@@ -1,4 +1,7 @@
-## [1.4.2] - in progress
+## in progress
+* New BO civilizations from Season 6 added.
+
+## [1.4.2] - 2022.10.26
 * Build orders can be unchecked, so that they do not appear when cycling between the build orders with the dedicated hotkey.
 * Malians and Ottomans added (Season 3).
 
