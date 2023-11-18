@@ -1,4 +1,4 @@
-## [1.4.5] - 2023.11.18
+## in progress
 * New BO civilizations from Season 6 added.
 
 ## [1.4.2] - 2022.10.26
