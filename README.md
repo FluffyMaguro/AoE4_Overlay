@@ -24,6 +24,7 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 **Linux** 
 * ```cd ~/Documents```
 * ```git clone https://github.com/FluffyMaguro/AoE4_Overlay.git```
+* ```cd ~/Documents/AoE4_Overlay```
 * ```pip install -r requirements.txt```
 * ```python3 src/AoE4_Overlay.py```
 </br>
