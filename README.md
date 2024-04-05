@@ -2,8 +2,6 @@
  
 * **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.4.5/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
-* Example commands to run script on Linux Mint 21.3/Ubuntu 22.04
-* TODO: fill out commands
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
 
@@ -19,9 +17,17 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 
 
 # How to use
-
+**Windows**
 * Download and extract the archive.
 * Run `AoE4_Overlay.exe`.
+
+**Linux** 
+* ```cd ~/Documents```
+* ```git clone https://github.com/FluffyMaguro/AoE4_Overlay.git```
+* ```pip install -r requirements.txt```
+* ```python3 src/AoE4_Overlay.py```
+</br>
+
 * Find your profile by entering your profile ID, Steam ID or player name.
 * Set up the hotkey for showing/hiding overlay.
   * Overlay will be automatically shown when a new game starts (or app starts).
