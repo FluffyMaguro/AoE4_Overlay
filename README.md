@@ -2,6 +2,8 @@
  
 * **[DOWNLOAD HERE](https://github.com/FluffyMaguro/AoE4_Overlay/releases/download/1.4.5/AoE4_Overlay.zip)** (Windows)
 * Or run the script with Python 3.6+ (Windows/Mac/Linux)
+* Example commands to run script on Linux Mint 21.3/Ubuntu 22.04
+* TODO: fill out commands
 
 ![Screenshot](https://i.imgur.com/eN2zJ3c.jpg)
 
