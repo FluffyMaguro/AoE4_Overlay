@@ -17,9 +17,18 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 
 
 # How to use
-
+**Windows**
 * Download and extract the archive.
 * Run `AoE4_Overlay.exe`.
+
+**Linux** 
+* ```cd ~/Documents```
+* ```git clone https://github.com/FluffyMaguro/AoE4_Overlay.git```
+* ```cd ~/Documents/AoE4_Overlay```
+* ```pip install -r requirements.txt```
+* ```python3 src/AoE4_Overlay.py```
+</br>
+
 * Find your profile by entering your profile ID, Steam ID or player name.
 * Set up the hotkey for showing/hiding overlay.
   * Overlay will be automatically shown when a new game starts (or app starts).
