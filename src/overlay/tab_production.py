@@ -1,7 +1,6 @@
 import json
 from PyQt5 import QtWidgets, QtGui, QtCore
 from typing import Dict, List, Union
-from PyQt5.QtCore import QTimer
 
 class ProductionTab(QtWidgets.QWidget):
     def __init__(self):
@@ -82,9 +81,8 @@ class ProductionTab(QtWidgets.QWidget):
         self.automation_button.toggled.connect(self.toggle_automation)
         automation_layout.addWidget(self.automation_button)
 
-        # Timer for automation
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.print_shortcuts)
+        # Flag to check if automation is active
+        self.automation_active = False
 
     def load_from_json(self, file_path: str, key: str) -> List[Dict[str, Union[str, Dict[str, float]]]]:
         with open(file_path, 'r') as file:
@@ -124,14 +122,15 @@ class ProductionTab(QtWidgets.QWidget):
         self.stone_cost.setText(f"{current_stone:.2f}")
 
     def toggle_automation(self, checked: bool):
-        if checked:
-            self.timer.start(5000)  # Start timer with 5-second interval
-        else:
-            self.timer.stop()  # Stop timer
+        self.automation_active = checked
 
     def print_shortcuts(self):
         shortcuts = [btn.text() for btn in self.production_icons]
         print("Current shortcuts in production:", shortcuts)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+        if self.automation_active and event.key() == QtCore.Qt.Key_O:
+            self.print_shortcuts()
 
 # Example usage
 app = QtWidgets.QApplication([])
