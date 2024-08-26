@@ -19,6 +19,7 @@ from overlay.tab_override import OverrideTab
 from overlay.tab_random import RandomTab
 from overlay.tab_settings import SettingsTab
 from overlay.tab_stats import StatsTab
+from overlay.tab_production import ProductionTab
 from overlay.websocket import Websocket_manager
 from overlay.worker import scheldule
 
@@ -45,6 +46,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.override_tab.update_override.connect(self.override_update_event)
         self.settigns_tab = SettingsTab(self)
         self.settigns_tab.new_profile.connect(self.new_profile_found)
+        self.production_tab = ProductionTab(self)
 
         self.addTab(self.settigns_tab, "Settings")
         self.addTab(self.games_tab, "Games")
@@ -53,7 +55,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.build_order_tab, "Build orders")
         self.addTab(self.random_tab, "Randomize")
         self.addTab(self.override_tab, "Override")
-        # self.addTab(self.production, "Production")
+        self.addTab(self.production_tab, "Production")
 
     def start(self):
         logger.info(
