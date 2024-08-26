@@ -53,6 +53,7 @@ class TabWidget(QtWidgets.QTabWidget):
         self.addTab(self.build_order_tab, "Build orders")
         self.addTab(self.random_tab, "Randomize")
         self.addTab(self.override_tab, "Override")
+        # self.addTab(self.production, "Production")
 
     def start(self):
         logger.info(
