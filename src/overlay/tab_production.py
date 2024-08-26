@@ -54,8 +54,7 @@ class ProductionTab(QtWidgets.QWidget):
         production_groupbox.setLayout(self.production_layout)
         main_layout.addWidget(production_groupbox)
 
-        self.production_icons = []
-        self.item_costs = {}  # Dictionary to track costs of items in production
+        self.production_items = {}  # Dictionary to manage production items with count
 
         # Costs section
         costs_groupbox = QtWidgets.QGroupBox("Costs:")
@@ -90,26 +89,47 @@ class ProductionTab(QtWidgets.QWidget):
             return data.get(key, [])
 
     def add_to_production(self, item: Dict[str, Union[str, Dict[str, float]]]):
-        # Create the production icon button with name
-        btn = QtWidgets.QPushButton(item['name'].capitalize())
-        btn.setIcon(QtGui.QIcon(item['icon_path']))
-        btn.clicked.connect(lambda: self.remove_from_production(btn, item))
-        self.production_icons.append(btn)
-        # Update the production layout
-        row = len(self.production_icons) // 5
-        col = len(self.production_icons) % 5
-        self.production_layout.addWidget(btn, row, col)
+        name = item['name']
+        if name in self.production_items:
+            self.production_items[name]['count'] += 1
+            self.update_production_button(name)
+        else:
+            # Create the production icon button with name
+            btn = QtWidgets.QPushButton(f"{name.capitalize()} x1")
+            btn.setIcon(QtGui.QIcon(item['icon_path']))
+            btn.clicked.connect(lambda: self.remove_from_production(btn, item))
+            self.production_items[name] = {
+                'data': item,
+                'button': btn,
+                'count': 1
+            }
+            # Update the production layout
+            row = len(self.production_items) // 5
+            col = len(self.production_items) % 5
+            self.production_layout.addWidget(btn, row, col)
         # Update costs based on the item's cost in JSON
         cost = item.get('cost', {"food": 0, "wood": 0, "gold": 0, "stone": 0})
-        self.item_costs[btn] = cost
         self.update_costs(cost['food'], cost['wood'], cost['gold'], cost['stone'])
 
     def remove_from_production(self, btn: QtWidgets.QPushButton, item: Dict[str, Union[str, Dict[str, float]]]):
-        btn.deleteLater()
-        self.production_icons.remove(btn)
-        # Update costs when item is removed
-        cost = self.item_costs.pop(btn, {"food": 0, "wood": 0, "gold": 0, "stone": 0})
-        self.update_costs(-cost['food'], -cost['wood'], -cost['gold'], -cost['stone'])
+        name = item['name']
+        if name in self.production_items:
+            if self.production_items[name]['count'] > 1:
+                self.production_items[name]['count'] -= 1
+                self.update_production_button(name)
+            else:
+                # Remove the button if count is 1
+                self.production_items[name]['button'].deleteLater()
+                del self.production_items[name]
+            # Update costs when item is removed
+            cost = item.get('cost', {"food": 0, "wood": 0, "gold": 0, "stone": 0})
+            self.update_costs(-cost['food'], -cost['wood'], -cost['gold'], -cost['stone'])
+
+    def update_production_button(self, name: str):
+        item = self.production_items[name]
+        button = item['button']
+        count = item['count']
+        button.setText(f"{name.capitalize()} x{count}")
 
     def update_costs(self, food: float, wood: float, gold: float, stone: float):
         current_food = round(float(self.food_cost.text()) + food, 2)
@@ -125,7 +145,9 @@ class ProductionTab(QtWidgets.QWidget):
         self.automation_active = checked
 
     def print_shortcuts(self):
-        shortcuts = [btn.text() for btn in self.production_icons]
+        shortcuts = []
+        for item in self.production_items.values():
+            shortcuts.extend([item['data']['hotkey']] * item['count'])
         print("Current shortcuts in production:", shortcuts)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
