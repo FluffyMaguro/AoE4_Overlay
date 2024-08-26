@@ -1,0 +1,58 @@
+{
+    "units": [
+        {
+            "name": "villager",
+            "civilization": "Global",
+            "cost": {
+                "food": 4.05,
+                "wood": 0,
+                "gold": 0,
+                "stone": 0
+            },
+            "build_location": "town center",
+            "icon_path": "src/img/build_order/unit_worker/villager.png",
+            "hotkey": "V"
+        },
+        {
+            "name": "archer",
+            "civilization": "Global",
+            "cost": {
+                "food": 3.24,
+                "wood": 6.45,
+                "gold": 0,
+                "stone": 0
+            },
+            "build_location": "archery range",
+            "icon_path": "src/img/build_order/unit_infantry/archer-2.png",
+            "hotkey": "A"
+        },
+        {
+            "name": "keshik",
+            "civilization": "Global",
+            "cost": {
+                "food": 6.48,
+                "wood": 0,
+                "gold": 4.32,
+                "stone": 0
+            },
+            "build_location": "stable",
+            "icon_path": "src/img/build_order/unit_mongols/keshik-2.png",
+            "hotkey": "A"
+        }
+    ],
+    "buildings": [
+        {
+            "name": "town center",
+            "civilization": "Global",
+            "build_location": "town center",
+            "icon_path": "src/img/build_order/building_economy/town-center.png",
+            "hotkey": "H"
+        },
+        {
+            "name": "archery range",
+            "civilization": "Global",
+            "icon_path": "src/img/build_order/building_military/archery-range.png",
+            "hotkey": "A"
+        }
+    ]
+}
