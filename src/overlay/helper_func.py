@@ -83,7 +83,6 @@ def match_mode(match: Dict[str, Any], convert_customs: bool = True) -> int:
 
 def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
     """ Processes game data returned by API
-    
     Sorts players to main is at the top. Calculates winrates. 
     Gets text for civs and maps. Apart from `team`, all player data returned as string."""
     result = {}
@@ -149,11 +148,11 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
 
         mode_data = player.get('modes', {}).get(lookup_mode, {})
         mode_str = lookup_mode.split('_')[0].upper()
-
         data = {
             'civ': current_civ.replace("_", " ").title(),
             'name': name,
             'team': zeroed(player['team'] + 1),
+            'country': player['country'],
             'rating': str(mode_data.get('rating', 0)),
             'rank': f"{mode_str}#{mode_data.get('rank',0)}",
             'wins': str(mode_data.get('wins_count', 0)),
