@@ -45,6 +45,7 @@ class InnerPlayer(PlayerWidget):
         for i in range(1, 3):
             self.team_cb.addItem(f"Team {i}")
         self.rating = QtWidgets.QLineEdit()
+        self.country = QtWidgets.QLabel()
         self.rank = QtWidgets.QLineEdit()
         self.winrate = QtWidgets.QLineEdit()
         self.wins = QtWidgets.QLineEdit()

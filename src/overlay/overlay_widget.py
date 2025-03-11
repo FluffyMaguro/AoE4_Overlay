@@ -20,6 +20,17 @@ def set_pixmap(civ: str, widget: QtWidgets.QWidget):
     PIXMAP_CACHE[civ] = pixmap
     widget.setPixmap(pixmap)
 
+def set_country_flag(country_code: str, widget: QtWidgets.QLabel):
+    """ Sets country flag to a widget. Handles caching."""
+    if country_code in PIXMAP_CACHE:
+        widget.setPixmap(PIXMAP_CACHE[country_code])
+        return
+    path = file_path(f"img/countries/{country_code}.png")  # PNG format
+    pixmap = QtGui.QPixmap(path)
+    pixmap = pixmap.scaled(widget.width(), widget.height(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    PIXMAP_CACHE[country_code] = pixmap
+    widget.setPixmap(pixmap)
+
 
 class PlayerWidget:
     """ Player widget shown on the overlay"""
@@ -42,7 +53,7 @@ class PlayerWidget:
 
         offset = 0
         for column, widget in enumerate(
-            (self.flag, self.name, self.rating, self.rank, self.winrate,
+            (self.flag, self.name, self.country, self.rating, self.rank, self.winrate,
              self.wins, self.losses, self.civ_games, self.civ_winrate,
              self.civ_median_wins)):
 
@@ -54,6 +65,10 @@ class PlayerWidget:
         # Separated so this can be changed in a child inner overlay for editing
         self.flag = QtWidgets.QLabel()
         self.flag.setFixedSize(QtCore.QSize(60, 30))
+        self.country = QtWidgets.QLabel()
+        self.country.setFixedSize(QtCore.QSize(25,14))
+        self.country.setScaledContents(True)  
+
         self.name = QtWidgets.QLabel()
         self.rating = QtWidgets.QLabel()
         self.rank = QtWidgets.QLabel()
@@ -63,11 +78,12 @@ class PlayerWidget:
         self.civ_games = QtWidgets.QLabel()
         self.civ_winrate = QtWidgets.QLabel()
         self.civ_median_wins = QtWidgets.QLabel()
+         
 
     def show(self, show: bool = True):
         self.visible = show
         """ Shows or hides all widgets in this class """
-        for widget in (self.flag, self.name, self.rating, self.rank,
+        for widget in (self.flag, self.name, self.country, self.rating, self.rank,
                        self.winrate, self.wins, self.losses, self.civ_games,
                        self.civ_winrate, self.civ_median_wins):
             widget.show() if show else widget.hide()
@@ -87,11 +103,15 @@ class PlayerWidget:
     def update_flag(self, ):
         set_pixmap(self.civ, self.flag)
 
+    def update_country_flag(self, country_code: str):
+        set_country_flag(country_code, self.country)
+
     def update_player(self, player_data: Dict[str, Any]):
         # Flag
         self.civ = player_data['civ']
         self.update_flag()
 
+        self.update_country_flag(player_data['country']) 
         # Indicate team with background color
         self.team = zeroed(player_data['team'])
         self.update_name_color()
@@ -119,6 +139,7 @@ class PlayerWidget:
             'civ': self.civ,
             'name': self.name.text(),
             'team': self.team,
+            'country': self.country.text(),
             'rating': self.rating.text(),
             'rank': self.rank.text(),
             'wins': self.wins.text(),
@@ -173,8 +194,8 @@ class AoEOverlay(OverlayWidget):
             "font-weight: bold; font-style: italic; color: #f2ea54")
         self.map.setAlignment(QtCore.Qt.AlignCenter)
         self.playerlayout.addWidget(self.map, 0, 0, 1, 2)
-
         # Header
+        country = QtWidgets.QLabel("Country")
         rating = QtWidgets.QLabel("Elo")
         rating.setStyleSheet("color: #7ab6ff; font-weight: bold")
         rank = QtWidgets.QLabel("Rank")
@@ -195,7 +216,7 @@ class AoEOverlay(OverlayWidget):
 
         offset = 0
         for column, widget in enumerate(
-            (rating, rank, winrate, wins, losses, self.civ_games,
+            (country, rating, rank, winrate, wins, losses, self.civ_games,
              self.civ_winrate, self.civ_med_wins)):
             if widget == self.civ_games:
                 offset = 1
@@ -237,7 +258,9 @@ class AoEOverlay(OverlayWidget):
         for i, player in enumerate(game_data['players']):
             if i >= len(self.players):
                 break
+
             self.players[i].update_player(player)
+
             if player['civ_games']:
                 show_civ_stats = True
 
