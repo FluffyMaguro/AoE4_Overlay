@@ -1,4 +1,5 @@
 ## in progress
+* Build order updated for season 10 content.
 * New BO civilizations from Season 6 added.
 
 ## [1.4.2] - 2022.10.26
