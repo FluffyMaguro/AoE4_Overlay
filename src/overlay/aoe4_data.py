@@ -39,6 +39,8 @@ civ_data = {
     13: 'Jeanne Darc',
     14: 'Order Of The Dragon',
     15: 'Zhu Xis Legacy',
+    16: 'House of Lancaster',
+    17: 'Knights Templar',
 }
 
 map_data = {
