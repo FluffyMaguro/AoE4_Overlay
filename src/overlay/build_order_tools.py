@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QPixmap
@@ -263,6 +264,36 @@ class QLabelSettings:
             self.text_alignment = None
 
 
+def search_image_extension(init_image_path: str) -> Optional[str]:
+    """Search the correct extension for a given image.
+
+    Parameters
+    ----------
+    init_image_path    Initial path for the image (with or without extension).
+
+    Returns
+    -------
+    Updated image path, None if not found.
+    """
+    if os.path.isfile(init_image_path):  # Return the original image if it exists.
+        return init_image_path
+    else:
+        # Split into base and (possibly empty) original extension
+        base, orig_ext = os.path.splitext(init_image_path)
+
+        extensions = ['.png', '.jpg', '.webp']  # List of extensions to try
+        if orig_ext in extensions:  # Do not re-test the initial extension
+            extensions.remove(orig_ext)
+
+        # Loop until we find the correct extension
+        for ext in extensions:
+            candidate = base + ext
+            if os.path.isfile(candidate):
+                return candidate
+
+    return None  # Image not found
+
+
 class MultiQLabelDisplay:
     """Display of several QLabel items"""
 
@@ -478,14 +509,12 @@ class MultiQLabelDisplay:
 
                     if self.game_pictures_folder is not None:  # try first with the game folder
                         game_image_path = os.path.join(self.game_pictures_folder, split_line[split_id])
-                        if os.path.isfile(game_image_path):
-                            image_path = game_image_path
+                        image_path = search_image_extension(game_image_path)
 
                     # try then with the common folder
                     if (self.common_pictures_folder is not None) and (image_path is None):
                         common_image_path = os.path.join(self.common_pictures_folder, split_line[split_id])
-                        if os.path.isfile(common_image_path):
-                            image_path = common_image_path
+                        image_path = search_image_extension(common_image_path)
 
                     if image_path is not None:  # image found
 
