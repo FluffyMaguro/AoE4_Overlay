@@ -1,4 +1,5 @@
 ## in progress
+* Build order images updated to .webp to match the ones from aoe4guides.com.
 * Build order updated for season 10 content.
 * New BO civilizations from Season 6 added.
 
