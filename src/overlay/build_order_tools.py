@@ -15,16 +15,20 @@ civilization_flags = {
     'Delhi Sultanate': 'civilization_flag/CivIcon-DelhiAoE4_spacing.png',
     'English': 'civilization_flag/CivIcon-EnglishAoE4_spacing.png',
     'French': 'civilization_flag/CivIcon-FrenchAoE4_spacing.png',
+    'Golden Horde': 'civilization_flag/CivIcon-GoldenHordeAoE4_spacing.png',
     'Holy Roman Empire': 'civilization_flag/CivIcon-HREAoE4_spacing.png',
     'House of Lancaster': 'civilization_flag/CivIcon-HouseofLancasterAoE4_spacing.png',
     'Japanese': 'civilization_flag/CivIcon-JapaneseAoE4_spacing.png',
     'Jeanne d\'Arc': 'civilization_flag/CivIcon-JeanneDArcAoE4_spacing.png',
     'Knights Templar': 'civilization_flag/CivIcon-KnightsTemplarAoE4_spacing.png',
+    'Macedonian Dynasty': 'civilization_flag/CivIcon-MacedonianDynastyAoE4_spacing.png',
     'Malians': 'civilization_flag/CivIcon-MaliansAoE4_spacing.png',
     'Mongols': 'civilization_flag/CivIcon-MongolsAoE4_spacing.png',
     'Order of the Dragon': 'civilization_flag/CivIcon-OrderOfTheDragonAoE4_spacing.png',
     'Ottomans': 'civilization_flag/CivIcon-OttomansAoE4_spacing.png',
     'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.png',
+    'Sengoku Daimyo': 'civilization_flag/CivIcon-SengokuDaimyoAoE4_spacing.png',
+    'Tughlaq Dynasty': 'civilization_flag/CivIcon-TughlaqDynastyAoE4_spacing.png',
     'Zhu Xi\'s Legacy': 'civilization_flag/CivIcon-ZhuXiLegacyAoE4_spacing.png'
 }
 
