@@ -41,6 +41,10 @@ civ_data = {
     15: 'Zhu Xis Legacy',
     16: 'House of Lancaster',
     17: 'Knights Templar',
+    18: 'Golden Horde',
+    19: 'Macedonian Dynasty',
+    20: 'Sengoku Daimyo',
+    21: 'Tughlaq Dynasty',
 }
 
 map_data = {

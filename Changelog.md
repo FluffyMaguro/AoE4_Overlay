@@ -2,6 +2,7 @@
 * Build order images updated to .webp to match the ones from aoe4guides.com.
 * Build order updated for season 10 content.
 * New BO civilizations from Season 6 added.
+* New BO civilizations from Season 12 added.
 
 ## [1.4.2] - 2022.10.26
 * Build orders can be unchecked, so that they do not appear when cycling between the build orders with the dedicated hotkey.
