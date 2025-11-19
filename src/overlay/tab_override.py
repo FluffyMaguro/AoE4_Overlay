@@ -1,6 +1,7 @@
 from typing import Any, Callable, Dict
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from overlay.aoe4_data import civ_data
 from overlay.helper_func import file_path, zeroed
@@ -135,7 +136,7 @@ class InnerOverlay(AoEOverlay):
         self.map.setStyleSheet(
             "font-weight: bold; font-style: italic; color: #f2ea54; border: 1px solid #444"
         )
-        self.map.setAlignment(QtCore.Qt.AlignCenter)
+        self.map.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.playerlayout.addWidget(self.map, 0, 0, 1, 2)
 
     def setup_as_overlay(self):
@@ -173,7 +174,7 @@ class OverrideTab(QtWidgets.QWidget):
         self.live_data = {}
         self.changed_data = {}
         layout = QtWidgets.QVBoxLayout()
-        layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         layout.setSpacing(15)
         self.setLayout(layout)
 

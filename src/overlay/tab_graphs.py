@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
 from overlay.api_checking import get_rating_history
 from overlay.graph_widget import GraphWidget
@@ -30,14 +30,14 @@ class GraphTab(QtWidgets.QWidget):
         """ Gets new data and updates graphs"""
         scheldule(self.plot_data, self.get_all_rating_history)
 
-    def change_plot_visibility(self, index: int, action: QtWidgets.QAction):
+    def change_plot_visibility(self, index: int, action: QtGui.QAction):
         """ Updates plot visibility for given `index`"""
         # Save plot visibility (needed to correctly update after new data is obtained)
         self.plot_visibility[index + 1] = action.isChecked()
         self.graph.set_plot_visibility(index + 1, action.isChecked())
         self.graph.update()
 
-    def limit_to_day(self, action: QtWidgets.QAction):
+    def limit_to_day(self, action: QtGui.QAction):
         """ Limits the graph x-axis to 1 day if `action` is checked"""
         self.graph.max_x_diff = 24 * 60 * 60 if action.isChecked() else -1
         self.graph.update()

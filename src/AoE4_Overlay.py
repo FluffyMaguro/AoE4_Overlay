@@ -6,7 +6,7 @@ from functools import partial
 from types import TracebackType
 from typing import Type
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from overlay.email_log import send_email_log
 from overlay.helper_func import file_path, is_compiled, pyqt_wait
@@ -70,7 +70,8 @@ class MainApp(QtWidgets.QMainWindow):
         self.setWindowTitle(f"AoE IV: Overlay ({VERSION})")
         self.setWindowIcon(QtGui.QIcon(file_path('img/aoe4_sword_shield.ico')))
         self.setGeometry(0, 0, settings.app_width, settings.app_height)
-        self.move(QtWidgets.QDesktopWidget().availableGeometry().center() -
+        screen = QtWidgets.QApplication.primaryScreen().availableGeometry()
+        self.move(screen.center() -
                   QtCore.QPoint(int(self.width() / 2), int(self.height() / 2)))
 
         # Create central widget
@@ -85,29 +86,29 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Html
         icon = self.style().standardIcon(
-            getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
-        htmlAction = QtWidgets.QAction(icon, 'Html files', self)
+            QtWidgets.QStyle.StandardPixmap.SP_DirLinkIcon)
+        htmlAction = QtGui.QAction(icon, 'Html files', self)
         htmlAction.triggered.connect(
             lambda: subprocess.run(['explorer', file_path("html")]))
         file_menu.addAction(htmlAction)
 
         # Config
         icon = self.style().standardIcon(
-            getattr(QtWidgets.QStyle, 'SP_DirLinkIcon'))
-        htmlAction = QtWidgets.QAction(icon, 'Config/logs', self)
+            QtWidgets.QStyle.StandardPixmap.SP_DirLinkIcon)
+        htmlAction = QtGui.QAction(icon, 'Config/logs', self)
         htmlAction.triggered.connect(
             lambda: subprocess.run(['explorer', CONFIG_FOLDER]))
         file_menu.addAction(htmlAction)
 
         # Exit
         icon = self.style().standardIcon(
-            getattr(QtWidgets.QStyle, 'SP_DialogCloseButton'))
-        exitAction = QtWidgets.QAction(icon, 'Exit', self)
-        exitAction.triggered.connect(QtWidgets.qApp.quit)
+            QtWidgets.QStyle.StandardPixmap.SP_DialogCloseButton)
+        exitAction = QtGui.QAction(icon, 'Exit', self)
+        exitAction.triggered.connect(QtWidgets.QApplication.quit)
         file_menu.addAction(exitAction)
 
         # Report crashes
-        # email_action = QtWidgets.QAction('Report crashes', self)
+        # email_action = QtGui.QAction('Report crashes', self)
         # email_action.setCheckable(True)
         # email_action.setChecked(settings.send_email_logs)
         # email_action.triggered.connect(lambda: setattr(
@@ -115,7 +116,7 @@ class MainApp(QtWidgets.QMainWindow):
         # settings_menu.addAction(email_action)
 
         # Log matches
-        mach_log_action = QtWidgets.QAction('Log match data', self)
+        mach_log_action = QtGui.QAction('Log match data', self)
         mach_log_action.setCheckable(True)
         mach_log_action.setChecked(settings.log_matches)
         mach_log_action.triggered.connect(
@@ -124,7 +125,7 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Github
         icon = QtGui.QIcon(file_path("img/github.png"))
-        githubAction = QtWidgets.QAction(icon, 'App on Github', self)
+        githubAction = QtGui.QAction(icon, 'App on Github', self)
         githubAction.triggered.connect(
             partial(webbrowser.open,
                     "https://github.com/FluffyMaguro/AoE4_Overlay"))
@@ -132,21 +133,21 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Discord
         icon = QtGui.QIcon(file_path("img/discord.png"))
-        mdiscordAction = QtWidgets.QAction(icon, 'My discord', self)
+        mdiscordAction = QtGui.QAction(icon, 'My discord', self)
         mdiscordAction.triggered.connect(
             partial(webbrowser.open, "https://discord.gg/FtGdhqD"))
         link_menu.addAction(mdiscordAction)
 
         # Maguro
         icon = QtGui.QIcon(file_path("img/maguro.jpg"))
-        maguroAction = QtWidgets.QAction(icon, 'Maguro.one', self)
+        maguroAction = QtGui.QAction(icon, 'Maguro.one', self)
         maguroAction.triggered.connect(
             partial(webbrowser.open, "https://www.maguro.one/"))
         link_menu.addAction(maguroAction)
 
         # Paypal
         icon = QtGui.QIcon(file_path("img/paypal.png"))
-        paypalAction = QtWidgets.QAction(icon, 'Donate', self)
+        paypalAction = QtGui.QAction(icon, 'Donate', self)
         paypalAction.triggered.connect(
             partial(webbrowser.open,
                     "https://www.paypal.com/paypalme/FluffyMaguro"))
@@ -154,14 +155,14 @@ class MainApp(QtWidgets.QMainWindow):
 
         # AoEIV.net
         icon = QtGui.QIcon(file_path("img/aoeivnet.png"))
-        aoe4netaction = QtWidgets.QAction(icon, 'AoEIV.net', self)
+        aoe4netaction = QtGui.QAction(icon, 'AoEIV.net', self)
         aoe4netaction.triggered.connect(
             partial(webbrowser.open, "https://aoeiv.net/"))
         link_menu.addAction(aoe4netaction)
 
         # AoE4 World
         icon = QtGui.QIcon(file_path("img/aoe4worldcom.ico"))
-        aoe4worldaction = QtWidgets.QAction(icon, 'AoE4 World', self)
+        aoe4worldaction = QtGui.QAction(icon, 'AoE4 World', self)
         aoe4worldaction.triggered.connect(
             partial(webbrowser.open, "https://aoe4world.com/"))
         link_menu.addAction(aoe4worldaction)
@@ -169,7 +170,7 @@ class MainApp(QtWidgets.QMainWindow):
         # Which graphs to show
         # self.show_graph_actions = []
         # for i in (1, 2, 3, 4):
-        #     action = QtWidgets.QAction(f'Show {i}v{i}', self)
+        #     action = QtGui.QAction(f'Show {i}v{i}', self)
         #     self.show_graph_actions.append(action)
         #     action.setCheckable(True)
         #     action.setChecked(True)
@@ -179,7 +180,7 @@ class MainApp(QtWidgets.QMainWindow):
         #     action.setChecked(settings.show_graph[str(i)])
         #     graphs_menu.addAction(action)
 
-        # lastday = QtWidgets.QAction("Last 24h", self)
+        # lastday = QtGui.QAction("Last 24h", self)
         # lastday.setCheckable(True)
         # lastday.changed.connect(
         #     partial(self.centralWidget().graph_tab.limit_to_day, lastday))
@@ -211,6 +212,6 @@ if __name__ == '__main__':
     settings.load()
     app = QtWidgets.QApplication(sys.argv)
     Main = MainApp()
-    exit_event = app.exec_()
+    exit_event = app.exec()
     Main.finish()
     sys.exit(exit_event)

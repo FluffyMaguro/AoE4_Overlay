@@ -6,7 +6,7 @@ from functools import partial
 from typing import Any, Dict, List, Optional
 
 import keyboard
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 import overlay.helper_func as hf
 from overlay.api_checking import Api_checker, get_full_match_history

@@ -7,7 +7,7 @@ import traceback
 from typing import Any, Dict, Optional, Union
 
 import requests
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 from overlay.aoe4_data import QM_ids
 from overlay.logging_func import get_logger
@@ -26,7 +26,7 @@ def pyqt_wait(miliseconds: int):
     """ Pause executing for `time` in miliseconds"""
     loop = QtCore.QEventLoop()
     QtCore.QTimer.singleShot(miliseconds, loop.quit)
-    loop.exec_()
+    loop.exec()
 
 
 def is_compiled() -> bool:

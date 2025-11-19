@@ -3,7 +3,8 @@ import math
 import time
 from typing import Iterable, List, Optional, Tuple, Union
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from overlay.logging_func import get_logger
 
@@ -220,7 +221,7 @@ class GraphWidget(QtWidgets.QWidget):
                   italic: bool = False,
                   underline: bool = False,
                   color: Union[QtGui.QColor,
-                               QtCore.Qt.GlobalColor] = QtCore.Qt.black):
+                               Qt.GlobalColor] = Qt.GlobalColor.black):
         pen = qp.pen()
         pen.setColor(color)
         qp.setPen(pen)
@@ -252,9 +253,9 @@ class GraphWidget(QtWidgets.QWidget):
                    qp: QtGui.QPainter,
                    points: List[Tuple[int, int]],
                    linewidth: int = 2,
-                   linestyle: QtCore.Qt.PenStyle = QtCore.Qt.SolidLine,
+                   linestyle: Qt.PenStyle = Qt.PenStyle.SolidLine,
                    color: Union[QtGui.QColor,
-                                QtCore.Qt.GlobalColor] = QtCore.Qt.black):
+                                Qt.GlobalColor] = Qt.GlobalColor.black):
         qp.setPen(QtGui.QPen(color, linewidth, linestyle))
         for idx, point in enumerate(points):
             # Skip the first one
@@ -302,7 +303,7 @@ class GraphWidget(QtWidgets.QWidget):
             xn2 = (xn, int(xn1[1] + self.height() / 100))
             self._draw_line(qp, [xn1, xn2], linewidth=1)
             rect = QtCore.QRect(xn - 100, box.y + box.height, 200, 30)
-            qp.drawText(rect, QtCore.Qt.AlignCenter,
+            qp.drawText(rect, Qt.AlignmentFlag.AlignCenter,
                         self._format_ticks(x, timestamp=self.x_is_timestamp))
 
             # Grid
@@ -319,7 +320,7 @@ class GraphWidget(QtWidgets.QWidget):
             yn2 = (int(box.x - self.height() / 100), yn)
             self._draw_line(qp, [yn1, yn2], linewidth=1)
             rect = QtCore.QRect(box.x - 110, yn - 16, 100, 30)
-            qp.drawText(rect, QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter,
+            qp.drawText(rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
                         self._format_ticks(y))
 
             # Grid
@@ -346,14 +347,14 @@ class GraphWidget(QtWidgets.QWidget):
 
                 # For limited range draw points as well
                 if self.max_x_diff > 0:
-                    qp.setPen(QtGui.QPen(QtCore.Qt.black, 3))
+                    qp.setPen(QtGui.QPen(Qt.GlobalColor.black, 3))
                     [qp.drawEllipse(x - 2, y - 2, 4, 4) for x, y in points]
 
             elif data["type"] == "text":
                 point = trans(data['x'][0], data['y'][0])
                 rect = QtCore.QRect(*point, 200, 20)
                 qp.setPen(QtGui.QColor(data['color']))
-                qp.drawText(rect, QtCore.Qt.AlignCenter, data['text'])
+                qp.drawText(rect, Qt.AlignmentFlag.AlignCenter, data['text'])
 
         # Legend
         labels = [
@@ -379,7 +380,7 @@ class GraphWidget(QtWidgets.QWidget):
                       (textbox.x() + -5, textbox.y() + 10)]
             self._draw_line(qp, points, color=used_colors[i], linewidth=4)
             self._set_font(qp, 10)
-            qp.drawText(textbox, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
+            qp.drawText(textbox, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop,
                         item["label"])
             textbox.setTop(textbox.top() + 25)
             i += 1
@@ -391,18 +392,18 @@ class GraphWidget(QtWidgets.QWidget):
         qp.setPen(QtGui.QColor("black"))
         rect = QtCore.QRect(box.x + box.width // 2 - 100,
                             self.height() - 25, 200, 25)
-        qp.drawText(rect, QtCore.Qt.AlignCenter, self.x_label)
+        qp.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.x_label)
 
         # Y-label
         qp.rotate(-90)
         rect = QtCore.QRect(-box.y - box.height // 2 - 100, 5, 200, 25)
-        qp.drawText(rect, QtCore.Qt.AlignCenter, self.y_label)
+        qp.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.y_label)
         qp.rotate(90)
 
         # Title
         self._set_font(qp, 14)
         rect = QtCore.QRect(box.x + box.width // 2 - 500, -2, 1000, 30)
-        qp.drawText(rect, QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter,
+        qp.drawText(rect, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter,
                     self.title)
 
         qp.end()

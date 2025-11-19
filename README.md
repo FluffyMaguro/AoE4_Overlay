@@ -19,6 +19,7 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 
 * I'm no longer working on this app. For build-order related issues tag [@CraftySalamander](https://github.com/CraftySalamander).
 * Anti-virus complaining about the app is normal for packaged Python apps. If you don't believe the packaged app is secure, download the source code and run it with Python.
+* Conversion to PyQT6 done by @ChrisTitusTech
 
 # How to use
 **Windows**

@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from overlay.custom_widgets import OverlayWidget, VerticalLabel
 from overlay.helper_func import file_path, zeroed
@@ -27,7 +28,7 @@ def set_country_flag(country_code: str, widget: QtWidgets.QLabel):
         return
     path = file_path(f"img/countries/{country_code}.png")  # PNG format
     pixmap = QtGui.QPixmap(path)
-    pixmap = pixmap.scaled(widget.width(), widget.height(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    pixmap = pixmap.scaled(widget.width(), widget.height(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
     PIXMAP_CACHE[country_code] = pixmap
     widget.setPixmap(pixmap)
 
@@ -48,7 +49,7 @@ class PlayerWidget:
         self.wins.setStyleSheet("color: #48bd21")
         self.losses.setStyleSheet("color: red")
         for widget in (self.civ_games, self.civ_winrate, self.civ_median_wins):
-            widget.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            widget.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
             widget.setStyleSheet(f"color: {settings.civ_stats_color}")
 
         offset = 0
@@ -164,7 +165,7 @@ class AoEOverlay(OverlayWidget):
     def setup_as_overlay(self):
         if settings.overlay_geometry is None:
             self.setGeometry(0, 0, 700, 400)
-            sg = QtWidgets.QDesktopWidget().screenGeometry(0)
+            sg = QtWidgets.QApplication.primaryScreen().availableGeometry()
             self.move(sg.width() - self.width() + 15, sg.top() - 20)
         else:
             self.setGeometry(*settings.overlay_geometry)
@@ -174,7 +175,7 @@ class AoEOverlay(OverlayWidget):
     def initUI(self):
         # Layouts & inner frame
         layout = QtWidgets.QVBoxLayout()
-        layout.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        layout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
         self.setLayout(layout)
 
         self.inner_frame = QtWidgets.QFrame()
@@ -183,8 +184,8 @@ class AoEOverlay(OverlayWidget):
         self.playerlayout = QtWidgets.QGridLayout()
         self.playerlayout.setContentsMargins(10, 20, 20, 10)
         self.playerlayout.setHorizontalSpacing(10)
-        self.playerlayout.setAlignment(QtCore.Qt.AlignRight
-                                       | QtCore.Qt.AlignTop)
+        self.playerlayout.setAlignment(Qt.AlignmentFlag.AlignRight
+                                       | Qt.AlignmentFlag.AlignTop)
         self.inner_frame.setLayout(self.playerlayout)
         self.update_style(settings.font_size)
 
@@ -192,7 +193,7 @@ class AoEOverlay(OverlayWidget):
         self.map = QtWidgets.QLabel()
         self.map.setStyleSheet(
             "font-weight: bold; font-style: italic; color: #f2ea54")
-        self.map.setAlignment(QtCore.Qt.AlignCenter)
+        self.map.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.playerlayout.addWidget(self.map, 0, 0, 1, 2)
         # Header
         country = QtWidgets.QLabel("Country")
@@ -211,7 +212,7 @@ class AoEOverlay(OverlayWidget):
         self.civ_med_wins = QtWidgets.QLabel("Wintime")
 
         for widget in (self.civ_games, self.civ_winrate, self.civ_med_wins):
-            widget.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            widget.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
             widget.setStyleSheet(f"color: {settings.civ_stats_color}")
 
         offset = 0

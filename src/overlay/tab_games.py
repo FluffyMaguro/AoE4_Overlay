@@ -2,7 +2,8 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict, List
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import Qt
 
 from overlay.logging_func import catch_exceptions, get_logger
 from overlay.settings import settings
@@ -86,9 +87,9 @@ class MatchEntry:
 
         for item in self.widgets:
             if item != link:
-                item.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+                item.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             if item not in team_widgets:
-                item.setAlignment(QtCore.Qt.AlignCenter)
+                item.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Line
         self.line = Line()
@@ -119,13 +120,13 @@ class MatchHistoryTab(QtWidgets.QWidget):
         scroll_content = QtWidgets.QWidget()
         self.scroll_layout = QtWidgets.QGridLayout(self)
         self.scroll_layout.setContentsMargins(10, 10, 10, 10)
-        self.scroll_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         scroll_content.setLayout(self.scroll_layout)
 
         # Scroll area
         scroll = QtWidgets.QScrollArea()
-        scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setWidget(scroll_content)
 
@@ -148,7 +149,7 @@ class MatchHistoryTab(QtWidgets.QWidget):
         self.header_widgets = set()
         for i in range(self.scroll_layout.count()):
             self.scroll_layout.itemAt(i).widget().setAlignment(
-                QtCore.Qt.AlignHCenter)
+                Qt.AlignmentFlag.AlignHCenter)
             self.scroll_layout.itemAt(i).widget().setStyleSheet(
                 "font-weight: bold")
             self.header_widgets.add(self.scroll_layout.itemAt(i).widget())

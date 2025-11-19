@@ -2,7 +2,7 @@ import sys
 import traceback
 from typing import Callable, Optional
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 from overlay.logging_func import get_logger
 

@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import Qt
 
 from overlay.aoe4_data import civ_data, map_data, mode_data
 from overlay.api_checking import get_leaderboard_data
@@ -24,16 +25,16 @@ class StatsTab(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 5)
         main_layout.setSpacing(10)
-        main_layout.setAlignment(QtCore.Qt.AlignTop)
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(main_layout)
 
         ### Mode stats
         mode_frame = QtWidgets.QGroupBox("Mode stats")
         main_layout.addWidget(mode_frame)
         layout = QtWidgets.QGridLayout()
-        layout.setAlignment(QtCore.Qt.AlignTop)
-        mode_frame.setSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                                 QtWidgets.QSizePolicy.Minimum)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        mode_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum,
+                                 QtWidgets.QSizePolicy.Policy.Minimum)
         mode_frame.setLayout(layout)
         mode_frame.setMaximumSize(900, 500)
 
@@ -82,7 +83,7 @@ class StatsTab(QtWidgets.QWidget):
 
         ### Filtering
         slayout = QtWidgets.QHBoxLayout()
-        slayout.setAlignment(QtCore.Qt.AlignLeft)
+        slayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         slayout.setSpacing(5)
         main_layout.addLayout(slayout)
 
@@ -135,7 +136,7 @@ class StatsTab(QtWidgets.QWidget):
         civ_group = QtWidgets.QGroupBox("Civilization stats")
         result_layout.addWidget(civ_group)
         civg_layout = QtWidgets.QGridLayout()
-        civg_layout.setAlignment(QtCore.Qt.AlignTop)
+        civg_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         civ_group.setLayout(civg_layout)
 
         # Civ headers
