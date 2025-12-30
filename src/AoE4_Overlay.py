@@ -34,13 +34,6 @@ def excepthook(exc_type: Type[BaseException], exc_value: Exception,
     logger.exception("Unhandled exception!",
                      exc_info=(exc_type, exc_value, exc_tback))
 
-    # If compiled, send email log
-    # try:
-    #     if is_compiled() and settings.send_email_logs:
-    #         send_email_log(VERSION, exc_type, exc_value, exc_tback)
-    # except Exception:
-    #     logger.exception("Failed to send a log through email")
-
     # Try to save settings
     try:
         settings.save()
@@ -79,7 +72,6 @@ class MainApp(QtWidgets.QMainWindow):
         ### Create menu bar items
         menubar = self.menuBar()
         file_menu = menubar.addMenu('File')
-        # graphs_menu = menubar.addMenu('Graphs')
         settings_menu = menubar.addMenu('Settings')
         link_menu = menubar.addMenu('Links')
 
@@ -105,14 +97,6 @@ class MainApp(QtWidgets.QMainWindow):
         exitAction = QtWidgets.QAction(icon, 'Exit', self)
         exitAction.triggered.connect(QtWidgets.qApp.quit)
         file_menu.addAction(exitAction)
-
-        # Report crashes
-        # email_action = QtWidgets.QAction('Report crashes', self)
-        # email_action.setCheckable(True)
-        # email_action.setChecked(settings.send_email_logs)
-        # email_action.triggered.connect(lambda: setattr(
-        #     settings, "send_email_logs", not settings.send_email_logs))
-        # settings_menu.addAction(email_action)
 
         # Log matches
         mach_log_action = QtWidgets.QAction('Log match data', self)
@@ -166,24 +150,6 @@ class MainApp(QtWidgets.QMainWindow):
             partial(webbrowser.open, "https://aoe4world.com/"))
         link_menu.addAction(aoe4worldaction)
 
-        # Which graphs to show
-        # self.show_graph_actions = []
-        # for i in (1, 2, 3, 4):
-        #     action = QtWidgets.QAction(f'Show {i}v{i}', self)
-        #     self.show_graph_actions.append(action)
-        #     action.setCheckable(True)
-        #     action.setChecked(True)
-        #     action.changed.connect(
-        #         partial(self.centralWidget().graph_tab.change_plot_visibility,
-        #                 i - 1, action))
-        #     action.setChecked(settings.show_graph[str(i)])
-        #     graphs_menu.addAction(action)
-
-        # lastday = QtWidgets.QAction("Last 24h", self)
-        # lastday.setCheckable(True)
-        # lastday.changed.connect(
-        #     partial(self.centralWidget().graph_tab.limit_to_day, lastday))
-        # graphs_menu.addAction(lastday)
         self.show()
 
     def closeEvent(self, _):
@@ -198,8 +164,6 @@ class MainApp(QtWidgets.QMainWindow):
             """ Give it some time to stop everything correctly"""
             settings.app_width = self.width()
             settings.app_height = self.height()
-            # for i, action in enumerate(self.show_graph_actions):
-            #     settings.show_graph[str(i + 1)] = action.isChecked()
             settings.save()
             self.centralWidget().stop_checking_api()
             pyqt_wait(1000)

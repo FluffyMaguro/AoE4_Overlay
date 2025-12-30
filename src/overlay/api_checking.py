@@ -56,42 +56,9 @@ def find_player(text: str) -> bool:
     return False
 
 
-# Not used anymore
-def get_rating_history(leaderboard_id: int, amount: int = 1) -> List[Any]:
-    """ Gets player match history"""
-    if settings.steam_id:
-        url = f"https://aoeiv.net/api/player/ratinghistory?game=aoe4&leaderboard_id={leaderboard_id}&steam_id={settings.steam_id}&count={amount}"
-    elif settings.profile_id:
-        url = f"https://aoeiv.net/api/player/ratinghistory?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={settings.profile_id}&count={amount}"
-    else:
-        return []
-
-    resp = session.get(url).text
-    try:
-        return json.loads(resp)
-    except:
-        logger.warning(f"Failed to parse rating history: {resp}")
-        return []
 
 
-# Not used anymore
-def get_leaderboard_data(leaderboard_id: int) -> Dict[str, Any]:
-    """ Gets leaderboard data for the main player"""
-    if settings.steam_id:
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&steam_id={settings.steam_id}&count=1"
-    elif settings.profile_id:
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&profile_id={settings.profile_id}&count=1"
-    elif settings.player_name:
-        url = f"https://aoeiv.net/api/leaderboard?game=aoe4&leaderboard_id={leaderboard_id}&search={settings.player_name}&count=1"
-    else:
-        return {}
 
-    resp = session.get(url).text
-    try:
-        return json.loads(resp)
-    except:
-        logger.warning(f"Failed to parse leaderboard data: {resp}")
-        return {}
 
 
 def get_full_match_history(amount: int) -> Optional[List[Any]]:
