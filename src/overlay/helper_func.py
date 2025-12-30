@@ -148,15 +148,22 @@ def process_game(game_data: Dict[str, Any]) -> Dict[str, Any]:
 
         mode_data = player.get('modes', {}).get(lookup_mode, {})
         mode_str = lookup_mode.split('_')[0].upper()
+
+        rating_val = mode_data.get('rating', 0)
+        if settings.show_mmr_instead_of_rank:
+            # Try to get MMR, fall back to rating if not available (e.g. for QM sometimes)
+            rating_val = mode_data.get('mmr', rating_val)
+
         data = {
             'civ': current_civ.replace("_", " ").title(),
             'name': name,
             'team': zeroed(player['team'] + 1),
             'country': player['country'],
-            'rating': str(mode_data.get('rating', 0)),
+            'rating': str(rating_val),
             'rank': f"{mode_str}#{mode_data.get('rank',0)}",
             'wins': str(mode_data.get('wins_count', 0)),
             'losses': str(mode_data.get('losses_count', 0)),
+
             'winrate': f"{mode_data.get('win_rate', 0)}%",
             'civ_games': civ_games,
             'civ_winrate': civ_winrate,

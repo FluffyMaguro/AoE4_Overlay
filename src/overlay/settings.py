@@ -24,6 +24,7 @@ class _Settings:
         self.overlay_geometry: Optional[List[int]] = None
         self.font_size: int = 12
         self.max_games_history: int = 100
+        self.show_mmr_instead_of_rank: bool = False
         self.civ_stats_color: str = "#BC8AEA"
         self.open_overlay_on_new_game = True
         self.show_graph = {"1": True, "2": True, "3": True, "4": True}
