@@ -3,19 +3,35 @@ This manages compiling the app with Nuitka and packaging it
 
 """
 
+import json
 import os
 import shutil
 from zipfile import ZIP_DEFLATED, ZipFile
 
+# Get version
+try:
+    with open('version.json', 'r') as f:
+        data = json.load(f)
+        VERSION = data['version']
+except Exception:
+    VERSION = "1.0.0"
+    print("Failed to read version.json")
+
 # Run nuitka
-os.system('cmd /c "python -m nuitka'
-          ' --plugin-enable=pyqt5'
-          ' --standalone'
-          ' --windows-disable-console'
-          ' --windows-icon-from-ico=src/img/aoe4_sword_shield.ico'
-          ' --include-data-dir=src/img=img'
-          ' --include-data-dir=src/html=html'
-          ' src/AoE4_Overlay.py')
+os.system(f'cmd /c "python -m nuitka'
+          f' --plugin-enable=pyqt5'
+          f' --standalone'
+          f' --windows-disable-console'
+          f' --windows-icon-from-ico=src/img/aoe4_sword_shield.ico'
+          f' --company-name="FluffyMaguro"'
+          f' --product-name="AoE4 Overlay"'
+          f' --file-version={VERSION}'
+          f' --product-version={VERSION}'
+          f' --file-description="Overlay for Age of Empires IV"'
+          f' --copyright="Copyright © 2023 FluffyMaguro"'
+          f' --include-data-dir=src/img=img'
+          f' --include-data-dir=src/html=html'
+          f' src/AoE4_Overlay.py"')
 
 # Zip
 file_name = f"AoE4_Overlay.zip"
