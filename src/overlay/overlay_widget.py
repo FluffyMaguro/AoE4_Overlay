@@ -14,6 +14,10 @@ def set_pixmap(civ: str, widget: QtWidgets.QWidget):
     if civ in PIXMAP_CACHE:
         widget.setPixmap(PIXMAP_CACHE[civ])
         return
+
+    if len(PIXMAP_CACHE) > 500:
+        PIXMAP_CACHE.clear()
+
     path = file_path(f"img/flags/{civ}.webp")
     pixmap = QtGui.QPixmap(path)
     pixmap = pixmap.scaled(widget.width(), widget.height())
