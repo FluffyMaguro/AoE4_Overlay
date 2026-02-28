@@ -327,6 +327,7 @@ class BoTab(QtWidgets.QWidget):
         # user interface
         self.bo_edit = QtWidgets.QTextEdit()  # text/json edit field
         self.naming_widget = QtWidgets.QLineEdit()  # BO name edition
+        self.select_all_checkbox = QtWidgets.QCheckBox("Select all")
         self.bo_list = QtWidgets.QListWidget()  # list of build orders
         self.font_size_combo = QtWidgets.QComboBox()  # overlay font
         self.image_height_combo = QtWidgets.QComboBox()  # images height
@@ -401,16 +402,20 @@ class BoTab(QtWidgets.QWidget):
         vertical_layout.addWidget(self.naming_widget)
 
         # list of build orders
+        vertical_layout.addWidget(self.select_all_checkbox)
         vertical_layout.addWidget(self.bo_list)
         for name in settings.buildorders:
             item = QtWidgets.QListWidgetItem(name)
             item.setCheckState(QtCore.Qt.Unchecked if (name in settings.unchecked_buildorders) else QtCore.Qt.Checked)
             self.bo_list.addItem(item)
         self.bo_list.currentItemChanged.connect(self.bo_selected)
+        self.bo_list.itemChanged.connect(self.on_bo_item_changed)
+        self.select_all_checkbox.stateChanged.connect(self.on_select_all_changed)
 
         self.bo_list.setCurrentRow(0)  # set first selected item
         if self.bo_list.currentItem().checkState() == QtCore.Qt.Unchecked:
             self.cycle_overlay()
+        self.update_select_all_checkbox()
 
         # add build order
         add_bo_button = QtWidgets.QPushButton("Add build order")
@@ -582,6 +587,7 @@ class BoTab(QtWidgets.QWidget):
         self.bo_list.setCurrentRow(self.bo_list.count() - 1)
         self.save_current_bo()
         self.update_order()
+        self.update_select_all_checkbox()
 
     def remove_build_order(self):
         """Remove the currently selected build order"""
@@ -590,6 +596,37 @@ class BoTab(QtWidgets.QWidget):
         del settings.buildorders[self.bo_list.currentItem().text()]
         self.bo_list.takeItem(self.bo_list.currentRow())
         self.update_order()
+        self.update_select_all_checkbox()
+
+    def on_select_all_changed(self, state: int):
+        """Set all BO checkboxes when select-all is changed."""
+        if state == QtCore.Qt.PartiallyChecked:
+            return
+
+        target_state = QtCore.Qt.Checked if (state == QtCore.Qt.Checked) else QtCore.Qt.Unchecked
+        with QtCore.QSignalBlocker(self.bo_list):
+            for row_id in range(self.bo_list.count()):
+                self.bo_list.item(row_id).setCheckState(target_state)
+
+    def on_bo_item_changed(self, _item: QtWidgets.QListWidgetItem):
+        """Update select-all state when one BO checkbox changes."""
+        self.update_select_all_checkbox()
+
+    def update_select_all_checkbox(self):
+        """Set select-all checkbox to checked, unchecked, or partially checked."""
+        rows_count = self.bo_list.count()
+        checked_count = 0
+        for row_id in range(rows_count):
+            if self.bo_list.item(row_id).checkState() == QtCore.Qt.Checked:
+                checked_count += 1
+
+        with QtCore.QSignalBlocker(self.select_all_checkbox):
+            if checked_count == 0:
+                self.select_all_checkbox.setCheckState(QtCore.Qt.Unchecked)
+            elif checked_count == rows_count:
+                self.select_all_checkbox.setCheckState(QtCore.Qt.Checked)
+            else:
+                self.select_all_checkbox.setCheckState(QtCore.Qt.PartiallyChecked)
 
     def move_build_order_up(self):
         """Move the currently selected build order up in the list"""
