@@ -4,6 +4,7 @@ import pathlib
 import sys
 import time
 import traceback
+import urllib.request
 from typing import Any, Dict, Optional, Union
 
 import requests
@@ -50,7 +51,7 @@ def version_check(version: str) -> str:
     """ Checks version. Returns either link for the new version or an empty string. """
     try:
         url = "https://raw.githubusercontent.com/FluffyMaguro/AoE4_Overlay/main/version.json"
-        data = json.loads(requests.get(url).text)
+        data = json.loads(requests.get(url, proxies=urllib.request.getproxies()).text)
         if version_to_int(version) < version_to_int(data['version']):
             return data['link']
     except Exception:
