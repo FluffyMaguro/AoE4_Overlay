@@ -69,7 +69,7 @@ class _Settings:
         self.image_stone: str = 'resource/resource_stone.webp'  # stone resource
         self.image_population: str = 'building_economy/house.webp'  # population icon
         self.image_villager: str = 'unit_worker/villager.webp'  # villager icon
-        self.image_age_unknown: str = 'age/age_unknown.png'  # unknown age image
+        self.image_age_unknown: str = 'age/age_unknown.webp'  # unknown age image
         self.image_age_1: str = 'age/age_1.webp'  # first age image (Dark Age)
         self.image_age_2: str = 'age/age_2.webp'  # second age image (Feudal Age)
         self.image_age_3: str = 'age/age_3.webp'  # third age image (Castle Age)

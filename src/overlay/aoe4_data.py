@@ -45,6 +45,7 @@ civ_data = {
     19: 'Macedonian Dynasty',
     20: 'Sengoku Daimyo',
     21: 'Tughlaq Dynasty',
+    22: 'Jin Dynasty',
 }
 
 map_data = {
