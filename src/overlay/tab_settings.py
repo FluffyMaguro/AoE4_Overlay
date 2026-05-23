@@ -109,6 +109,13 @@ class SettingsTab(QtWidgets.QWidget):
             self.font_size_changed)
         overlay_layout.addWidget(self.font_size_combo, 1, 1)
 
+        # Show MMR instead of rank
+        self.show_mmr_checkbox = QtWidgets.QCheckBox("Show MMR instead of Rank Points")
+        self.show_mmr_checkbox.setToolTip("If checked, shows internal MMR (ELO) instead of visible Ranked Points for ranked games.")
+        self.show_mmr_checkbox.setChecked(settings.show_mmr_instead_of_rank)
+        self.show_mmr_checkbox.stateChanged.connect(self.show_mmr_changed)
+        overlay_layout.addWidget(self.show_mmr_checkbox, 2, 0, 1, 2)
+
         # Position change button
         self.btn_change_position = QtWidgets.QPushButton(
             "Change/fix overlay position")
@@ -117,7 +124,7 @@ class SettingsTab(QtWidgets.QWidget):
         )
         self.btn_change_position.clicked.connect(
             self.overlay_widget.change_state)
-        overlay_layout.addWidget(self.btn_change_position, 2, 0, 1, 2)
+        overlay_layout.addWidget(self.btn_change_position, 3, 0, 1, 2)
 
         ### Messages
         self.msg = QtWidgets.QLabel()
@@ -228,6 +235,9 @@ class SettingsTab(QtWidgets.QWidget):
         font_size = self.font_size_combo.currentIndex() + 1
         settings.font_size = font_size
         self.overlay_widget.update_style(font_size)
+
+    def show_mmr_changed(self, state):
+        settings.show_mmr_instead_of_rank = bool(state)
 
     def hotkey_changed(self, new_hotkey: str):
         """ Checks whether the hotkey is actually new and valid.
