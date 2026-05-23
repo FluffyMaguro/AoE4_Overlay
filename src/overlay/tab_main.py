@@ -9,7 +9,8 @@ import keyboard
 from PyQt5 import QtWidgets
 
 import overlay.helper_func as hf
-from overlay.api_checking import Api_checker, get_full_match_history
+from overlay.api_checking import (Api_checker, close_session,
+                                  get_full_match_history)
 from overlay.logging_func import get_logger, log_match
 from overlay.settings import settings
 from overlay.tab_build_orders import BoTab
@@ -134,6 +135,7 @@ class TabWidget(QtWidgets.QTabWidget):
         """ The app is closing, we need to start shuttings things down"""
         self.force_stop = True
         self.api_checker.force_stop = True
+        close_session()
 
     def check_for_new_version(self):
         """ Checks for a new version, creates a button if there is one """
@@ -166,18 +168,18 @@ class TabWidget(QtWidgets.QTabWidget):
 
     def wait_for_wake(self):
         """ Function that checks for a interruption"""
-        interval = 10  # Seconds
-        while True:
+        interval = 5  # Check every 5 seconds
+        while not self.force_stop:
             start = time.time()
-            # Wait 5s
-            for _ in range(interval * 2):
-                time.sleep(0.5)
-                if self.force_stop:
-                    return None
+            time.sleep(interval)
+            
+            if self.force_stop:
+                return None
+                
             # Check the difference
             diff = time.time() - start
-            if diff > interval + 5:
-                time.sleep(4)
+            if diff > interval + 5: # If we slept 5+ seconds more than expected
+                time.sleep(4) # Wait for network etc to come back up
                 return diff - interval
 
     def pc_waken_from_sleep(self, diff: Optional[float]):
