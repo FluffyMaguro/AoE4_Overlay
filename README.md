@@ -20,6 +20,13 @@ API calls are done through [AoE4World.com](https://aoe4world.com/). For build or
 * I'm no longer working on this app. For build-order related issues tag [@CraftySalamander](https://github.com/CraftySalamander).
 * Anti-virus complaining about the app is normal for packaged Python apps. If you don't believe the packaged app is secure, download the source code and run it with Python.
 
+### Antivirus False Positives (Trojan:Win32/Wacatac.H!ml etc.)
+If Windows Defender or another antivirus flags `AoE4_Overlay.exe` as a virus, it is a **false positive**. This happens because the application is compiled with Nuitka/PyInstaller and is not digitally signed (certificates are expensive).
+
+**To fix this:**
+1.  **Whitelist the folder:** Add an exclusion for the AoE4_Overlay folder in Windows Security -> Virus & threat protection -> Manage settings -> Exclusions.
+2.  **Run from source:** If you are uncomfortable whitelisting the exe, follow the "Linux" instructions above to run the Python source code directly on Windows (install Python 3.8+, pip install requirements, run `python src/AoE4_Overlay.py`).
+
 # How to use
 **Windows**
 * Download and extract the archive.
