@@ -1,5 +1,6 @@
 import json
 import time
+import urllib.request
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -9,7 +10,19 @@ from overlay.logging_func import get_logger
 from overlay.settings import settings
 
 logger = get_logger(__name__)
-session = requests.session()
+
+
+def _create_session() -> requests.Session:
+    """Creates a requests session using system proxy settings (e.g. Clash/Flclash)."""
+    s = requests.Session()
+    proxies = urllib.request.getproxies()
+    if proxies:
+        s.proxies.update(proxies)
+        logger.info(f"Using system proxies: {proxies}")
+    return s
+
+
+session = _create_session()
 
 
 def find_player(text: str) -> bool:
