@@ -74,7 +74,7 @@ class _Settings:
         self.image_age_2: str = 'age/age_2.webp'  # second age image (Feudal Age)
         self.image_age_3: str = 'age/age_3.webp'  # third age image (Castle Age)
         self.image_age_4: str = 'age/age_4.webp'  # fourth age image (Imperial Age)
-        self.image_time: str = 'time/time.png'  # time for build order
+        self.image_time: str = 'time/time.webp'  # time for build order
 
     def load(self):
         """ Loads configuration from app data"""
