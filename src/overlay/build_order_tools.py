@@ -28,8 +28,10 @@ civilization_flags = {
     'Order of the Dragon': 'civilization_flag/CivIcon-OrderOfTheDragonAoE4_spacing.webp',
     'Ottomans': 'civilization_flag/CivIcon-OttomansAoE4_spacing.webp',
     'Rus': 'civilization_flag/CivIcon-RusAoE4_spacing.webp',
+    'Scots': 'civilization_flag/CivIcon-ScotsAoE4_spacing.webp',
     'Sengoku Daimyo': 'civilization_flag/CivIcon-SengokuDaimyoAoE4_spacing.webp',
     'Tughlaq Dynasty': 'civilization_flag/CivIcon-TughlaqDynastyAoE4_spacing.webp',
+    'Vikings': 'civilization_flag/CivIcon-VikingsAoE4_spacing.webp',
     'Zhu Xi\'s Legacy': 'civilization_flag/CivIcon-ZhuXiLegacyAoE4_spacing.webp'
 }
 
